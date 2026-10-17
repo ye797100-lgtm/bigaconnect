@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="tr" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigaConnect - ÇOMÜ Biga Sosyal Ağı</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome İkonları -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brandYellow: '#FACC15',
+            brandDarkYellow: '#EAB308',
+            brandLightYellow: '#FEF08A'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes beeFly {
+      0% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-4px) rotate(-6deg); }
+      50% { transform: translateY(2px) rotate(4deg); }
+      75% { transform: translateY(-3px) rotate(-3deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes wingFlutter {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.6); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .animate-bee {
+      animation: beeFly 2.5s ease-in-out infinite;
+    }
+    .bee-wing {
+      transform-origin: bottom center;
+      animation: wingFlutter 0.15s ease-in-out infinite;
+    }
+    .coming-soon-card {
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-yellow-50/30 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
+
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row min-h-screen">
+
+    <!-- SOL KENAR MENÜSÜ (SIDEBAR) -->
+    <aside class="w-full lg:w-64 bg-white dark:bg-gray-800 border-r border-yellow-200 dark:border-gray-700 p-4 flex flex-col justify-between sticky top-0 lg:h-screen z-30 shadow-sm">
+      <div>
+        <!-- Logo & Canlı BigaBee Maskotu -->
+        <div class="flex items-center justify-between mb-6 pt-2 px-2">
+          <span class="text-2xl font-black text-gray-900 dark:text-white tracking-tight cursor-pointer" onclick="switchTab('timeline')">
+            Biga<span class="text-yellow-500">Connect</span>
+          </span>
+          
+          <!-- BİGABEE MASKOT -->
+          <div class="relative group cursor-pointer animate-bee" onclick="beeEasterEgg()" title="BigaBee'ye tıkla!">
+            <svg class="w-11 h-11 drop-shadow-md" viewBox="0 0 100 100" fill="none">
+              <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse class="bee-wing" cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
+              <path d="M42 36 C44 48, 44 68, 42 80" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M56 35 C58 48, 58 68, 56 81" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M80 58 L92 58 L80 62 Z" fill="#1F2937"/>
+              <circle cx="26" cy="54" r="16" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+              <circle cx="22" cy="50" r="4" fill="#1F2937"/>
+              <circle cx="20" cy="48" r="1.5" fill="white"/>
+              <circle cx="26" cy="60" r="3" fill="#F87171" opacity="0.6"/>
+              <path d="M18 58 Q22 64 26 58" stroke="#1F2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M22 40 Q16 30 12 32" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="11" cy="32" r="2.5" fill="#1F2937"/>
+            </svg>
+            <span class="absolute left-1/2 -translate-x-1/2 -bottom-6 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+              Vızzz! 🐝
+            </span>
+          </div>
+        </div>
+
+        <!-- Dikey Menü -->
+        <nav class="space-y-1.5">
+          <button onclick="switchTab('timeline')" id="btnTimeline" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span>Akış</span>
+          </button>
+
+          <button onclick="switchTab('explore')" id="btnExplore" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-compass text-lg text-yellow-600"></i>
+            <span>Keşfet & Gündem</span>
+          </button>
+
+          <button onclick="switchTab('dm')" id="btnDm" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-comments text-lg text-yellow-600"></i>
+            <span>Mesajlar</span>
+          </button>
+
+          <button onclick="switchTab('notifications')" id="btnNotifications" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-bell text-lg text-yellow-600"></i>
+            <span>Bildirimler</span>
+          </button>
+
+          <button onclick="switchTab('requests')" id="btnRequests" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-user-plus text-lg text-yellow-600"></i>
+            <span>İstekler</span>
+          </button>
+
+          <button onclick="switchTab('map')" id="btnMap" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i>
+            <span>Kampüs Haritası</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tema Değiştirici ve Giriş / Hesap Oluştur Butonları -->
+      <div class="pt-4 border-t border-yellow-100 dark:border-gray-700 space-y-2">
+        <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-yellow-200 dark:hover:bg-gray-600 transition">
+          <span class="flex items-center gap-2">
+            <i id="themeIcon" class="fa-solid fa-moon text-yellow-600"></i>
+            <span id="themeText">Gece Modu</span>
+          </span>
+          <i class="fa-solid fa-circle-half-stroke text-gray-400"></i>
+        </button>
+
+        <!-- YAN YANA GİRİŞ YAP VE HESAP OLUŞTUR BUTONLARI -->
+        <div id="authButtonsGroup" class="grid grid-cols-2 gap-2">
+          <button onclick="openAuthModal('login')" class="py-2 px-2 bg-gray-100 dark:bg-gray-700 hover:bg-yellow-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-extrabold rounded-xl text-[11px] transition text-center shadow-xs">
+            Giriş Yap
+          </button>
+          <button onclick="openAuthModal('register')" class="py-2 px-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-[11px] transition text-center shadow-xs">
+            Hesap Oluştur
+          </button>
+        </div>
+
+        <!-- ÇIKIŞ YAP BUTONU (Sadece Giriş Yapıldığında Görünür) -->
+        <button id="logoutBtn" onclick="handleLogout()" class="w-full py-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 font-extrabold rounded-xl text-xs transition hidden">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i> Çıkış Yap
+        </button>
+      </div>
+    </aside>
+
+    <!-- ORTA İÇERİK ALANI -->
+    <main class="flex-1 p-4 sm:p-6 border-r border-yellow-200 dark:border-gray-700">
+
+      <!-- ÜST SAĞ PROFİL ALANI -->
+      <div class="flex justify-between items-center mb-6 pb-3 border-b border-yellow-200 dark:border-gray-700">
+        <h2 id="pageTitle" class="text-xl font-black text-gray-900 dark:text-white">Akış</h2>
+        
+        <!-- SAĞ ÜST PROFİL KARTI -->
+        <div onclick="openProfileModal()" class="flex items-center gap-3 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-3 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
+          <div id="userAvatarHeader" class="w-8 h-8 rounded-full bg-yellow-400 font-black text-gray-900 flex items-center justify-center text-xs border border-yellow-500">
+            MÖ
+          </div>
+          <div class="hidden sm:block text-left">
+            <h4 id="userNameHeader" class="font-bold text-xs text-gray-900 dark:text-white leading-tight">Misafir Öğrenci</h4>
+            <span id="userHandleHeader" class="text-[10px] text-gray-400 block">@ogrenci</span>
+          </div>
+          <i class="fa-solid fa-gear text-xs text-yellow-600 ml-1"></i>
+        </div>
+      </div>
+
+      <!-- 1. AKIŞ SEKMESİ -->
+      <div id="tabTimeline" class="tab-content space-y-5">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border-2 border-yellow-200 dark:border-gray-700 relative">
+          
+          <!-- Üye Değilse Üstüne Gelen Kilit Arayüzü -->
+          <div id="postAreaOverlay" class="absolute inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-[2px] z-10 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
+            <div class="text-3xl mb-1">🔒</div>
+            <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Paylaşım yapmak için üye olun</h4>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3">Akışta düşüncelerini paylaşmak ve vızıldamak için giriş yapın.</p>
+            <div class="flex gap-2">
+              <button onclick="openAuthModal('login')" class="px-4 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-xl text-xs hover:bg-yellow-200 transition">Giriş Yap</button>
+              <button onclick="openAuthModal('register')" class="px-4 py-1.5 bg-yellow-400 text-gray-900 font-black rounded-xl text-xs hover:bg-yellow-500 transition shadow-sm">Hesap Oluştur</button>
+            </div>
+          </div>
+
+          <textarea id="postText" rows="3" placeholder="Biga kampüsünde ne oluyor? Düşüncelerini vızıldat..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none text-sm dark:text-white"></textarea>
+          <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+            <div class="flex gap-4 text-gray-400 text-base">
+              <button class="hover:text-yellow-600 transition"><i class="fa-regular fa-image"></i></button>
+              <button class="hover:text-yellow-600 transition"><i class="fa-solid fa-location-dot"></i></button>
+            </div>
+            <button onclick="sharePost()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold px-6 py-2 rounded-xl text-sm transition-transform active:scale-95 shadow">
+              Paylaş 🚀
+            </button>
+          </div>
+        </div>
+
+        <div id="timeline" class="space-y-4">
+          <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6">
+            <div class="text-5xl mb-3">🐝</div>
+            <h3 class="font-bold text-gray-800 dark:text-gray-200 text-base">Henüz bir vızıldı yok!</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. KEŞFET & GÜNDEM SEKMESİ -->
+      <div id="tabExplore" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
+          <h3 class="font-black text-gray-900 dark:text-white text-base mb-3">🔥 Biga Kampüs Gündemi</h3>
+          <p class="text-xs text-gray-400">Canlı paylaşımlar yapıldıkça popüler konular ve etiketler burada görünecek.</p>
+        </div>
+      </div>
+
+      <!-- 3. MESAJLAR SEKMESİ -->
+      <div id="tabDm" class="tab-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col h-[520px]">
+        <div class="p-4 border-b border-yellow-100 dark:border-gray-700 flex items-center justify-between bg-yellow-100/50 dark:bg-gray-700/50">
+          <h4 class="font-bold text-sm text-gray-900 dark:text-white">Mesaj Kutusu</h4>
+        </div>
+
+        <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/50 dark:bg-gray-900/50 flex items-center justify-center">
+          <div class="text-center text-gray-400 text-xs">Henüz başlatılmış bir sohbet yok.</div>
+        </div>
+
+        <div class="p-3 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 flex gap-2">
+          <input type="text" id="dmInput" placeholder="Mesajınızı yazın..." class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm dark:text-white" onkeypress="handleDmKey(event)">
+          <button onclick="sendDm()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-5 py-2.5 rounded-xl text-sm shadow">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. BİLDİRİMLER SEKMESİ -->
+      <div id="tabNotifications" class="tab-content hidden space-y-3">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-10">
+          <div class="text-4xl mb-2">🔔</div>
+          <h3 class="font-bold text-gray-700 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
+          <p class="text-xs text-gray-400 mt-1">Biri seni vızzladığında veya paylaşımını beğendiğinde burada görünecek.</p>
+        </div>
+      </div>
+
+      <!-- 5. ARKADAŞ İSTEKLERİ SEKMESİ -->
+      <div id="tabRequests" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
+          <h3 class="font-black text-gray-900 dark:text-white text-lg mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-user-plus text-yellow-500"></i> Arkadaşlık İstekleri
+          </h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Gelen istekler bu alanda listelenecek.</p>
+          <div class="text-center py-6 text-xs text-gray-400">Bekleyen istek bulunmuyor.</div>
+        </div>
+      </div>
+
+      <!-- 6. KAMPÜS HARİTASI SEKMESİ (PEK YAKINDA) -->
+      <div id="tabMap" class="tab-content hidden space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+            <div>
+              <h3 class="font-black text-gray-900 dark:text-white text-lg flex items-center gap-2">
+                <i class="fa-solid fa-map-location-dot text-yellow-500"></i> ÇOMÜ Biga Ramazan Aydın Yerleşkesi
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">BigaConnect İnteraktif Kampüs & Canlı Konum Haritası</p>
+            </div>
+            <span class="text-xs bg-yellow-400 text-gray-900 font-black px-3 py-1 rounded-full shadow-sm">Biga Kampüs</span>
+          </div>
+
+          <div class="relative w-full h-[440px] bg-gradient-to-br from-yellow-100 via-amber-50 to-yellow-200 dark:from-gray-800 dark:via-gray-900 dark:to-yellow-950/30 rounded-2xl border-2 border-dashed border-yellow-400 dark:border-yellow-600 flex flex-col items-center justify-center p-6 text-center overflow-hidden shadow-inner coming-soon-card">
+            
+            <div class="absolute top-6 left-8 text-4xl opacity-20">🐝</div>
+            <div class="absolute bottom-8 right-10 text-5xl opacity-20">📍</div>
+            <div class="absolute top-10 right-12 text-3xl opacity-20">🏛️</div>
+            <div class="absolute bottom-10 left-10 text-3xl opacity-20">☕</div>
+
+            <div class="w-20 h-20 bg-yellow-400/90 text-gray-900 rounded-3xl flex items-center justify-center text-4xl shadow-xl border-2 border-yellow-500 mb-4 animate-bounce">
+              📍
+            </div>
+
+            <span class="text-xs font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-200 dark:bg-yellow-900/50 px-3 py-1 rounded-full mb-2">
+              BigaConnect Live Map
+            </span>
+
+            <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
+              Pek Yakında! 🐝✨
+            </h3>
+
+            <p class="text-xs text-gray-600 dark:text-gray-300 max-w-md leading-relaxed font-medium mb-4">
+              ÇOMÜ Biga Ramazan Aydın Yerleşkesi’nde arkadaşlarınızın anlık konumlarını haritada görebileceğiniz, Maka Cafe, Kütüphane ve İİBF’deki canlı kalabalık durumunu takip edebileceğiniz <b>Canlı Kampüs Haritası</b> çok yakında burada olacak!
+            </p>
+
+            <div class="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 px-4 py-2 rounded-xl border border-yellow-300 dark:border-gray-700 text-xs font-bold text-gray-800 dark:text-gray-200 shadow-sm">
+              <span>🚀 Çok Yakında Biga Kampüsünde Canlıda!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- SAĞ PANEL -->
+    <aside class="w-full lg:w-80 p-4 sm:p-6 bg-white/50 dark:bg-gray-800/50 sticky top-0 lg:h-screen overflow-y-auto space-y-4">
+      
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-2.5">
+          <h3 class="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">
+            🏆 Haftanın Popüler Arıları
+          </h3>
+          <span class="text-[10px] bg-yellow-400 text-gray-900 font-extrabold px-2 py-0.5 rounded-full shadow-xs">Top 3</span>
+        </div>
+
+        <p class="text-[11px] text-gray-400 leading-tight">Bu hafta kampüste en çok vızıldayan ve etkileşim alan öğrenciler!</p>
+
+        <div class="pt-2 text-center py-6 bg-yellow-50/50 dark:bg-gray-700/30 rounded-xl border border-dashed border-yellow-200 dark:border-gray-600">
+          <span class="text-2xl mb-1 block">🏆</span>
+          <h4 class="font-bold text-xs text-gray-800 dark:text-gray-200">Kürsü henüz boş!</h4>
+          <p class="text-[10px] text-gray-400 mt-0.5">İlk vızıldayan sen ol, haftanın arısı seçil!</p>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-4">
+        
+        <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-3">
+          <h3 class="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-users text-yellow-500"></i> Yeni Öğrenciler
+          </h3>
+          <span class="text-[10px] bg-yellow-100 dark:bg-gray-700 text-yellow-800 dark:text-yellow-400 px-2 py-0.5 rounded-full font-bold">Biga Kampüs</span>
+        </div>
+
+        <p class="text-[11px] text-gray-400">Aramıza yeni katılan öğrencilerle tanış ve vızzla!</p>
+
+        <div class="text-center py-6 bg-gray-50/50 dark:bg-gray-700/30 rounded-xl border border-dashed border-gray-200 dark:border-gray-600">
+          <span class="text-2xl mb-1 block">🐝</span>
+          <h4 class="font-bold text-xs text-gray-800 dark:text-gray-200">Henüz katılım yok</h4>
+          <p class="text-[10px] text-gray-400 mt-0.5">Arkadaşlarını BigaConnect'e davet et!</p>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- GİRİŞ YAP MODALI -->
+  <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <div class="text-center mb-5">
+        <div class="text-4xl mb-1">🐝</div>
+        <h3 class="font-black text-xl text-gray-900 dark:text-white">Giriş Yap</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">BigaConnect hesabınıza erişmek için bilgilerinizi girin.</p>
+      </div>
+      <form onsubmit="handleLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta veya Kullanıcı Adı</label>
+          <input type="text" id="loginUser" required placeholder="E-posta adresi veya kullanıcı adı" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
+          <input type="password" required placeholder="Şifreniz" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <button type="submit" class="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition">Giriş Yap</button>
+      </form>
+      <div class="text-center mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Hesabınız yok mu? <a href="#" onclick="openAuthModal('register')" class="text-yellow-600 font-bold hover:underline">Kaydol</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HESAP OLUŞTUR MODALI -->
+  <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <div class="text-center mb-4">
+        <div class="text-3xl mb-1">🐝</div>
+        <h3 class="font-black text-xl text-gray-900 dark:text-white">Hesap Oluştur</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Biga kampüs topluluğuna katılın!</p>
+      </div>
+      <form onsubmit="handleRegister(event)" class="space-y-2.5">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
+          <input type="text" id="regName" required placeholder="Adınız ve Soyadınız" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2 text-xs text-gray-400">@</span>
+            <input type="text" id="regHandle" required placeholder="kullanici_adi" class="w-full pl-7 pr-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölüm / Sınıf</label>
+          <input type="text" id="regDept" required placeholder="Bölümünüz ve Sınıfınız" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
+          <input type="email" id="regEmail" required placeholder="E-posta adresiniz" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
+          <input type="password" required placeholder="Şifreniz" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs shadow transition mt-2">Kayıt Ol ve Katıl</button>
+      </form>
+      <div class="text-center mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Zaten hesabınız var mı? <a href="#" onclick="openAuthModal('login')" class="text-yellow-600 font-bold hover:underline">Giriş Yap</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFİL ÖZELLEŞTİRME MODALI -->
+  <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
+      <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <h3 class="font-black text-lg text-gray-900 dark:text-white mb-4">Profilini Özelleştir</h3>
+      <form onsubmit="saveProfile(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
+          <input type="text" id="editName" value="Misafir Öğrenci" class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
+          <input type="text" id="editHandle" value="ogrenci" class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölüm / Sınıf</label>
+          <input type="text" id="editDept" value="ÇOMÜ Öğrencisi" class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition">Kaydet</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let isLoggedIn = false;
+
+    function updateLoginState(loggedIn, name = "Misafir Öğrenci", handle = "ogrenci") {
+      isLoggedIn = loggedIn;
+      const overlay = document.getElementById('postAreaOverlay');
+      const authGroup = document.getElementById('authButtonsGroup');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (loggedIn) {
+        if (overlay) overlay.classList.add('hidden');
+        if (authGroup) authGroup.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+
+        document.getElementById('userNameHeader').innerText = name;
+        document.getElementById('userHandleHeader').innerText = '@' + handle.replace('@', '');
+        document.getElementById('userAvatarHeader').innerText = name.substring(0, 2).toUpperCase();
+      } else {
+        if (overlay) overlay.classList.remove('hidden');
+        if (authGroup) authGroup.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+
+        document.getElementById('userNameHeader').innerText = "Misafir Öğrenci";
+        document.getElementById('userHandleHeader').innerText = "@ogrenci";
+        document.getElementById('userAvatarHeader').innerText = "MÖ";
+      }
+    }
+
+    function switchTab(tabName) {
+      const titles = {
+        timeline: 'Akış',
+        explore: 'Keşfet & Gündem',
+        dm: 'Mesajlar',
+        notifications: 'Bildirimler',
+        requests: 'Arkadaşlık İstekleri',
+        map: 'Kampüs Haritası'
+      };
+
+      const titleElement = document.getElementById('pageTitle');
+      if (titleElement) {
+        titleElement.innerText = titles[tabName.toLowerCase()] || 'BigaConnect';
+      }
+
+      const allTabs = document.querySelectorAll('.tab-content');
+      allTabs.forEach(tab => tab.classList.add('hidden'));
+
+      const targetTab = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (targetTab) {
+        targetTab.classList.remove('hidden');
+      }
+
+      const activeBtnId = 'btn' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      const allBtns = document.querySelectorAll('.nav-btn');
+
+      allBtns.forEach(btn => {
+        if (btn.id === activeBtnId) {
+          btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
+        } else {
+          btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
+        }
+      });
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        themeIcon.className = "fa-solid fa-moon text-yellow-600";
+        themeText.innerText = "Gece Modu";
+      } else {
+        html.classList.add('dark');
+        themeIcon.className = "fa-solid fa-sun text-yellow-400";
+        themeText.innerText = "Gündüz Modu";
+      }
+    }
+
+    function openAuthModal(mode) {
+      closeAuthModal();
+      if (mode === 'register') {
+        document.getElementById('registerModal').classList.remove('hidden');
+      } else {
+        document.getElementById('loginModal').classList.remove('hidden');
+      }
+    }
+
+    function closeAuthModal() { 
+      document.getElementById('loginModal').classList.add('hidden'); 
+      document.getElementById('registerModal').classList.add('hidden'); 
+    }
+    function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
+    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('loginUser').value;
+      const cleanUser = user.includes('@') ? user.split('@')[0] : user;
+      
+      updateLoginState(true, cleanUser, cleanUser);
+      alert(`🐝 Hoş geldiniz! Giriş başarılı.`);
+      closeAuthModal();
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value;
+      const handle = document.getElementById('regHandle').value;
+
+      updateLoginState(true, name, handle);
+      alert(`🐝 Tebrikler ${name}! Hesabınız oluşturuldu ve giriş yapıldı.`);
+      closeAuthModal();
+    }
+
+    function handleLogout() {
+      if (confirm("Çıkış yapmak istediğinize emin misiniz?")) {
+        updateLoginState(false);
+        alert("Başarıyla çıkış yapıldı.");
+      }
+    }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('editName').value;
+      const handle = document.getElementById('editHandle').value;
+
+      document.getElementById('userNameHeader').innerText = name;
+      document.getElementById('userHandleHeader').innerText = '@' + handle.replace('@', '');
+      document.getElementById('userAvatarHeader').innerText = name.substring(0, 2).toUpperCase();
+
+      alert("Profil bilgilerin güncellendi!");
+      closeProfileModal();
+    }
+
+    function vizzla(kullanici) {
+      alert(`🐝 Bzzz! ${kullanici} kişisini vızzladın!`);
+    }
+
+    function beeEasterEgg() {
+      alert("🐝 BigaBee vızıldadı: 'BigaConnect lansmanı tüm hızıyla devam ediyor!'");
+    }
+
+    function sharePost() {
+      if (!isLoggedIn) {
+        alert("Paylaşım yapmak için lütfen giriş yapın.");
+        openAuthModal('login');
+        return;
+      }
+
+      const text = document.getElementById('postText').value;
+      if (!text.trim()) return alert("Lütfen bir şeyler yazın!");
+      
+      const emptyState = document.getElementById('emptyState');
+      if (emptyState) emptyState.remove();
+
+      const name = document.getElementById('userNameHeader').innerText;
+      const handle = document.getElementById('userHandleHeader').innerText;
+
+      const timeline = document.getElementById('timeline');
+      const newPost = document.createElement('div');
+      newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group";
+      newPost.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-black text-gray-900 border border-yellow-500">
+              ${name.substring(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-gray-900 dark:text-white">${name}</h4>
+              <span class="text-xs text-gray-400">${handle} · Şimdi</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="deletePost(this)" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition" title="Paylaşımı Sil">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+            <button onclick="vizzla('${name}')" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95">
+              🐝 Vızzla!
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed mb-3">${text}</p>
+      `;
+      timeline.prepend(newPost);
+      document.getElementById('postText').value = '';
+    }
+
+    function deletePost(btnElement) {
+      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
+        const postCard = btnElement.closest('.post-card');
+        if (postCard) {
+          postCard.remove();
+          
+          // Eğer akışta hiç post kalmadıysa emptyState'i geri ekle
+          const timeline = document.getElementById('timeline');
+          if (timeline.children.length === 0) {
+            timeline.innerHTML = `
+              <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6">
+                <div class="text-5xl mb-3">🐝</div>
+                <h3 class="font-bold text-gray-800 dark:text-gray-200 text-base">Henüz bir vızıldı yok!</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+              </div>
+            `;
+          }
+        }
+      }
+    }
+
+    function sendDm() {
+      const input = document.getElementById('dmInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatMessages = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = "flex items-start gap-2 justify-end w-full";
+      msgDiv.innerHTML = `
+        <div class="bg-yellow-400 text-gray-900 font-medium p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%] text-sm">
+          ${text}
+        </div>
+      `;
+      chatMessages.appendChild(msgDiv);
+      input.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleDmKey(e) { if (e.key === 'Enter') sendDm(); }
+  </script>
+</body>
+</html>
