@@ -71,9 +71,29 @@
   <aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-gray-800 z-50 p-5 flex flex-col justify-between shadow-2xl lg:hidden drawer-closed border-r border-yellow-200 dark:border-gray-700">
     <div>
       <div class="flex items-center justify-between mb-6 pb-2 border-b border-gray-100 dark:border-gray-700">
-        <span class="text-xl font-black text-gray-900 dark:text-white tracking-tight">
-          Biga<span class="text-yellow-500">Connect</span>
-        </span>
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-black text-gray-900 dark:text-white tracking-tight">
+            Biga<span class="text-yellow-500">Connect</span>
+          </span>
+          <!-- DRAWER İÇİNDEKİ MİNİ BİGABEE -->
+          <div class="animate-bee">
+            <svg class="w-7 h-7 drop-shadow-sm" viewBox="0 0 100 100" fill="none">
+              <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse class="bee-wing" cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
+              <path d="M42 36 C44 48, 44 68, 42 80" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M56 35 C58 48, 58 68, 56 81" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M80 58 L92 58 L80 62 Z" fill="#1F2937"/>
+              <circle cx="26" cy="54" r="16" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+              <circle cx="22" cy="50" r="4" fill="#1F2937"/>
+              <circle cx="20" cy="48" r="1.5" fill="white"/>
+              <circle cx="26" cy="60" r="3" fill="#F87171" opacity="0.6"/>
+              <path d="M18 58 Q22 64 26 58" stroke="#1F2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M22 40 Q16 30 12 32" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="11" cy="32" r="2.5" fill="#1F2937"/>
+            </svg>
+          </div>
+        </div>
         <button onclick="closeMobileDrawer()" class="text-gray-400 hover:text-gray-600 p-1">
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
@@ -209,14 +229,33 @@
     <!-- ORTA İÇERİK ALANI -->
     <main class="flex-1 p-3 sm:p-6 border-r border-yellow-200 dark:border-gray-700">
 
-      <!-- ÜST SAĞ PROFİL & MOBİL YAN MENÜ BUTONU -->
+      <!-- ÜST SAĞ PROFİL & MOBİL YAN MENÜ BUTONU & MOBİL BİGABEE MASKOTU -->
       <div class="flex justify-between items-center mb-4 sm:mb-6 pb-3 border-b border-yellow-200 dark:border-gray-700">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5">
           <!-- MOBİL TWITTER TARZI MENÜ AÇMA İKONU -->
           <button onclick="openMobileDrawer()" class="lg:hidden p-2 rounded-xl bg-yellow-400 text-gray-900 font-bold active:scale-95 transition shadow-xs">
             <i class="fa-solid fa-bars text-base"></i>
           </button>
           <h2 id="pageTitle" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Akış</h2>
+          
+          <!-- MOBİL ÜST BARA ÖZEL BİGABEE MASKOTU -->
+          <div class="lg:hidden relative animate-bee ml-1">
+            <svg class="w-8 h-8 drop-shadow-md" viewBox="0 0 100 100" fill="none">
+              <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse class="bee-wing" cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
+              <path d="M42 36 C44 48, 44 68, 42 80" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M56 35 C58 48, 58 68, 56 81" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M80 58 L92 58 L80 62 Z" fill="#1F2937"/>
+              <circle cx="26" cy="54" r="16" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+              <circle cx="22" cy="50" r="4" fill="#1F2937"/>
+              <circle cx="20" cy="48" r="1.5" fill="white"/>
+              <circle cx="26" cy="60" r="3" fill="#F87171" opacity="0.6"/>
+              <path d="M18 58 Q22 64 26 58" stroke="#1F2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M22 40 Q16 30 12 32" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="11" cy="32" r="2.5" fill="#1F2937"/>
+            </svg>
+          </div>
         </div>
         
         <div onclick="openProfileModal()" class="flex items-center gap-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
@@ -235,8 +274,11 @@
       <div id="contentTimeline" class="page-content space-y-4 sm:space-y-5">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm border-2 border-yellow-200 dark:border-gray-700 relative">
           
+          <!-- FONTAWESOME VEKTÖREL ŞIK KİLİT İKONU ENTEGRESİ -->
           <div id="postAreaOverlay" class="absolute inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-[2px] z-10 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
-            <div class="text-3xl mb-1">🔒</div>
+            <div class="w-12 h-12 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-xl mb-2 shadow-xs">
+              <i class="fa-solid fa-lock"></i>
+            </div>
             <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Paylaşım yapmak için üye olun</h4>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3">Akışta düşüncelerini paylaşmak ve vızıldamak için giriş yapın.</p>
             <div class="flex gap-2">
@@ -274,7 +316,7 @@
         </div>
       </div>
 
-      <!-- 3. MESAJLAR SEKMESİ (SOHBET SEÇİMİ ZORUNLU REORGANİZE MANTIĞI) -->
+      <!-- 3. MESAJLAR SEKMESİ -->
       <div id="contentDm" class="page-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col sm:flex-row h-[500px]">
         
         <!-- Sol Sohbet Listesi -->
@@ -312,10 +354,13 @@
 
       <!-- 4. BİLDİRİMLER SEKMESİ -->
       <div id="contentNotifications" class="page-content hidden space-y-3">
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-10">
-          <div class="text-4xl mb-2">🔔</div>
-          <h3 class="font-bold text-gray-700 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
-          <p class="text-xs text-gray-400 mt-1">Biri seni vızzladığında veya paylaşımını beğendiğinde burada görünecek.</p>
+        <!-- FONTAWESOME VEKTÖREL ŞIK ZİL İKONU ENTEGRESİ -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-12 flex flex-col items-center justify-center">
+          <div class="w-14 h-14 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl mb-3 shadow-xs">
+            <i class="fa-solid fa-bell"></i>
+          </div>
+          <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
+          <p class="text-xs text-gray-400 mt-1 max-w-xs">Biri seni vızzladığında veya paylaşımını beğendiğinde burada görünecek.</p>
         </div>
       </div>
 
@@ -375,7 +420,7 @@
 
     </main>
 
-    <!-- SAĞ PANEL (Sadece PC'de görünür, mobilde tamamen gizlendi) -->
+    <!-- SAĞ PANEL (Sadece PC'de görünür) -->
     <aside class="hidden lg:block w-80 p-6 bg-white/50 dark:bg-gray-800/50 sticky top-0 h-screen overflow-y-auto space-y-4">
       
       <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
@@ -510,7 +555,6 @@
   <script>
     let isLoggedIn = false;
 
-    // Mobil Drawer Aç / Kapa Fonksiyonları
     function openMobileDrawer() {
       document.getElementById('mobileDrawer').classList.remove('drawer-closed');
       document.getElementById('mobileDrawer').classList.add('drawer-open');
