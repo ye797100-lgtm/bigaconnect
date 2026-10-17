@@ -75,7 +75,6 @@
           <span class="text-xl font-black text-gray-900 dark:text-white tracking-tight">
             Biga<span class="text-yellow-500">Connect</span>
           </span>
-          <!-- DRAWER İÇİNDEKİ MİNİ BİGABEE -->
           <div class="animate-bee">
             <svg class="w-7 h-7 drop-shadow-sm" viewBox="0 0 100 100" fill="none">
               <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
@@ -103,6 +102,10 @@
         <button onclick="switchTab('timeline'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm">
           <i class="fa-solid fa-house text-lg"></i>
           <span>Akış</span>
+        </button>
+        <button onclick="switchTab('profile'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <i class="fa-solid fa-user text-lg text-yellow-600"></i>
+          <span>Profilim</span>
         </button>
         <button onclick="switchTab('explore'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
           <i class="fa-solid fa-compass text-lg text-yellow-600"></i>
@@ -179,6 +182,10 @@
             <i class="fa-solid fa-house text-lg"></i>
             <span>Akış</span>
           </button>
+          <button onclick="switchTab('profile')" id="menuProfile" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <i class="fa-solid fa-user text-lg text-yellow-600"></i>
+            <span>Profilim</span>
+          </button>
           <button onclick="switchTab('explore')" id="menuExplore" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-compass text-lg text-yellow-600"></i>
             <span>Keşfet & Gündem</span>
@@ -232,13 +239,11 @@
       <!-- ÜST SAĞ PROFİL & MOBİL YAN MENÜ BUTONU & MOBİL BİGABEE MASKOTU -->
       <div class="flex justify-between items-center mb-4 sm:mb-6 pb-3 border-b border-yellow-200 dark:border-gray-700">
         <div class="flex items-center gap-2.5">
-          <!-- MOBİL TWITTER TARZI MENÜ AÇMA İKONU -->
           <button onclick="openMobileDrawer()" class="lg:hidden p-2 rounded-xl bg-yellow-400 text-gray-900 font-bold active:scale-95 transition shadow-xs">
             <i class="fa-solid fa-bars text-base"></i>
           </button>
           <h2 id="pageTitle" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Akış</h2>
           
-          <!-- MOBİL ÜST BARA ÖZEL BİGABEE MASKOTU -->
           <div class="lg:hidden relative animate-bee ml-1">
             <svg class="w-8 h-8 drop-shadow-md" viewBox="0 0 100 100" fill="none">
               <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
@@ -258,9 +263,10 @@
           </div>
         </div>
         
-        <div onclick="openProfileModal()" class="flex items-center gap-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
-          <div id="userAvatarHeader" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-yellow-400 font-black text-gray-900 flex items-center justify-center text-xs border border-yellow-500">
-            MÖ
+        <div onclick="switchTab('profile')" class="flex items-center gap-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
+          <div id="userAvatarHeader" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-yellow-400 font-black text-gray-900 flex items-center justify-center text-xs border border-yellow-500 overflow-hidden">
+            <span id="userAvatarHeaderInitials">MÖ</span>
+            <img id="userAvatarHeaderImg" src="" class="w-full h-full object-cover hidden" alt="Avatar">
           </div>
           <div class="hidden sm:block text-left">
             <h4 id="userNameHeader" class="font-bold text-xs text-gray-900 dark:text-white leading-tight">Misafir Öğrenci</h4>
@@ -274,7 +280,6 @@
       <div id="contentTimeline" class="page-content space-y-4 sm:space-y-5">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm border-2 border-yellow-200 dark:border-gray-700 relative">
           
-          <!-- FONTAWESOME VEKTÖREL ŞIK KİLİT İKONU ENTEGRESİ -->
           <div id="postAreaOverlay" class="absolute inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-[2px] z-10 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
             <div class="w-12 h-12 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-xl mb-2 shadow-xs">
               <i class="fa-solid fa-lock"></i>
@@ -300,15 +305,70 @@
         </div>
 
         <div id="timeline" class="space-y-4">
-          <div id="emptyState" class="text-center py-10 sm:py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6">
-            <div class="text-4xl sm:text-5xl mb-3">🐝</div>
+          <div id="emptyState" class="text-center py-10 sm:py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+            <div class="w-16 h-16 rounded-3xl bg-yellow-400/90 text-gray-900 flex items-center justify-center text-3xl mb-3 shadow-md border-2 border-yellow-500 animate-bee">
+              🐝
+            </div>
             <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
           </div>
         </div>
       </div>
 
-      <!-- 2. KEŞFET & GÜNDEM SEKMESİ -->
+      <!-- 2. PROFİL SEKMESİ -->
+      <div id="contentProfile" class="page-content hidden space-y-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 overflow-hidden shadow-sm">
+          
+          <div class="h-32 sm:h-44 w-full bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 relative">
+            <img id="profileBannerImg" src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover opacity-90" alt="Banner">
+          </div>
+
+          <div class="px-4 sm:px-6 pb-6 relative">
+            <div class="flex justify-between items-end -mt-12 sm:-mt-16 mb-4">
+              <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-full border-4 border-white dark:border-gray-800 bg-yellow-400 font-black text-gray-900 flex items-center justify-center text-xl sm:text-3xl shadow-md overflow-hidden relative">
+                <span id="profileAvatarInitials">MÖ</span>
+                <img id="profileAvatarImg" src="" class="w-full h-full object-cover hidden" alt="PP">
+              </div>
+
+              <button onclick="openProfileModal()" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs sm:text-sm shadow transition">
+                <i class="fa-solid fa-pen-to-square mr-1"></i> Profili Düzenle
+              </button>
+            </div>
+
+            <div class="space-y-1">
+              <h3 id="profileNameDisplay" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Misafir Öğrenci</h3>
+              <p id="profileHandleDisplay" class="text-xs text-gray-400 font-medium">@ogrenci</p>
+              
+              <div class="flex flex-wrap gap-2 mt-2">
+                <span class="bg-yellow-100 dark:bg-gray-700 text-yellow-900 dark:text-yellow-400 text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                  <i class="fa-solid fa-graduation-cap mr-1"></i> <span id="profileDeptDisplay">İktisat</span>
+                </span>
+                <span class="bg-amber-100 dark:bg-gray-700 text-amber-900 dark:text-amber-400 text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                  <i class="fa-solid fa-layer-group mr-1"></i> <span id="profileClassDisplay">1. Sınıf</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+              <p id="profileBioDisplay" class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝
+              </p>
+            </div>
+
+            <div class="flex gap-4 mt-4 text-xs text-gray-500 dark:text-gray-400 font-bold">
+              <span><b class="text-gray-900 dark:text-white">0</b> Takip Edilen</span>
+              <span><b class="text-gray-900 dark:text-white">0</b> Takipçi</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
+          <h4 class="font-black text-sm text-gray-900 dark:text-white mb-3">Paylaşımların</h4>
+          <div class="text-center py-6 text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>
+        </div>
+      </div>
+
+      <!-- 3. KEŞFET & GÜNDEM SEKMESİ -->
       <div id="contentExplore" class="page-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
           <h3 class="font-black text-gray-900 dark:text-white text-base mb-3">🔥 Biga Kampüs Gündemi</h3>
@@ -316,10 +376,9 @@
         </div>
       </div>
 
-      <!-- 3. MESAJLAR SEKMESİ -->
+      <!-- 4. MESAJLAR SEKMESİ -->
       <div id="contentDm" class="page-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col sm:flex-row h-[500px]">
         
-        <!-- Sol Sohbet Listesi -->
         <div class="w-full sm:w-1/3 border-b sm:border-b-0 sm:border-r border-yellow-100 dark:border-gray-700 p-3 bg-yellow-50/30 dark:bg-gray-900/30 overflow-y-auto">
           <h4 class="font-black text-xs uppercase tracking-wider text-gray-500 mb-2 px-2">Sohbetler</h4>
           <div class="space-y-1">
@@ -329,7 +388,6 @@
           </div>
         </div>
 
-        <!-- Sağ Mesajlaşma Alanı -->
         <div class="flex-1 flex flex-col h-full bg-white dark:bg-gray-800">
           <div id="chatHeader" class="p-3 border-b border-gray-100 dark:border-gray-700 font-bold text-xs text-gray-500 bg-gray-50/50 dark:bg-gray-900/50">
             Sohbet Seçilmedi
@@ -352,9 +410,8 @@
 
       </div>
 
-      <!-- 4. BİLDİRİMLER SEKMESİ -->
+      <!-- 5. BİLDİRİMLER SEKMESİ -->
       <div id="contentNotifications" class="page-content hidden space-y-3">
-        <!-- FONTAWESOME VEKTÖREL ŞIK ZİL İKONU ENTEGRESİ -->
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-12 flex flex-col items-center justify-center">
           <div class="w-14 h-14 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl mb-3 shadow-xs">
             <i class="fa-solid fa-bell"></i>
@@ -364,7 +421,7 @@
         </div>
       </div>
 
-      <!-- 5. ARKADAŞ İSTEKLERİ SEKMESİ -->
+      <!-- 6. ARKADAŞ İSTEKLERİ SEKMESİ -->
       <div id="contentRequests" class="page-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
           <h3 class="font-black text-gray-900 dark:text-white text-base sm:text-lg mb-1 flex items-center gap-2">
@@ -375,7 +432,7 @@
         </div>
       </div>
 
-      <!-- 6. KAMPÜS HARİTASI SEKMESİ -->
+      <!-- 7. KAMPÜS HARİTASI SEKMESİ -->
       <div id="contentMap" class="page-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-4">
           <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
@@ -420,7 +477,7 @@
 
     </main>
 
-    <!-- SAĞ PANEL (Sadece PC'de görünür) -->
+    <!-- SAĞ PANEL (PC Görünümü) -->
     <aside class="hidden lg:block w-80 p-6 bg-white/50 dark:bg-gray-800/50 sticky top-0 h-screen overflow-y-auto space-y-4">
       
       <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
@@ -488,9 +545,9 @@
     </div>
   </div>
 
-  <!-- HESAP OLUŞTUR MODALI -->
+  <!-- HESAP OLUŞTUR MODALI (BÖLÜM VE SINIF SEÇMELİ DROPDOWN EKLENDİ) -->
   <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       <div class="text-center mb-4">
         <div class="text-3xl mb-1">🐝</div>
@@ -509,10 +566,57 @@
             <input type="text" id="regHandle" required placeholder="kullanici_adi" class="w-full pl-7 pr-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
           </div>
         </div>
+        
+        <!-- SEÇMELİ BÖLÜM MENÜSÜ -->
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölüm / Sınıf</label>
-          <input type="text" id="regDept" required placeholder="Bölümünüz ve Sınıfınız" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümünüz</label>
+          <select id="regDept" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <option value="" disabled selected>Bölümünüzü Seçin</option>
+            <optgroup label="İktisadi ve İdari Bilimler Fakültesi (İİBF)">
+              <option value="İktisat">İktisat</option>
+              <option value="İşletme">İşletme</option>
+              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+              <option value="Maliye">Maliye</option>
+              <option value="Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)">Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)</option>
+              <option value="Ekonometri">Ekonometri</option>
+              <option value="Siyaset Bilimi ve Kamu Yönetimi">Siyaset Bilimi ve Kamu Yönetimi</option>
+              <option value="Yönetim Bilişim Sistemleri (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
+            </optgroup>
+            <optgroup label="Uygulamalı Bilimler Fakültesi (UBF)">
+              <option value="Uluslararası Ticaret ve Lojistik">Uluslararası Ticaret ve Lojistik</option>
+              <option value="Finans ve Bankacılık">Finans ve Bankacılık</option>
+              <option value="Muhasebe ve Finans Yönetimi">Muhasebe ve Finans Yönetimi</option>
+              <option value="Gayrimenkul Gelişimi ve Yönetimi">Gayrimenkul Gelişimi ve Yönetimi</option>
+            </optgroup>
+            <optgroup label="Biga Meslek Yüksekokulu (MYO)">
+              <option value="Muhasebe ve Vergi Uygulamaları">Muhasebe ve Vergi Uygulamaları</option>
+              <option value="İşletme Yönetimi">İşletme Yönetimi</option>
+              <option value="Pazarlama">Pazarlama</option>
+              <option value="Otomotiv Teknolojisi">Otomotiv Teknolojisi</option>
+              <option value="Elektrik">Elektrik</option>
+              <option value="Makine">Makine</option>
+              <option value="Gıda Teknolojisi">Gıda Teknolojisi</option>
+              <option value="Süt ve Ürünleri Teknolojisi">Süt ve Ürünleri Teknolojisi</option>
+              <option value="Yerel Yönetimler">Yerel Yönetimler</option>
+              <option value="Kooperatifçilik">Kooperatifçilik</option>
+            </optgroup>
+          </select>
         </div>
+
+        <!-- SEÇMELİ SINIF MENÜSÜ -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfınız</label>
+          <select id="regClass" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <option value="" disabled selected>Sınıfınızı Seçin</option>
+            <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
+            <option value="1. Sınıf">1. Sınıf</option>
+            <option value="2. Sınıf">2. Sınıf</option>
+            <option value="3. Sınıf">3. Sınıf</option>
+            <option value="4. Sınıf">4. Sınıf</option>
+            <option value="Mezun">Mezun</option>
+          </select>
+        </div>
+
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
           <input type="email" id="regEmail" required placeholder="E-posta adresiniz" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
@@ -529,25 +633,82 @@
     </div>
   </div>
 
-  <!-- PROFİL ÖZELLEŞTİRME MODALI -->
+  <!-- PROFİL ÖZELLEŞTİRME MODALI (SEÇMELİ BÖLÜM VE SINIF MENÜSÜ EKLENDİ) -->
   <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       <h3 class="font-black text-lg text-gray-900 dark:text-white mb-4">Profilini Özelleştir</h3>
       <form onsubmit="saveProfile(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
-          <input type="text" id="editName" value="Misafir Öğrenci" class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <input type="text" id="editName" value="Misafir Öğrenci" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
-          <input type="text" id="editHandle" value="ogrenci" class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <input type="text" id="editHandle" value="ogrenci" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        
+        <!-- SEÇMELİ BÖLÜM DÜZENLEME -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümünüz</label>
+          <select id="editDept" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <optgroup label="İktisadi ve İdari Bilimler Fakültesi (İİBF)">
+              <option value="İktisat" selected>İktisat</option>
+              <option value="İşletme">İşletme</option>
+              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+              <option value="Maliye">Maliye</option>
+              <option value="Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)">Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)</option>
+              <option value="Ekonometri">Ekonometri</option>
+              <option value="Siyaset Bilimi ve Kamu Yönetimi">Siyaset Bilimi ve Kamu Yönetimi</option>
+              <option value="Yönetim Bilişim Sistemleri (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
+            </optgroup>
+            <optgroup label="Uygulamalı Bilimler Fakültesi (UBF)">
+              <option value="Uluslararası Ticaret ve Lojistik">Uluslararası Ticaret ve Lojistik</option>
+              <option value="Finans ve Bankacılık">Finans ve Bankacılık</option>
+              <option value="Muhasebe ve Finans Yönetimi">Muhasebe ve Finans Yönetimi</option>
+              <option value="Gayrimenkul Gelişimi ve Yönetimi">Gayrimenkul Gelişimi ve Yönetimi</option>
+            </optgroup>
+            <optgroup label="Biga Meslek Yüksekokulu (MYO)">
+              <option value="Muhasebe ve Vergi Uygulamaları">Muhasebe ve Vergi Uygulamaları</option>
+              <option value="İşletme Yönetimi">İşletme Yönetimi</option>
+              <option value="Pazarlama">Pazarlama</option>
+              <option value="Otomotiv Teknolojisi">Otomotiv Teknolojisi</option>
+              <option value="Elektrik">Elektrik</option>
+              <option value="Makine">Makine</option>
+              <option value="Gıda Teknolojisi">Gıda Teknolojisi</option>
+              <option value="Süt ve Ürünleri Teknolojisi">Süt ve Ürünleri Teknolojisi</option>
+              <option value="Yerel Yönetimler">Yerel Yönetimler</option>
+              <option value="Kooperatifçilik">Kooperatifçilik</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- SEÇMELİ SINIF DÜZENLEME -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfınız</label>
+          <select id="editClass" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
+            <option value="1. Sınıf" selected>1. Sınıf</option>
+            <option value="2. Sınıf">2. Sınıf</option>
+            <option value="3. Sınıf">3. Sınıf</option>
+            <option value="4. Sınıf">4. Sınıf</option>
+            <option value="Mezun">Mezun</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Profil Fotoğrafı Linki (PP)</label>
+          <input type="text" id="editAvatarUrl" placeholder="https://örnek.com/resim.jpg" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölüm / Sınıf</label>
-          <input type="text" id="editDept" value="ÇOMÜ Öğrencisi" class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Banner (Kapak) Görsel Linki</label>
+          <input type="text" id="editBannerUrl" placeholder="https://örnek.com/kapak.jpg" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
-        <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition">Kaydet</button>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Biyografi</label>
+          <textarea id="editBio" rows="2" placeholder="Hakkında kısa bir şeyler yaz..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400 resize-none">Biga kampüsünde vızıldamaya hazır! 🐝</textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs shadow transition mt-2">Değişiklikleri Kaydet</button>
       </form>
     </div>
   </div>
@@ -567,7 +728,7 @@
       document.getElementById('mobileDrawerBackdrop').classList.add('hidden');
     }
 
-    function updateLoginState(loggedIn, name = "Misafir Öğrenci", handle = "ogrenci") {
+    function updateLoginState(loggedIn, name = "Misafir Öğrenci", handle = "ogrenci", dept = "İktisat", classNum = "1. Sınıf") {
       isLoggedIn = loggedIn;
       const overlay = document.getElementById('postAreaOverlay');
       const authGroup = document.getElementById('authButtonsGroup');
@@ -584,7 +745,13 @@
 
         document.getElementById('userNameHeader').innerText = name;
         document.getElementById('userHandleHeader').innerText = '@' + handle.replace('@', '');
-        document.getElementById('userAvatarHeader').innerText = name.substring(0, 2).toUpperCase();
+        document.getElementById('userAvatarHeaderInitials').innerText = name.substring(0, 2).toUpperCase();
+        
+        document.getElementById('profileNameDisplay').innerText = name;
+        document.getElementById('profileHandleDisplay').innerText = '@' + handle.replace('@', '');
+        document.getElementById('profileDeptDisplay').innerText = dept;
+        document.getElementById('profileClassDisplay').innerText = classNum;
+        document.getElementById('profileAvatarInitials').innerText = name.substring(0, 2).toUpperCase();
       } else {
         if (overlay) overlay.classList.remove('hidden');
         if (authGroup) authGroup.classList.remove('hidden');
@@ -594,13 +761,20 @@
 
         document.getElementById('userNameHeader').innerText = "Misafir Öğrenci";
         document.getElementById('userHandleHeader').innerText = "@ogrenci";
-        document.getElementById('userAvatarHeader').innerText = "MÖ";
+        document.getElementById('userAvatarHeaderInitials').innerText = "MÖ";
+
+        document.getElementById('profileNameDisplay').innerText = "Misafir Öğrenci";
+        document.getElementById('profileHandleDisplay').innerText = "@ogrenci";
+        document.getElementById('profileDeptDisplay').innerText = "İktisat";
+        document.getElementById('profileClassDisplay').innerText = "1. Sınıf";
+        document.getElementById('profileAvatarInitials').innerText = "MÖ";
       }
     }
 
     function switchTab(tabName) {
       const titles = {
         timeline: 'Akış',
+        profile: 'Profilim',
         explore: 'Keşfet & Gündem',
         dm: 'Mesajlar',
         notifications: 'Bildirimler',
@@ -679,8 +853,10 @@
       e.preventDefault();
       const name = document.getElementById('regName').value;
       const handle = document.getElementById('regHandle').value;
+      const dept = document.getElementById('regDept').value;
+      const classNum = document.getElementById('regClass').value;
 
-      updateLoginState(true, name, handle);
+      updateLoginState(true, name, handle, dept, classNum);
       alert(`🐝 Tebrikler ${name}! Hesabınız oluşturuldu ve giriş yapıldı.`);
       closeAuthModal();
     }
@@ -696,10 +872,37 @@
       e.preventDefault();
       const name = document.getElementById('editName').value;
       const handle = document.getElementById('editHandle').value;
+      const dept = document.getElementById('editDept').value;
+      const classNum = document.getElementById('editClass').value;
+      const bio = document.getElementById('editBio').value;
+      const avatarUrl = document.getElementById('editAvatarUrl').value.trim();
+      const bannerUrl = document.getElementById('editBannerUrl').value.trim();
 
       document.getElementById('userNameHeader').innerText = name;
       document.getElementById('userHandleHeader').innerText = '@' + handle.replace('@', '');
-      document.getElementById('userAvatarHeader').innerText = name.substring(0, 2).toUpperCase();
+      
+      document.getElementById('profileNameDisplay').innerText = name;
+      document.getElementById('profileHandleDisplay').innerText = '@' + handle.replace('@', '');
+      document.getElementById('profileDeptDisplay').innerText = dept;
+      document.getElementById('profileClassDisplay').innerText = classNum;
+      document.getElementById('profileBioDisplay').innerText = bio || 'Henüz bir biyografi eklenmedi.';
+
+      if (avatarUrl) {
+        const headerImg = document.getElementById('userAvatarHeaderImg');
+        const profileImg = document.getElementById('profileAvatarImg');
+        
+        headerImg.src = avatarUrl;
+        headerImg.classList.remove('hidden');
+        document.getElementById('userAvatarHeaderInitials').classList.add('hidden');
+
+        profileImg.src = avatarUrl;
+        profileImg.classList.remove('hidden');
+        document.getElementById('profileAvatarInitials').classList.add('hidden');
+      }
+
+      if (bannerUrl) {
+        document.getElementById('profileBannerImg').src = bannerUrl;
+      }
 
       alert("Profil bilgilerin güncellendi!");
       closeProfileModal();
@@ -731,7 +934,7 @@
       newPost.innerHTML = `
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-black text-gray-900 border border-yellow-500">
+            <div class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-black text-gray-900 border border-yellow-500 overflow-hidden">
               ${name.substring(0, 2).toUpperCase()}
             </div>
             <div>
@@ -763,9 +966,11 @@
           const timeline = document.getElementById('timeline');
           if (timeline.children.length === 0) {
             timeline.innerHTML = `
-              <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6">
-                <div class="text-5xl mb-3">🐝</div>
-                <h3 class="font-bold text-gray-800 dark:text-gray-200 text-base">Henüz bir vızıldı yok!</h3>
+              <div id="emptyState" class="text-center py-10 sm:py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+                <div class="w-16 h-16 rounded-3xl bg-yellow-400/90 text-gray-900 flex items-center justify-center text-3xl mb-3 shadow-md border-2 border-yellow-500 animate-bee">
+                  🐝
+                </div>
+                <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
               </div>
             `;
