@@ -90,32 +90,32 @@
 
         <!-- Dikey Menü -->
         <nav class="space-y-1.5">
-          <button onclick="switchTab('timeline')" id="btnTimeline" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition">
+          <button onclick="switchTab('timeline')" id="menuTimeline" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition">
             <i class="fa-solid fa-house text-lg"></i>
             <span>Akış</span>
           </button>
 
-          <button onclick="switchTab('explore')" id="btnExplore" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+          <button onclick="switchTab('explore')" id="menuExplore" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-compass text-lg text-yellow-600"></i>
             <span>Keşfet & Gündem</span>
           </button>
 
-          <button onclick="switchTab('dm')" id="btnDm" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+          <button onclick="switchTab('dm')" id="menuDm" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-comments text-lg text-yellow-600"></i>
             <span>Mesajlar</span>
           </button>
 
-          <button onclick="switchTab('notifications')" id="btnNotifications" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+          <button onclick="switchTab('notifications')" id="menuNotifications" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-bell text-lg text-yellow-600"></i>
             <span>Bildirimler</span>
           </button>
 
-          <button onclick="switchTab('requests')" id="btnRequests" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+          <button onclick="switchTab('requests')" id="menuRequests" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-user-plus text-lg text-yellow-600"></i>
             <span>İstekler</span>
           </button>
 
-          <button onclick="switchTab('map')" id="btnMap" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+          <button onclick="switchTab('map')" id="menuMap" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i>
             <span>Kampüs Haritası</span>
           </button>
@@ -132,7 +132,6 @@
           <i class="fa-solid fa-circle-half-stroke text-gray-400"></i>
         </button>
 
-        <!-- YAN YANA GİRİŞ YAP VE HESAP OLUŞTUR BUTONLARI -->
         <div id="authButtonsGroup" class="grid grid-cols-2 gap-2">
           <button onclick="openAuthModal('login')" class="py-2 px-2 bg-gray-100 dark:bg-gray-700 hover:bg-yellow-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-extrabold rounded-xl text-[11px] transition text-center shadow-xs">
             Giriş Yap
@@ -142,7 +141,6 @@
           </button>
         </div>
 
-        <!-- ÇIKIŞ YAP BUTONU (Sadece Giriş Yapıldığında Görünür) -->
         <button id="logoutBtn" onclick="handleLogout()" class="w-full py-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 font-extrabold rounded-xl text-xs transition hidden">
           <i class="fa-solid fa-right-from-bracket mr-1"></i> Çıkış Yap
         </button>
@@ -156,7 +154,6 @@
       <div class="flex justify-between items-center mb-6 pb-3 border-b border-yellow-200 dark:border-gray-700">
         <h2 id="pageTitle" class="text-xl font-black text-gray-900 dark:text-white">Akış</h2>
         
-        <!-- SAĞ ÜST PROFİL KARTI -->
         <div onclick="openProfileModal()" class="flex items-center gap-3 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-3 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
           <div id="userAvatarHeader" class="w-8 h-8 rounded-full bg-yellow-400 font-black text-gray-900 flex items-center justify-center text-xs border border-yellow-500">
             MÖ
@@ -170,10 +167,9 @@
       </div>
 
       <!-- 1. AKIŞ SEKMESİ -->
-      <div id="tabTimeline" class="tab-content space-y-5">
+      <div id="contentTimeline" class="page-content space-y-5">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border-2 border-yellow-200 dark:border-gray-700 relative">
           
-          <!-- Üye Değilse Üstüne Gelen Kilit Arayüzü -->
           <div id="postAreaOverlay" class="absolute inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-[2px] z-10 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
             <div class="text-3xl mb-1">🔒</div>
             <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Paylaşım yapmak için üye olun</h4>
@@ -206,7 +202,7 @@
       </div>
 
       <!-- 2. KEŞFET & GÜNDEM SEKMESİ -->
-      <div id="tabExplore" class="tab-content hidden space-y-4">
+      <div id="contentExplore" class="page-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
           <h3 class="font-black text-gray-900 dark:text-white text-base mb-3">🔥 Biga Kampüs Gündemi</h3>
           <p class="text-xs text-gray-400">Canlı paylaşımlar yapıldıkça popüler konular ve etiketler burada görünecek.</p>
@@ -214,7 +210,7 @@
       </div>
 
       <!-- 3. MESAJLAR SEKMESİ -->
-      <div id="tabDm" class="tab-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col h-[520px]">
+      <div id="contentDm" class="page-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col h-[520px]">
         <div class="p-4 border-b border-yellow-100 dark:border-gray-700 flex items-center justify-between bg-yellow-100/50 dark:bg-gray-700/50">
           <h4 class="font-bold text-sm text-gray-900 dark:text-white">Mesaj Kutusu</h4>
         </div>
@@ -232,7 +228,7 @@
       </div>
 
       <!-- 4. BİLDİRİMLER SEKMESİ -->
-      <div id="tabNotifications" class="tab-content hidden space-y-3">
+      <div id="contentNotifications" class="page-content hidden space-y-3">
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-10">
           <div class="text-4xl mb-2">🔔</div>
           <h3 class="font-bold text-gray-700 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
@@ -241,7 +237,7 @@
       </div>
 
       <!-- 5. ARKADAŞ İSTEKLERİ SEKMESİ -->
-      <div id="tabRequests" class="tab-content hidden space-y-4">
+      <div id="contentRequests" class="page-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
           <h3 class="font-black text-gray-900 dark:text-white text-lg mb-1 flex items-center gap-2">
             <i class="fa-solid fa-user-plus text-yellow-500"></i> Arkadaşlık İstekleri
@@ -251,15 +247,15 @@
         </div>
       </div>
 
-      <!-- 6. KAMPÜS HARİTASI SEKMESİ (PEK YAKINDA) -->
-      <div id="tabMap" class="tab-content hidden space-y-4">
+      <!-- 6. KAMPÜS HARİTASI SEKMESİ -->
+      <div id="contentMap" class="page-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-4">
           <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
             <div>
               <h3 class="font-black text-gray-900 dark:text-white text-lg flex items-center gap-2">
                 <i class="fa-solid fa-map-location-dot text-yellow-500"></i> ÇOMÜ Biga Ramazan Aydın Yerleşkesi
               </h3>
-              <p class="text-xs text-gray-400 mt-0.5">BigaConnect İnteraktif Kampüs & Canlı Konum Haritası</p>
+              <p class="text-xs text-gray-400 mt-0.5">BigaConnect Canlı Konum Radarı</p>
             </div>
             <span class="text-xs bg-yellow-400 text-gray-900 font-black px-3 py-1 rounded-full shadow-sm">Biga Kampüs</span>
           </div>
@@ -268,23 +264,23 @@
             
             <div class="absolute top-6 left-8 text-4xl opacity-20">🐝</div>
             <div class="absolute bottom-8 right-10 text-5xl opacity-20">📍</div>
-            <div class="absolute top-10 right-12 text-3xl opacity-20">🏛️</div>
-            <div class="absolute bottom-10 left-10 text-3xl opacity-20">☕</div>
+            <div class="absolute top-10 right-12 text-3xl opacity-20">🗺️</div>
+            <div class="absolute bottom-10 left-10 text-3xl opacity-20">👥</div>
 
             <div class="w-20 h-20 bg-yellow-400/90 text-gray-900 rounded-3xl flex items-center justify-center text-4xl shadow-xl border-2 border-yellow-500 mb-4 animate-bounce">
               📍
             </div>
 
             <span class="text-xs font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-200 dark:bg-yellow-900/50 px-3 py-1 rounded-full mb-2">
-              BigaConnect Live Map
+              BigaConnect Canlı Radar
             </span>
 
             <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-2">
-              Pek Yakında! 🐝✨
+              Çok Yakında! 🐝✨
             </h3>
 
             <p class="text-xs text-gray-600 dark:text-gray-300 max-w-md leading-relaxed font-medium mb-4">
-              ÇOMÜ Biga Ramazan Aydın Yerleşkesi’nde arkadaşlarınızın anlık konumlarını haritada görebileceğiniz, Maka Cafe, Kütüphane ve İİBF’deki canlı kalabalık durumunu takip edebileceğiniz <b>Canlı Kampüs Haritası</b> çok yakında burada olacak!
+              ÇOMÜ Biga Ramazan Aydın Yerleşkesi’nde arkadaşlarının anlık konumlarını harita üzerinde görebileceğin, kimin kampüsün neresinde olduğunu canlı takip edebileceğin interaktif radar sistemi çok yakında hizmetinizde!
             </p>
 
             <div class="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 px-4 py-2 rounded-xl border border-yellow-300 dark:border-gray-700 text-xs font-bold text-gray-800 dark:text-gray-200 shadow-sm">
@@ -471,22 +467,22 @@
         titleElement.innerText = titles[tabName.toLowerCase()] || 'BigaConnect';
       }
 
-      const allTabs = document.querySelectorAll('.tab-content');
-      allTabs.forEach(tab => tab.classList.add('hidden'));
+      const allContents = document.querySelectorAll('.page-content');
+      allContents.forEach(el => el.classList.add('hidden'));
 
-      const targetTab = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
-      if (targetTab) {
-        targetTab.classList.remove('hidden');
+      const targetContent = document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (targetContent) {
+        targetContent.classList.remove('hidden');
       }
 
-      const activeBtnId = 'btn' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-      const allBtns = document.querySelectorAll('.nav-btn');
+      const activeBtnId = 'menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      const allBtns = document.querySelectorAll('.menu-btn');
 
       allBtns.forEach(btn => {
         if (btn.id === activeBtnId) {
-          btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
+          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
         } else {
-          btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
+          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
         }
       });
     }
@@ -622,7 +618,6 @@
         if (postCard) {
           postCard.remove();
           
-          // Eğer akışta hiç post kalmadıysa emptyState'i geri ekle
           const timeline = document.getElementById('timeline');
           if (timeline.children.length === 0) {
             timeline.innerHTML = `
@@ -640,7 +635,7 @@
     function sendDm() {
       const input = document.getElementById('dmInput');
       const text = input.value.trim();
-      if (!text) return;
+      if (!text.trim()) return;
 
       const chatMessages = document.getElementById('chatMessages');
       const msgDiv = document.createElement('div');
