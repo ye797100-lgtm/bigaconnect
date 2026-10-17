@@ -51,45 +51,92 @@
       animation: pulseGlow 3s ease-in-out infinite;
     }
 
-    /* MOBİL ÖZEL İYİLEŞTİRMELER (PC'Yİ ASLA ETKİLEMEZ) */
-    @media (max-width: 1023px) {
-      .mobile-scroll-nav {
-        display: flex;
-        overflow-x: auto;
-        gap: 8px;
-        padding-bottom: 4px;
-        scrollbar-width: none;
-      }
-      .mobile-scroll-nav::-webkit-scrollbar {
-        display: none;
-      }
-      .menu-btn {
-        flex-shrink: 0;
-        width: auto !important;
-        padding: 8px 14px !important;
-        font-size: 12px !important;
-      }
-      .menu-btn span {
-        display: inline !important;
-      }
+    /* TWITTER TARZI MOBIL DRAWER ANİMASYONU */
+    #mobileDrawer {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .drawer-closed {
+      transform: translateX(-100%);
+    }
+    .drawer-open {
+      transform: translateX(0);
     }
   </style>
 </head>
 <body class="bg-yellow-50/30 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
 
+  <!-- MOBİL İÇİN TWITTER TARZI SOLDAN AÇILAN YAN BAR (DRAWER) OVERLAY -->
+  <div id="mobileDrawerBackdrop" onclick="closeMobileDrawer()" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden backdrop-blur-xs"></div>
+  
+  <aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-gray-800 z-50 p-5 flex flex-col justify-between shadow-2xl lg:hidden drawer-closed border-r border-yellow-200 dark:border-gray-700">
+    <div>
+      <div class="flex items-center justify-between mb-6 pb-2 border-b border-gray-100 dark:border-gray-700">
+        <span class="text-xl font-black text-gray-900 dark:text-white tracking-tight">
+          Biga<span class="text-yellow-500">Connect</span>
+        </span>
+        <button onclick="closeMobileDrawer()" class="text-gray-400 hover:text-gray-600 p-1">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <nav class="space-y-2">
+        <button onclick="switchTab('timeline'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm">
+          <i class="fa-solid fa-house text-lg"></i>
+          <span>Akış</span>
+        </button>
+        <button onclick="switchTab('explore'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <i class="fa-solid fa-compass text-lg text-yellow-600"></i>
+          <span>Keşfet & Gündem</span>
+        </button>
+        <button onclick="switchTab('dm'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <i class="fa-solid fa-comments text-lg text-yellow-600"></i>
+          <span>Mesajlar</span>
+        </button>
+        <button onclick="switchTab('notifications'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <i class="fa-solid fa-bell text-lg text-yellow-600"></i>
+          <span>Bildirimler</span>
+        </button>
+        <button onclick="switchTab('requests'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <i class="fa-solid fa-user-plus text-lg text-yellow-600"></i>
+          <span>İstekler</span>
+        </button>
+        <button onclick="switchTab('map'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i>
+          <span>Kampüs Haritası</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="pt-4 border-t border-yellow-100 dark:border-gray-700 space-y-3">
+      <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-moon text-yellow-600"></i>
+          <span>Gece / Gündüz Modu</span>
+        </span>
+      </button>
+
+      <div id="mobileDrawerAuthGroup" class="grid grid-cols-2 gap-2">
+        <button onclick="openAuthModal('login'); closeMobileDrawer();" class="py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-extrabold rounded-xl text-xs text-center">Giriş Yap</button>
+        <button onclick="openAuthModal('register'); closeMobileDrawer();" class="py-2.5 bg-yellow-400 text-gray-900 font-extrabold rounded-xl text-xs text-center">Kaydol</button>
+      </div>
+
+      <button id="mobileDrawerLogoutBtn" onclick="handleLogout(); closeMobileDrawer();" class="w-full py-2.5 bg-red-100 text-red-700 font-extrabold rounded-xl text-xs hidden">
+        Çıkış Yap
+      </button>
+    </div>
+  </aside>
+
   <div class="max-w-7xl mx-auto flex flex-col lg:flex-row min-h-screen">
 
-    <!-- SOL KENAR MENÜSÜ (Mobilde üst yatay/dikey akışkan bar, PC'de orijinal sidebar) -->
-    <aside class="w-full lg:w-64 bg-white dark:bg-gray-800 border-b lg:border-r border-yellow-200 dark:border-gray-700 p-3 lg:p-4 flex flex-col lg:justify-between sticky top-0 lg:h-screen z-30 shadow-sm">
-      <div class="flex flex-col lg:block">
-        <!-- Logo & Canlı BigaBee Maskotu (Easter Egg kaldırıldı, sade animasyon) -->
-        <div class="flex items-center justify-between mb-3 lg:mb-6 pt-1 lg:pt-2 px-1 lg:px-2">
-          <span class="text-xl lg:text-2xl font-black text-gray-900 dark:text-white tracking-tight cursor-pointer" onclick="switchTab('timeline')">
+    <!-- DESKTOP SOL KENAR MENÜSÜ (PC Görünümü) -->
+    <aside class="hidden lg:flex w-64 bg-white dark:bg-gray-800 border-r border-yellow-200 dark:border-gray-700 p-4 flex-col justify-between sticky top-0 h-screen z-30 shadow-sm">
+      <div>
+        <div class="flex items-center justify-between mb-6 pt-2 px-2">
+          <span class="text-2xl font-black text-gray-900 dark:text-white tracking-tight cursor-pointer" onclick="switchTab('timeline')">
             Biga<span class="text-yellow-500">Connect</span>
           </span>
-          
           <div class="relative animate-bee">
-            <svg class="w-9 h-9 lg:w-11 lg:h-11 drop-shadow-md" viewBox="0 0 100 100" fill="none">
+            <svg class="w-11 h-11 drop-shadow-md" viewBox="0 0 100 100" fill="none">
               <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
               <ellipse class="bee-wing" cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
               <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
@@ -107,33 +154,27 @@
           </div>
         </div>
 
-        <!-- Dikey Menü (Mobilde yatay kaydırılabilir, PC'de dikey) -->
-        <nav class="space-y-1.5 mobile-scroll-nav">
+        <nav class="space-y-1.5">
           <button onclick="switchTab('timeline')" id="menuTimeline" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition">
             <i class="fa-solid fa-house text-lg"></i>
             <span>Akış</span>
           </button>
-
           <button onclick="switchTab('explore')" id="menuExplore" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-compass text-lg text-yellow-600"></i>
             <span>Keşfet & Gündem</span>
           </button>
-
           <button onclick="switchTab('dm')" id="menuDm" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-comments text-lg text-yellow-600"></i>
             <span>Mesajlar</span>
           </button>
-
           <button onclick="switchTab('notifications')" id="menuNotifications" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-bell text-lg text-yellow-600"></i>
             <span>Bildirimler</span>
           </button>
-
           <button onclick="switchTab('requests')" id="menuRequests" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-user-plus text-lg text-yellow-600"></i>
             <span>İstekler</span>
           </button>
-
           <button onclick="switchTab('map')" id="menuMap" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i>
             <span>Kampüs Haritası</span>
@@ -141,8 +182,7 @@
         </nav>
       </div>
 
-      <!-- Tema Değiştirici ve Giriş / Hesap Oluştur Butonları (Mobilde gizlenir / Kompaktlaşır) -->
-      <div class="hidden lg:block pt-4 border-t border-yellow-100 dark:border-gray-700 space-y-2">
+      <div class="pt-4 border-t border-yellow-100 dark:border-gray-700 space-y-2">
         <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-yellow-200 dark:hover:bg-gray-600 transition">
           <span class="flex items-center gap-2">
             <i id="themeIcon" class="fa-solid fa-moon text-yellow-600"></i>
@@ -169,29 +209,25 @@
     <!-- ORTA İÇERİK ALANI -->
     <main class="flex-1 p-3 sm:p-6 border-r border-yellow-200 dark:border-gray-700">
 
-      <!-- ÜST SAĞ PROFİL ALANI -->
+      <!-- ÜST SAĞ PROFİL & MOBİL YAN MENÜ BUTONU -->
       <div class="flex justify-between items-center mb-4 sm:mb-6 pb-3 border-b border-yellow-200 dark:border-gray-700">
-        <h2 id="pageTitle" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Akış</h2>
+        <div class="flex items-center gap-3">
+          <!-- MOBİL TWITTER TARZI MENÜ AÇMA İKONU -->
+          <button onclick="openMobileDrawer()" class="lg:hidden p-2 rounded-xl bg-yellow-400 text-gray-900 font-bold active:scale-95 transition shadow-xs">
+            <i class="fa-solid fa-bars text-base"></i>
+          </button>
+          <h2 id="pageTitle" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Akış</h2>
+        </div>
         
-        <div class="flex items-center gap-2">
-          <!-- Mobilde hızlı erişim için tema ve giriş butonu -->
-          <button onclick="toggleDarkMode()" class="lg:hidden p-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs">
-            <i id="themeIconMobile" class="fa-solid fa-moon"></i>
-          </button>
-          <button onclick="openAuthModal('login')" id="mobileLoginBtn" class="lg:hidden py-1.5 px-3 bg-yellow-400 text-gray-900 font-extrabold rounded-xl text-xs shadow-xs">
-            Giriş Yap
-          </button>
-
-          <div onclick="openProfileModal()" class="flex items-center gap-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
-            <div id="userAvatarHeader" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-yellow-400 font-black text-gray-900 flex items-center justify-center text-xs border border-yellow-500">
-              MÖ
-            </div>
-            <div class="hidden sm:block text-left">
-              <h4 id="userNameHeader" class="font-bold text-xs text-gray-900 dark:text-white leading-tight">Misafir Öğrenci</h4>
-              <span id="userHandleHeader" class="text-[10px] text-gray-400 block">@ogrenci</span>
-            </div>
-            <i class="fa-solid fa-gear text-xs text-yellow-600 ml-0.5"></i>
+        <div onclick="openProfileModal()" class="flex items-center gap-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
+          <div id="userAvatarHeader" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-yellow-400 font-black text-gray-900 flex items-center justify-center text-xs border border-yellow-500">
+            MÖ
           </div>
+          <div class="hidden sm:block text-left">
+            <h4 id="userNameHeader" class="font-bold text-xs text-gray-900 dark:text-white leading-tight">Misafir Öğrenci</h4>
+            <span id="userHandleHeader" class="text-[10px] text-gray-400 block">@ogrenci</span>
+          </div>
+          <i class="fa-solid fa-gear text-xs text-yellow-600 ml-0.5"></i>
         </div>
       </div>
 
@@ -238,22 +274,40 @@
         </div>
       </div>
 
-      <!-- 3. MESAJLAR SEKMESİ -->
-      <div id="contentDm" class="page-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col h-[460px] sm:h-[520px]">
-        <div class="p-3 sm:p-4 border-b border-yellow-100 dark:border-gray-700 flex items-center justify-between bg-yellow-100/50 dark:bg-gray-700/50">
-          <h4 class="font-bold text-sm text-gray-900 dark:text-white">Mesaj Kutusu</h4>
+      <!-- 3. MESAJLAR SEKMESİ (SOHBET SEÇİMİ ZORUNLU REORGANİZE MANTIĞI) -->
+      <div id="contentDm" class="page-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col sm:flex-row h-[500px]">
+        
+        <!-- Sol Sohbet Listesi -->
+        <div class="w-full sm:w-1/3 border-b sm:border-b-0 sm:border-r border-yellow-100 dark:border-gray-700 p-3 bg-yellow-50/30 dark:bg-gray-900/30 overflow-y-auto">
+          <h4 class="font-black text-xs uppercase tracking-wider text-gray-500 mb-2 px-2">Sohbetler</h4>
+          <div class="space-y-1">
+            <div id="emptyChatNotice" class="text-center py-8 text-xs text-gray-400">
+              Henüz sohbetiniz yok.
+            </div>
+          </div>
         </div>
 
-        <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/50 dark:bg-gray-900/50 flex items-center justify-center">
-          <div class="text-center text-gray-400 text-xs">Henüz başlatılmış bir sohbet yok.</div>
+        <!-- Sağ Mesajlaşma Alanı -->
+        <div class="flex-1 flex flex-col h-full bg-white dark:bg-gray-800">
+          <div id="chatHeader" class="p-3 border-b border-gray-100 dark:border-gray-700 font-bold text-xs text-gray-500 bg-gray-50/50 dark:bg-gray-900/50">
+            Sohbet Seçilmedi
+          </div>
+
+          <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/30 dark:bg-gray-900/20 flex flex-col items-center justify-center">
+            <div class="text-center text-gray-400 text-xs">
+              <i class="fa-solid fa-comments text-3xl mb-2 text-yellow-500 opacity-60"></i>
+              <p>Mesajlaşmaya başlamak için sol taraftan bir sohbet seçin.</p>
+            </div>
+          </div>
+
+          <div class="p-3 border-t border-gray-100 dark:border-gray-700 flex gap-2">
+            <input type="text" id="dmInput" disabled placeholder="Önce bir sohbet seçin..." class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none text-sm dark:text-white opacity-50 cursor-not-allowed" onkeypress="handleDmKey(event)">
+            <button id="dmSendBtn" disabled onclick="sendDm()" class="bg-yellow-400 text-gray-900 font-bold px-4 py-2.5 rounded-xl text-sm opacity-50 cursor-not-allowed">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="p-3 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 flex gap-2">
-          <input type="text" id="dmInput" placeholder="Mesajınızı yazın..." class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm dark:text-white" onkeypress="handleDmKey(event)">
-          <button onclick="sendDm()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-4 sm:px-5 py-2.5 rounded-xl text-sm shadow">
-            <i class="fa-solid fa-paper-plane"></i>
-          </button>
-        </div>
       </div>
 
       <!-- 4. BİLDİRİMLER SEKMESİ -->
@@ -321,8 +375,8 @@
 
     </main>
 
-    <!-- SAĞ PANEL (Mobilde alt kısımda alt alta sıralanır, PC'de sabit sidebar) -->
-    <aside class="w-full lg:w-80 p-3 sm:p-6 bg-white/50 dark:bg-gray-800/50 lg:sticky top-0 lg:h-screen overflow-y-auto space-y-4">
+    <!-- SAĞ PANEL (Sadece PC'de görünür, mobilde tamamen gizlendi) -->
+    <aside class="hidden lg:block w-80 p-6 bg-white/50 dark:bg-gray-800/50 sticky top-0 h-screen overflow-y-auto space-y-4">
       
       <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-2.5">
@@ -456,18 +510,33 @@
   <script>
     let isLoggedIn = false;
 
+    // Mobil Drawer Aç / Kapa Fonksiyonları
+    function openMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-closed');
+      document.getElementById('mobileDrawer').classList.add('drawer-open');
+      document.getElementById('mobileDrawerBackdrop').classList.remove('hidden');
+    }
+
+    function closeMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-open');
+      document.getElementById('mobileDrawer').classList.add('drawer-closed');
+      document.getElementById('mobileDrawerBackdrop').classList.add('hidden');
+    }
+
     function updateLoginState(loggedIn, name = "Misafir Öğrenci", handle = "ogrenci") {
       isLoggedIn = loggedIn;
       const overlay = document.getElementById('postAreaOverlay');
       const authGroup = document.getElementById('authButtonsGroup');
       const logoutBtn = document.getElementById('logoutBtn');
-      const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+      const mobileAuthGroup = document.getElementById('mobileDrawerAuthGroup');
+      const mobileLogoutBtn = document.getElementById('mobileDrawerLogoutBtn');
 
       if (loggedIn) {
         if (overlay) overlay.classList.add('hidden');
         if (authGroup) authGroup.classList.add('hidden');
         if (logoutBtn) logoutBtn.classList.remove('hidden');
-        if (mobileLoginBtn) mobileLoginBtn.classList.add('hidden');
+        if (mobileAuthGroup) mobileAuthGroup.classList.add('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.remove('hidden');
 
         document.getElementById('userNameHeader').innerText = name;
         document.getElementById('userHandleHeader').innerText = '@' + handle.replace('@', '');
@@ -476,7 +545,8 @@
         if (overlay) overlay.classList.remove('hidden');
         if (authGroup) authGroup.classList.remove('hidden');
         if (logoutBtn) logoutBtn.classList.add('hidden');
-        if (mobileLoginBtn) mobileLoginBtn.classList.remove('hidden');
+        if (mobileAuthGroup) mobileAuthGroup.classList.remove('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
 
         document.getElementById('userNameHeader').innerText = "Misafir Öğrenci";
         document.getElementById('userHandleHeader').innerText = "@ogrenci";
@@ -508,7 +578,7 @@
       }
 
       const activeBtnId = 'menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-      const allBtns = document.querySelectorAll('.menu-btn');
+      const allBtns = document.querySelectorAll('.menu-btn, .menu-btn-mobile');
 
       allBtns.forEach(btn => {
         if (btn.id === activeBtnId) {
@@ -522,18 +592,15 @@
     function toggleDarkMode() {
       const html = document.documentElement;
       const themeIcon = document.getElementById('themeIcon');
-      const themeIconMobile = document.getElementById('themeIconMobile');
       const themeText = document.getElementById('themeText');
 
       if (html.classList.contains('dark')) {
         html.classList.remove('dark');
         if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
-        if (themeIconMobile) themeIconMobile.className = "fa-solid fa-moon";
         if (themeText) themeText.innerText = "Gece Modu";
       } else {
         html.classList.add('dark');
         if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
-        if (themeIconMobile) themeIconMobile.className = "fa-solid fa-sun";
         if (themeText) themeText.innerText = "Gündüz Modu";
       }
     }
@@ -665,8 +732,10 @@
 
     function sendDm() {
       const input = document.getElementById('dmInput');
+      if (input.disabled) return;
+      
       const text = input.value.trim();
-      if (!text.trim()) return;
+      if (!text) return;
 
       const chatMessages = document.getElementById('chatMessages');
       const msgDiv = document.createElement('div');
