@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script>
-    // Sayfa açılmadan önce kaydedilen temayı uyguluyoruz (Sayfa yenilense bile mod kalır)
     if (localStorage.getItem('biga_theme') === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -60,6 +59,7 @@
   <!-- Gizli Dosya Seçiciler -->
   <input type="file" id="hiddenAvatarInput" accept="image/*" class="hidden" onchange="uploadDirectAvatar(event)">
   <input type="file" id="hiddenBannerInput" accept="image/*" class="hidden" onchange="uploadDirectBanner(event)">
+  <input type="file" id="hiddenPostImageInput" accept="image/*" class="hidden" onchange="previewPostImage(event)">
 
   <!-- MOBİL YAN BAR OVERLAY -->
   <div id="mobileDrawerBackdrop" onclick="closeMobileDrawer()" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden backdrop-blur-xs"></div>
@@ -196,9 +196,16 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm border-2 border-yellow-200 dark:border-gray-700 relative">
           
           <textarea id="postText" rows="3" placeholder="Biga kampüsünde ne oluyor? @kullanici_adi ile etiketleyebilirsin..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none text-sm dark:text-white"></textarea>
+          
+          <!-- Gönderi Fotoğraf Önizleme Alanı -->
+          <div id="postImagePreviewContainer" class="hidden relative mt-2 mb-2 w-full h-40 bg-gray-100 dark:bg-gray-900 rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700">
+            <img id="postImagePreview" src="" class="w-full h-full object-cover" alt="Önizleme">
+            <button onclick="removePostImage()" class="absolute top-2 right-2 bg-black/60 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs hover:bg-black transition"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+
           <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
             <div class="flex gap-4 text-gray-400 text-base">
-              <button class="hover:text-yellow-600 transition"><i class="fa-regular fa-image"></i></button>
+              <button onclick="triggerPostImageUpload()" type="button" class="hover:text-yellow-600 transition cursor-pointer" title="Fotoğraf Ekle"><i class="fa-regular fa-image"></i></button>
               <button class="hover:text-yellow-600 transition"><i class="fa-solid fa-location-dot"></i></button>
             </div>
             <button onclick="sharePost()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm transition-transform active:scale-95 shadow cursor-pointer">Paylaş 🚀</button>
@@ -525,7 +532,7 @@
     </div>
   </div>
 
-  <!-- Firebase Entegrasyonu ve Yeni Özellikler -->
+  <!-- Firebase Entegrasyonu ve Fotoğraflı Yanıt Mantığı -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -548,6 +555,8 @@
 
     let isLoggedIn = false;
     let currentUserData = null;
+    let currentPostImageBase64 = "";
+    let activeReplyImageBase64 = {};
 
     onAuthStateChanged(auth, async (user) => {
       const modal = document.getElementById('authModal');
@@ -755,7 +764,57 @@
       reader.readAsDataURL(file);
     };
 
-    // Metin içindeki @kullanici_adi ifadelerini tıklanabilir etiketlere dönüştürme fonksiyonu
+    // Gönderiye Fotoğraf Ekleme
+    window.triggerPostImageUpload = function() {
+      document.getElementById('hiddenPostImageInput').click();
+    };
+
+    window.previewPostImage = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentPostImageBase64 = e.target.result;
+        document.getElementById('postImagePreview').src = currentPostImageBase64;
+        document.getElementById('postImagePreviewContainer').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.removePostImage = function() {
+      currentPostImageBase64 = "";
+      document.getElementById('postImagePreview').src = "";
+      document.getElementById('postImagePreviewContainer').classList.add('hidden');
+      document.getElementById('hiddenPostImageInput').value = "";
+    };
+
+    // Yanıta Fotoğraf Ekleme Tetikleyicisi
+    window.triggerReplyImageUpload = function(postId) {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+          activeReplyImageBase64[postId] = uploadEvent.target.result;
+          const previewBox = document.getElementById(`replyImagePreviewBox_${postId}`);
+          const previewImg = document.getElementById(`replyImagePreviewImg_${postId}`);
+          previewImg.src = activeReplyImageBase64[postId];
+          previewBox.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      };
+      fileInput.click();
+    };
+
+    window.removeReplyImage = function(postId) {
+      activeReplyImageBase64[postId] = "";
+      const previewBox = document.getElementById(`replyImagePreviewBox_${postId}`);
+      previewBox.classList.add('hidden');
+    };
+
     function parseMentions(text) {
       return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1.5 py-0.5 rounded">@$1</span>');
     }
@@ -767,7 +826,7 @@
       }
 
       const text = document.getElementById('postText').value;
-      if (!text.trim()) return alert("Lütfen bir şeyler yazın!");
+      if (!text.trim() && !currentPostImageBase64) return alert("Lütfen bir şeyler yazın veya fotoğraf ekleyin!");
 
       try {
         await addDoc(collection(db, "posts"), {
@@ -776,23 +835,27 @@
           handle: '@' + currentUserData.handle.replace('@',''),
           avatarUrl: currentUserData.avatarUrl || '',
           text: text,
+          postImageUrl: currentPostImageBase64 || '',
           replies: [],
           createdAt: serverTimestamp()
         });
 
         document.getElementById('postText').value = '';
+        removePostImage();
         loadPostsFromFirestore();
       } catch (error) {
         alert("Paylaşım gönderilemedi: " + error.message);
       }
     };
 
-    // Yanıt (Ment) Gönderme ve Firestore Güncelleme
+    // Twitter Tarzı Yanıt ve Fotoğraf Gönderme
     window.sendReply = async function(postId) {
       if (!auth.currentUser) return alert("Yanıt vermek için giriş yapmalısın.");
       const inputEl = document.getElementById(`replyInput_${postId}`);
       const replyText = inputEl.value.trim();
-      if (!replyText) return alert("Boş yanıt gönderilemez!");
+      const replyImage = activeReplyImageBase64[postId] || "";
+
+      if (!replyText && !replyImage) return alert("Boş yanıt gönderilemez!");
 
       try {
         const postRef = doc(db, "posts", postId);
@@ -804,12 +867,15 @@
           replies.push({
             name: currentUserData.name,
             handle: '@' + currentUserData.handle.replace('@',''),
+            avatarUrl: currentUserData.avatarUrl || '',
             text: replyText,
+            replyImageUrl: replyImage,
             time: 'Az önce'
           });
 
           await setDoc(postRef, { replies }, { merge: true });
           inputEl.value = '';
+          activeReplyImageBase64[postId] = "";
           loadPostsFromFirestore();
         }
       } catch (error) {
@@ -817,7 +883,6 @@
       }
     };
 
-    // Vızzlatma Sistemi ve Bildirim Gönderme
     window.vizzlaUser = async function(postOwnerUid, postOwnerName) {
       if (!auth.currentUser) return;
       if (postOwnerUid === auth.currentUser.uid) return;
@@ -889,7 +954,7 @@
           const p = docSnap.data();
           const postId = docSnap.id;
           const isOwner = auth.currentUser && p.uid === auth.currentUser.uid;
-          appendPostToDOM(postId, p.uid, p.name, p.handle, p.avatarUrl, p.text, p.replies || [], 'Az önce', isOwner);
+          appendPostToDOM(postId, p.uid, p.name, p.handle, p.avatarUrl, p.text, p.postImageUrl || '', p.replies || [], 'Az önce', isOwner);
         });
       } catch (e) {
         console.error("Gönderiler yüklenirken hata:", e);
@@ -907,7 +972,7 @@
       }
     };
 
-    function appendPostToDOM(postId, ownerUid, name, handle, avatarUrl, text, replies, time, isOwner) {
+    function appendPostToDOM(postId, ownerUid, name, handle, avatarUrl, text, postImageUrl, replies, time, isOwner) {
       const timeline = document.getElementById('timeline');
       const newPost = document.createElement('div');
       newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group space-y-3";
@@ -928,15 +993,39 @@
 
       const formattedText = parseMentions(text);
 
-      let repliesHTML = replies.map(r => `
-        <div class="bg-yellow-50/60 dark:bg-gray-900/40 p-2.5 rounded-xl border border-yellow-100 dark:border-gray-700 text-xs space-y-1">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-gray-900 dark:text-white">${r.name} <span class="text-[10px] text-gray-400 font-normal">${r.handle}</span></span>
-            <span class="text-[10px] text-gray-400">${r.time}</span>
-          </div>
-          <p class="text-gray-700 dark:text-gray-200">${parseMentions(r.text)}</p>
+      const postImageHTML = postImageUrl ? `
+        <div class="mt-2 rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700 max-h-80 bg-gray-100 dark:bg-gray-900">
+          <img src="${postImageUrl}" class="w-full h-full object-cover" alt="Gönderi Görseli">
         </div>
-      `).join('');
+      ` : '';
+
+      let repliesHTML = replies.map(r => {
+        const replyAvatarHTML = (r.avatarUrl && r.avatarUrl !== '') 
+          ? `<img src="${r.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
+          : `<i class="fa-solid fa-user text-gray-400 text-[10px]"></i>`;
+
+        const replyImageHTML = r.replyImageUrl ? `
+          <div class="mt-1.5 rounded-lg overflow-hidden border border-yellow-200 dark:border-gray-700 max-h-48 bg-gray-100 dark:bg-gray-900">
+            <img src="${r.replyImageUrl}" class="w-full h-full object-cover" alt="Yanıt Görseli">
+          </div>
+        ` : '';
+
+        return `
+          <div class="flex gap-2.5 pt-2 border-t border-yellow-100 dark:border-gray-700/60">
+            <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center overflow-hidden shrink-0 border border-gray-300 dark:border-gray-600">
+              ${replyAvatarHTML}
+            </div>
+            <div class="flex-1 space-y-1">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-xs text-gray-900 dark:text-white">${r.name} <span class="text-[10px] text-gray-400 font-normal">${r.handle}</span></span>
+                <span class="text-[10px] text-gray-400">${r.time}</span>
+              </div>
+              <p class="text-xs text-gray-700 dark:text-gray-200 leading-relaxed">${parseMentions(r.text)}</p>
+              ${replyImageHTML}
+            </div>
+          </div>
+        `;
+      }).join('');
 
       newPost.innerHTML = `
         <div class="flex items-center justify-between mb-1">
@@ -955,13 +1044,23 @@
           </div>
         </div>
         <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>
+        ${postImageHTML}
         
-        <!-- Yanıtlar Bölümü -->
-        <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-2">
+        <!-- Twitter Tarzı Yanıtlar Bölümü -->
+        <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-3">
           <div class="space-y-2">${repliesHTML}</div>
-          <div class="flex gap-2 pt-1">
-            <input type="text" id="replyInput_${postId}" placeholder="Yanıt yaz (örn: @kullanici)..." class="flex-1 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400">
-            <button onclick="sendReply('${postId}')" class="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold rounded-xl text-xs transition cursor-pointer">Yanıtla</button>
+          
+          <!-- Yanıt Yazma Alanı (Fotoğraf Destekli) -->
+          <div class="bg-yellow-50/40 dark:bg-gray-900/40 p-2.5 rounded-2xl border border-yellow-200 dark:border-gray-700 space-y-2">
+            <div id="replyImagePreviewBox_${postId}" class="hidden relative w-full h-28 rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700">
+              <img id="replyImagePreviewImg_${postId}" src="" class="w-full h-full object-cover" alt="Yanıt Önizleme">
+              <button onclick="removeReplyImage('${postId}')" class="absolute top-1.5 right-1.5 bg-black/60 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="replyInput_${postId}" placeholder="Yanıtla (@kullanici yazarak etiketle)..." class="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400">
+              <button onclick="triggerReplyImageUpload('${postId}')" type="button" class="text-gray-400 hover:text-yellow-600 px-2 py-1 text-sm cursor-pointer" title="Yanıtına Fotoğraf Ekle"><i class="fa-regular fa-image"></i></button>
+              <button onclick="sendReply('${postId}')" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs transition cursor-pointer">Yanıtla</button>
+            </div>
           </div>
         </div>
       `;
@@ -969,7 +1068,7 @@
     }
   </script>
 
-  <!-- Arayüz Kontrolleri ve Kalıcı Tema Mantığı -->
+  <!-- Arayüz Kontrolleri -->
   <script>
     function openMobileDrawer() {
       document.getElementById('mobileDrawer').classList.remove('drawer-closed');
@@ -1095,7 +1194,6 @@
       });
     }
 
-    // Gece/Gündüz Modunu hafızada saklayan ve anlık değiştiren fonksiyon
     function toggleDarkMode() {
       const html = document.documentElement;
       const themeIcon = document.getElementById('themeIcon');
@@ -1114,7 +1212,6 @@
       }
     }
 
-    // Sayfa açıldığında tema butonunun ikonunu güncel duruma getir
     window.addEventListener('DOMContentLoaded', () => {
       const themeIcon = document.getElementById('themeIcon');
       const themeText = document.getElementById('themeText');
@@ -1128,7 +1225,7 @@
     });
 
     function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
-    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+    function closeProfileModal() { document.getElementById('profileModal'].classList.add('hidden'); }
   </script>
 </body>
 </html>
