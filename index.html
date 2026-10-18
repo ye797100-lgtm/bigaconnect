@@ -265,8 +265,8 @@
                 <p id="profileHandleDisplay" class="text-xs text-gray-400 font-medium">@---</p>
                 
                 <div class="flex flex-wrap gap-2 pt-2">
-                  <span class="bg-yellow-100 dark:bg-gray-700 text-yellow-900 dark:text-yellow-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-graduation-cap mr-1"></i> <span id="profileDeptDisplay">---</span></span>
-                  <span class="bg-amber-100 dark:bg-gray-700 text-amber-900 dark:text-amber-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-layer-group mr-1"></i> <span id="profileClassDisplay">---</span></span>
+                  <span class="bg-yellow-100 dark:bg-gray-700 text-yellow-900 dark:text-yellow-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-graduation-cap mr-1"></i> <span id="profileDeptDisplay">İktisat</span></span>
+                  <span class="bg-amber-100 dark:bg-gray-700 text-amber-900 dark:text-amber-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-layer-group mr-1"></i> <span id="profileClassDisplay">1. Sınıf</span></span>
                   <span class="bg-yellow-400/20 text-yellow-800 dark:text-yellow-300 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-bolt mr-1"></i> Vızz Puan: <span id="profileVizzScoreDisplay">0</span></span>
                 </div>
               </div>
@@ -385,7 +385,7 @@
 
   </div>
 
-  <!-- AUTH MODAL -->
+  <!-- AUTH MODAL (Giriş/Kayıt) -->
   <div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[95vh] overflow-y-auto">
       
@@ -472,7 +472,7 @@
     </div>
   </div>
 
-  <!-- PROFİL DÜZENLEME MODALI (Tek Tuşla Gizli/Açık Hesap & Bio) -->
+  <!-- PROFİL DÜZENLEME MODALI -->
   <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -551,6 +551,34 @@
     let activeReplyImageBase64 = {};
     let viewedProfileUserId = null;
     let currentProfileSubTab = 'posts';
+
+    // Sabit Test Verileri (Sayfa Temizlendiğinde Bile Silinmeyecek Tweetler)
+    const MOCK_POSTS = [
+      {
+        id: "mock1",
+        uid: "user_demo_1",
+        name: "Ahmet Yılmaz",
+        handle: "@ahmetyilmaz",
+        avatarUrl: "",
+        text: "Biga İİBF kütüphanesi vize haftasında yine tıka basa dolu! Yer kapmak için sabah 8'de gelmek şart. 📚🐝",
+        postImageUrl: "",
+        replies: [
+          { uid: "user_demo_2", name: "Elif Kaya", handle: "@elifkaya", avatarUrl: "", text: "Aynen valla, sabah 8.15'te geldim tek masa kalmamıştı...", createdAt: "2026-10-18T10:30:00Z" }
+        ],
+        createdAt: new Date(Date.now() - 3600000 * 2)
+      },
+      {
+        id: "mock2",
+        uid: "user_demo_2",
+        name: "Elif Kaya",
+        handle: "@elifkaya",
+        avatarUrl: "",
+        text: "Ramazan Aydın Kampüsü yemekhanesindeki bugünkü tatlı efsaneydi! Kim yaptıysa ellerine sağlık. 👌😋",
+        postImageUrl: "",
+        replies: [],
+        createdAt: new Date(Date.now() - 3600000 * 5)
+      }
+    ];
 
     setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Kalıcılık hatası:", err));
 
@@ -1148,7 +1176,6 @@
         viewedProfileUserId = userId;
         const uData = snap.data();
 
-        // Gizlilik Kontrolü: Gizli hesap ve takip etmiyorsa içerikleri gösterme
         const isFollowing = (currentUserData.following || []).includes(userId);
         if (uData.isPrivate && !isFollowing) {
           alert("Bu hesap gizli! Gönderileri görebilmek için takip etmelisin.");
@@ -1268,21 +1295,20 @@
         const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.empty) {
-          timeline.innerHTML = `
-            <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
-              <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
-              <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
-            </div>
-          `;
-          return;
+        timeline.innerHTML = '';
+
+        // Hem veritabanındaki gönderileri hem de varsayılan mock tweetleri birleştir
+        let allPosts = [];
+        querySnapshot.forEach((docSnap) => {
+          allPosts.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        if (allPosts.length === 0) {
+          allPosts = MOCK_POSTS;
         }
 
-        timeline.innerHTML = '';
-        querySnapshot.forEach((docSnap) => {
-          const p = docSnap.data();
-          const postId = docSnap.id;
+        allPosts.forEach((p) => {
+          const postId = p.id;
           const isOwner = auth.currentUser && p.uid === auth.currentUser.uid;
           const timeAgo = formatTimeAgo(p.createdAt);
           appendPostToDOM(postId, p.uid, p.name, p.handle, p.avatarUrl, p.text, p.postImageUrl || '', p.replies || [], timeAgo, isOwner);
@@ -1526,15 +1552,4 @@
       };
 
       const titleElement = document.getElementById('pageTitle');
-      if (titleElement) titleElement.innerText = titles[tabName.toLowerCase()] || 'BigaConnect';
-
-      document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
-      const targetContent = document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
-      if (targetContent) targetContent.classList.remove('hidden');
-
-      const activeBtnId = 'menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-      document.querySelectorAll('.menu-btn, .menu-btn-mobile').forEach(btn => {
-        if (btn.id === activeBtnId) {
-          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
-        } else {
-          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100
+      if (
