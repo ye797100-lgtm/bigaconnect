@@ -11,6 +11,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script>
+    // Sayfa açılmadan önce kaydedilen temayı uyguluyoruz (Sayfa yenilense bile mod kalır)
+    if (localStorage.getItem('biga_theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     tailwind.config = {
       darkMode: 'class',
       theme: {
@@ -50,7 +57,7 @@
 </head>
 <body class="bg-yellow-50/30 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
 
-  <!-- Gizli Dosya Seçiciler (Twitter Tarzı Doğrudan Tıklama İçin) -->
+  <!-- Gizli Dosya Seçiciler -->
   <input type="file" id="hiddenAvatarInput" accept="image/*" class="hidden" onchange="uploadDirectAvatar(event)">
   <input type="file" id="hiddenBannerInput" accept="image/*" class="hidden" onchange="uploadDirectBanner(event)">
 
@@ -188,7 +195,7 @@
       <div id="contentTimeline" class="page-content space-y-4 sm:space-y-5">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm border-2 border-yellow-200 dark:border-gray-700 relative">
           
-          <textarea id="postText" rows="3" placeholder="Biga kampüsünde ne oluyor? Düşüncelerini vızıldat..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none text-sm dark:text-white"></textarea>
+          <textarea id="postText" rows="3" placeholder="Biga kampüsünde ne oluyor? @kullanici_adi ile etiketleyebilirsin..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none text-sm dark:text-white"></textarea>
           <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
             <div class="flex gap-4 text-gray-400 text-base">
               <button class="hover:text-yellow-600 transition"><i class="fa-regular fa-image"></i></button>
@@ -207,12 +214,11 @@
         </div>
       </div>
 
-      <!-- 2. PROFİL SEKMESİ (Twitter Tarzı Doğrudan Tıklanabilir Banner ve PP) -->
+      <!-- 2. PROFİL SEKMESİ -->
       <div id="contentProfile" class="page-content hidden space-y-4">
         <div id="profileLoggedInView" class="space-y-4">
           <div class="bg-white dark:bg-gray-800 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm overflow-hidden">
             
-            <!-- Banner Alanı (Üstüne tıklayınca galeri/kamera açılır) -->
             <div onclick="triggerBannerUpload()" title="Bannerı Değiştirmek İçin Tıkla" class="h-36 sm:h-48 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 relative overflow-hidden cursor-pointer group">
               <img id="profileBannerImg" src="" class="w-full h-full object-cover hidden" alt="Banner">
               <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5">
@@ -220,7 +226,6 @@
               </div>
             </div>
 
-            <!-- Profil Detayları ve PP (PP'ye tıklayınca galeri/kamera açılır) -->
             <div class="px-5 pb-6 pt-0 relative">
               <div class="flex justify-between items-end -mt-12 sm:-mt-14 mb-3">
                 <div onclick="triggerAvatarUpload()" title="Profil Fotoğrafını Değiştirmek İçin Tıkla" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-300 flex items-center justify-center text-4xl border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden relative bg-white cursor-pointer group">
@@ -279,10 +284,11 @@
 
       <!-- 5. BİLDİRİMLER SEKMESİ -->
       <div id="contentNotifications" class="page-content hidden space-y-3">
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-12 flex flex-col items-center justify-center">
-          <div class="w-14 h-14 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl mb-3 shadow-xs"><i class="fa-solid fa-bell"></i></div>
-          <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
-          <p class="text-xs text-gray-400 mt-1 max-w-xs">Biri seni vızzladığında veya paylaşımını beğendiğinde burada görünecek.</p>
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
+          <h3 class="font-black text-gray-900 dark:text-white text-base sm:text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-bell text-yellow-500"></i> Bildirimler</h3>
+          <div id="notificationsList" class="space-y-2">
+            <div class="text-center py-8 text-xs text-gray-400">Henüz bir bildirim yok. Biri seni vızzlattığında burada görünecek.</div>
+          </div>
         </div>
       </div>
 
@@ -334,7 +340,7 @@
 
   </div>
 
-  <!-- AUTH MODAL (Giriş / Kayıt) -->
+  <!-- AUTH MODAL -->
   <div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[95vh] overflow-y-auto">
       
@@ -344,13 +350,11 @@
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Kampüs Avucunuzun İçinde</p>
       </div>
 
-      <!-- Sekmeler -->
       <div class="flex bg-gray-100 dark:bg-gray-700 p-1.5 rounded-2xl mb-4">
         <button id="btnTabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-black rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition cursor-pointer">GİRİŞ YAP</button>
         <button id="btnTabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-black rounded-xl text-gray-400 hover:text-gray-600 transition cursor-pointer">KAYIT OL</button>
       </div>
 
-      <!-- Google ile Giriş -->
       <button type="button" onclick="handleGoogleLogin()" class="w-full mb-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer">
         <i class="fa-brands fa-google text-red-500"></i> Google ile Devam Et
       </button>
@@ -361,7 +365,6 @@
         <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
       </div>
 
-      <!-- GİRİŞ FORMU -->
       <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-3">
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
@@ -382,7 +385,6 @@
         <button type="submit" class="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition cursor-pointer">Giriş Yap</button>
       </form>
 
-      <!-- KAYIT FORMU -->
       <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-2.5 hidden">
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
@@ -455,7 +457,7 @@
     </div>
   </div>
 
-  <!-- PROFİL DÜZENLEME MODALI (Bölüm ve Sınıf Değiştirme Eklendi) -->
+  <!-- PROFİL DÜZENLEME MODALI -->
   <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -523,7 +525,7 @@
     </div>
   </div>
 
-  <!-- Firebase Entegrasyonu ve Twitter Tarzı Yükleme Mantığı -->
+  <!-- Firebase Entegrasyonu ve Yeni Özellikler -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -558,16 +560,20 @@
           currentUserData = userDocSnap.data();
         } else {
           currentUserData = {
+            uid: user.uid,
             name: user.displayName || "Biga Öğrencisi",
             handle: user.email.split('@')[0],
             dept: "İktisat",
             classNum: "1. Sınıf",
             avatarUrl: user.photoURL || "",
             bannerUrl: "",
-            bio: "Biga kampüsünde vızıldamaya hazır! 🐝"
+            bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
+            notifications: []
           };
+          await setDoc(userDocRef, currentUserData);
         }
         updateLoginState(true, currentUserData);
+        loadNotifications();
       } else {
         modal.classList.remove('hidden');
         updateLoginState(false, null);
@@ -597,7 +603,7 @@
     window.handleRegister = async function(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value;
-      const handle = document.getElementById('regHandle').value;
+      const handle = document.getElementById('regHandle').value.replace('@','');
       const dept = document.getElementById('regDept').value;
       const classNum = document.getElementById('regClass').value;
       const email = document.getElementById('regEmail').value;
@@ -617,7 +623,8 @@
           email,
           avatarUrl: "",
           bannerUrl: "",
-          bio: "Biga kampüsünde vızıldamaya hazır! 🐝"
+          bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
+          notifications: []
         };
 
         await setDoc(doc(db, "users", user.uid), userData);
@@ -663,7 +670,8 @@
             email: user.email,
             avatarUrl: user.photoURL || "",
             bannerUrl: "",
-            bio: "Biga kampüsünde vızıldamaya hazır! 🐝"
+            bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
+            notifications: []
           });
         }
         alert("🐝 Google ile giriş başarılı!");
@@ -679,13 +687,12 @@
       }
     };
 
-    // Profil Yazı Bilgilerini Kaydetme
     window.saveProfile = async function(e) {
       e.preventDefault();
       if (!auth.currentUser) return;
 
       const name = document.getElementById('editName').value;
-      const handle = document.getElementById('editHandle').value;
+      const handle = document.getElementById('editHandle').value.replace('@','');
       const dept = document.getElementById('editDept').value;
       const classNum = document.getElementById('editClass').value;
       const bio = document.getElementById('editBio').value;
@@ -706,7 +713,6 @@
       closeProfileModal();
     };
 
-    // Twitter Tarzı PP Değiştirme (Doğrudan Tıklayınca Kamera/Galeri İzni)
     window.triggerAvatarUpload = function() {
       document.getElementById('hiddenAvatarInput').click();
     };
@@ -728,7 +734,6 @@
       reader.readAsDataURL(file);
     };
 
-    // Twitter Tarzı Banner Değiştirme (Doğrudan Tıklayınca Kamera/Galeri İzni)
     window.triggerBannerUpload = function() {
       document.getElementById('hiddenBannerInput').click();
     };
@@ -750,6 +755,11 @@
       reader.readAsDataURL(file);
     };
 
+    // Metin içindeki @kullanici_adi ifadelerini tıklanabilir etiketlere dönüştürme fonksiyonu
+    function parseMentions(text) {
+      return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1.5 py-0.5 rounded">@$1</span>');
+    }
+
     window.sharePost = async function() {
       if (!auth.currentUser) {
         alert("Paylaşım yapmak için lütfen giriş yapın.");
@@ -766,6 +776,7 @@
           handle: '@' + currentUserData.handle.replace('@',''),
           avatarUrl: currentUserData.avatarUrl || '',
           text: text,
+          replies: [],
           createdAt: serverTimestamp()
         });
 
@@ -775,6 +786,86 @@
         alert("Paylaşım gönderilemedi: " + error.message);
       }
     };
+
+    // Yanıt (Ment) Gönderme ve Firestore Güncelleme
+    window.sendReply = async function(postId) {
+      if (!auth.currentUser) return alert("Yanıt vermek için giriş yapmalısın.");
+      const inputEl = document.getElementById(`replyInput_${postId}`);
+      const replyText = inputEl.value.trim();
+      if (!replyText) return alert("Boş yanıt gönderilemez!");
+
+      try {
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await getDoc(postRef);
+        if (postSnap.exists()) {
+          const postData = postSnap.data();
+          const replies = postData.replies || [];
+          
+          replies.push({
+            name: currentUserData.name,
+            handle: '@' + currentUserData.handle.replace('@',''),
+            text: replyText,
+            time: 'Az önce'
+          });
+
+          await setDoc(postRef, { replies }, { merge: true });
+          inputEl.value = '';
+          loadPostsFromFirestore();
+        }
+      } catch (error) {
+        alert("Yanıt gönderilemedi: " + error.message);
+      }
+    };
+
+    // Vızzlatma Sistemi ve Bildirim Gönderme
+    window.vizzlaUser = async function(postOwnerUid, postOwnerName) {
+      if (!auth.currentUser) return;
+      if (postOwnerUid === auth.currentUser.uid) return;
+
+      try {
+        const ownerRef = doc(db, "users", postOwnerUid);
+        const ownerSnap = await getDoc(ownerRef);
+        
+        let notifs = [];
+        if (ownerSnap.exists()) {
+          notifs = ownerSnap.data().notifications || [];
+        }
+
+        notifs.unshift({
+          text: `🐝 <strong>${currentUserData.name}</strong> (@${currentUserData.handle}) seni vızzladı!`,
+          time: 'Az önce'
+        });
+
+        await setDoc(ownerRef, { notifications: notifs }, { merge: true });
+        alert(`🐝 Bzzz! ${postOwnerName} kişisini başarıyla vızzladın ve bildirim gönderildi!`);
+      } catch (e) {
+        console.error("Vızzlatma hatası:", e);
+      }
+    };
+
+    async function loadNotifications() {
+      if (!auth.currentUser) return;
+      const listEl = document.getElementById('notificationsList');
+      try {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const notifs = userSnap.data().notifications || [];
+          if (notifs.length === 0) {
+            listEl.innerHTML = `<div class="text-center py-8 text-xs text-gray-400">Henüz bir bildirim yok. Biri seni vızzlattığında burada görünecek.</div>`;
+            return;
+          }
+          listEl.innerHTML = notifs.map(n => `
+            <div class="p-3 bg-yellow-50/50 dark:bg-gray-700/30 rounded-xl border border-yellow-200 dark:border-gray-700 flex items-center justify-between text-xs">
+              <span>${n.text}</span>
+              <span class="text-[10px] text-gray-400">${n.time}</span>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        console.error("Bildirimler yüklenirken hata:", e);
+      }
+    }
 
     async function loadPostsFromFirestore() {
       const timeline = document.getElementById('timeline');
@@ -797,7 +888,8 @@
         querySnapshot.forEach((docSnap) => {
           const p = docSnap.data();
           const postId = docSnap.id;
-          appendPostToDOM(postId, p.name, p.handle, p.avatarUrl, p.text, 'Az önce', p.uid === (auth.currentUser ? auth.currentUser.uid : null));
+          const isOwner = auth.currentUser && p.uid === auth.currentUser.uid;
+          appendPostToDOM(postId, p.uid, p.name, p.handle, p.avatarUrl, p.text, p.replies || [], 'Az önce', isOwner);
         });
       } catch (e) {
         console.error("Gönderiler yüklenirken hata:", e);
@@ -815,10 +907,10 @@
       }
     };
 
-    function appendPostToDOM(postId, name, handle, avatarUrl, text, time, isOwner) {
+    function appendPostToDOM(postId, ownerUid, name, handle, avatarUrl, text, replies, time, isOwner) {
       const timeline = document.getElementById('timeline');
       const newPost = document.createElement('div');
-      newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group";
+      newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group space-y-3";
 
       const avatarHTML = (avatarUrl && avatarUrl !== '') 
         ? `<img src="${avatarUrl}" class="w-full h-full object-cover" alt="PP">`
@@ -829,8 +921,25 @@
           <i class="fa-solid fa-trash-can"></i>
         </button>` : '';
 
+      const vizzlaBtnHTML = !isOwner ? `
+        <button onclick="vizzlaUser('${ownerUid}', '${name}')" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95 cursor-pointer">
+          🐝 Vızzla!
+        </button>` : '';
+
+      const formattedText = parseMentions(text);
+
+      let repliesHTML = replies.map(r => `
+        <div class="bg-yellow-50/60 dark:bg-gray-900/40 p-2.5 rounded-xl border border-yellow-100 dark:border-gray-700 text-xs space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-gray-900 dark:text-white">${r.name} <span class="text-[10px] text-gray-400 font-normal">${r.handle}</span></span>
+            <span class="text-[10px] text-gray-400">${r.time}</span>
+          </div>
+          <p class="text-gray-700 dark:text-gray-200">${parseMentions(r.text)}</p>
+        </div>
+      `).join('');
+
       newPost.innerHTML = `
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-1">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center border border-gray-300 dark:border-gray-600 overflow-hidden">
               ${avatarHTML}
@@ -842,18 +951,25 @@
           </div>
           <div class="flex items-center gap-2">
             ${deleteBtnHTML}
-            <button onclick="vizzla('${name}')" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95 cursor-pointer">
-              🐝 Vızzla!
-            </button>
+            ${vizzlaBtnHTML}
           </div>
         </div>
-        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed mb-3">${text}</p>
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>
+        
+        <!-- Yanıtlar Bölümü -->
+        <div class="pt-2 border-t border-gray-100 dark:border-gray-700 space-y-2">
+          <div class="space-y-2">${repliesHTML}</div>
+          <div class="flex gap-2 pt-1">
+            <input type="text" id="replyInput_${postId}" placeholder="Yanıt yaz (örn: @kullanici)..." class="flex-1 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400">
+            <button onclick="sendReply('${postId}')" class="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold rounded-xl text-xs transition cursor-pointer">Yanıtla</button>
+          </div>
+        </div>
       `;
       timeline.appendChild(newPost);
     }
   </script>
 
-  <!-- Arayüz Kontrolleri -->
+  <!-- Arayüz Kontrolleri ve Kalıcı Tema Mantığı -->
   <script>
     function openMobileDrawer() {
       document.getElementById('mobileDrawer').classList.remove('drawer-closed');
@@ -979,24 +1095,40 @@
       });
     }
 
+    // Gece/Gündüz Modunu hafızada saklayan ve anlık değiştiren fonksiyon
     function toggleDarkMode() {
       const html = document.documentElement;
       const themeIcon = document.getElementById('themeIcon');
       const themeText = document.getElementById('themeText');
+      
       if (html.classList.contains('dark')) {
         html.classList.remove('dark');
+        localStorage.setItem('biga_theme', 'light');
         if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
         if (themeText) themeText.innerText = "Gece Modu";
       } else {
         html.classList.add('dark');
+        localStorage.setItem('biga_theme', 'dark');
         if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
         if (themeText) themeText.innerText = "Gündüz Modu";
       }
     }
 
+    // Sayfa açıldığında tema butonunun ikonunu güncel duruma getir
+    window.addEventListener('DOMContentLoaded', () => {
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+      if (document.documentElement.classList.contains('dark')) {
+        if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
+        if (themeText) themeText.innerText = "Gündüz Modu";
+      } else {
+        if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
+        if (themeText) themeText.innerText = "Gece Modu";
+      }
+    });
+
     function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
     function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
-    function vizzla(kullanici) { alert(`🐝 Bzzz! ${kullanici} kişisini vızzladın!`); }
   </script>
 </body>
 </html>
