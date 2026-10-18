@@ -608,6 +608,12 @@
         try {
           currentUserData = JSON.parse(savedUser);
           if (currentUserData && currentUserData.email) {
+            // Ortak veritabanından en güncel kullanıcı verisini senkronize et
+            let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+            const latestUser = users.find(u => u.email === currentUserData.email);
+            if (latestUser) {
+              currentUserData = latestUser;
+            }
             updateLoginState(true, currentUserData);
           }
         } catch (e) {
@@ -919,6 +925,7 @@
       closeAuthModal();
     }
 
+    // ESNEK GİRİŞ SİSTEMİ (Ortak veritabanı üzerinden her cihazda çalışır)
     function handleLogin(e) {
       e.preventDefault();
       const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
@@ -926,8 +933,9 @@
 
       let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
       const cleanId = identifier.replace('@', '');
+      
       const user = users.find(u => 
-        (u.email === identifier || u.handle.toLowerCase() === cleanId) && u.password === password
+        (u.email.toLowerCase() === identifier || u.handle.toLowerCase() === cleanId) && u.password === password
       );
 
       if (!user) {
@@ -1105,7 +1113,6 @@
       }
     }
 
-    // TWEET ATMA MANTIĞIYLA YANIT GÖNDERME
     function sendReply(postId, targetHandle, originalAuthorName) {
       const input = document.getElementById('reply-input-' + postId);
       if (!input) return;
