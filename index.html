@@ -596,7 +596,7 @@
     let isLoggedIn = false;
     let currentUserData = null;
 
-    // SAYFA AÇILDIĞINDA LOCALSTORAGE'DAN TEMA VE KULLANICIYI GÜVENLİ YÜKLE
+    // SAYFA AÇILDIĞINDA KULLANICIYI VE TEMAYI HATIRLA
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('biga_theme');
       if (savedTheme === 'dark') {
@@ -1135,10 +1135,9 @@
             </div>
             <div>
               <h4 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
-                ${name}
-                ${privacy === 'private' ? '<i class="fa-solid fa-lock text-[10px] text-gray-400" title="Gizli Hesap"></i>' : ''}
+                ${name}${privacy === 'private' ? '<i class="fa-solid fa-lock text-[10px] text-gray-400" title="Gizli Hesap"></i>' : ''}
               </h4>
-              <span class="text-xs text-gray-400">${cleanHandle} · ${time}</span>
+              <span class="text-xs text-gray-400">${cleanHandle} ·${time}</span>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -1187,62 +1186,4 @@
           postItem.className = "bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700";
           postItem.innerHTML = `
             <div class="flex items-center gap-3 mb-2">
-              <div class="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                ${avatarHTML}
-              </div>
-              <div>
-                <h4 class="font-bold text-xs text-gray-900 dark:text-white">${p.name}</h4>
-                <span class="text-[10px] text-gray-400">${p.handle} · ${p.time}</span>
-              </div>
-            </div>
-            <p class="text-xs text-gray-800 dark:text-gray-100">${formatTextWithMentions(p.text)}</p>
-          `;
-          container.appendChild(postItem);
-        });
-      } catch (e) {
-        container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
-      }
-    }
-
-    function deletePost(btnElement) {
-      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
-        const postCard = btnElement.closest('.post-card');
-        if (postCard) {
-          postCard.remove();
-          savePostsToStorage();
-          if (currentUserData) loadUserPosts(currentUserData.handle);
-          
-          const timeline = document.getElementById('timeline');
-          if (timeline && timeline.children.length === 0) {
-            timeline.innerHTML = `
-              <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
-                <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
-                <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
-              </div>
-            `;
-          }
-        }
-      }
-    }
-
-    function sendDm() {
-      const input = document.getElementById('dmInput');
-      if (!input || input.disabled) return;
-      const text = input.value.trim();
-      if (!text) return;
-
-      const chatMessages = document.getElementById('chatMessages');
-      if (!chatMessages) return;
-      const msgDiv = document.createElement('div');
-      msgDiv.className = "flex items-start gap-2 justify-end w-full";
-      msgDiv.innerHTML = `<div class="bg-yellow-400 text-gray-900 font-medium p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%] text-sm">${text}</div>`;
-      chatMessages.appendChild(msgDiv);
-      input.value = '';
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function handleDmKey(e) { if (e.key === 'Enter') sendDm(); }
-  </script>
-</body>
-</html>
+              <div class="
