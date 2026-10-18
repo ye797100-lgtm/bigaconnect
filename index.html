@@ -44,8 +44,8 @@
         <div class="md:col-span-1 space-y-2">
             <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
                 <nav class="space-y-1">
-                    <button onclick="switchTab('feed')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-brand-600 bg-brand-50 dark:bg-brand-900/20"><i class="fa-solid fa-house"></i><span>Akış</span></button>
-                    <button onclick="switchTab('profile')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"><i class="fa-solid fa-user"></i><span>Profil</span></button>
+                    <button id="btnNavFeed" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-brand-600 bg-brand-50 dark:bg-brand-900/20"><i class="fa-solid fa-house"></i><span>Akış</span></button>
+                    <button id="btnNavProfile" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"><i class="fa-solid fa-user"></i><span>Profil</span></button>
                 </nav>
             </div>
         </div>
@@ -61,7 +61,7 @@
                         <label class="cursor-pointer text-brand-600 hover:text-brand-700 flex items-center space-x-2 font-medium text-sm">
                             <i class="fa-solid fa-image text-lg"></i>
                             <span id="selectedFileName">Fotoğraf Ekle</span>
-                            <input type="file" id="postImageFile" accept="image/*" class="hidden" onchange="document.getElementById('selectedFileName').innerText = this.files[0] ? this.files[0].name : 'Fotoğraf Ekle'">
+                            <input type="file" id="postImageFile" accept="image/*" class="hidden">
                         </label>
                         <button id="btnCreatePost" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-xl font-bold shadow-md transition-all">Paylaş 🐝</button>
                     </div>
@@ -80,7 +80,7 @@
                         <img id="profileAvatarPreview" src="https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" class="w-24 h-24 rounded-full object-cover border-4 border-brand-500 shadow-md">
                         <label class="absolute bottom-0 right-0 bg-brand-500 text-white p-2 rounded-full cursor-pointer hover:bg-brand-600 shadow">
                             <i class="fa-solid fa-camera text-xs"></i>
-                            <input type="file" id="profileAvatarInput" accept="image/*" class="hidden" onchange="updateProfileAvatar(this)">
+                            <input type="file" id="profileAvatarInput" accept="image/*" class="hidden">
                         </label>
                     </div>
                     <h2 id="profileNameDisplay" class="text-xl font-bold">Ad Soyad</h2>
@@ -101,14 +101,14 @@
                 <p class="text-sm text-gray-500">Kampüsün Sosyal Ağı</p>
             </div>
 
-            <!-- Sekme Seçici (Giriş Yap / Kayıt Ol) -->
+            <!-- Sekme Seçici -->
             <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
-                <button id="tabLoginBtn" onclick="switchAuthMode('login')" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all">Giriş Yap</button>
-                <button id="tabRegisterBtn" onclick="switchAuthMode('register')" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all">Kayıt Ol</button>
+                <button id="tabLoginBtn" type="button" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all cursor-pointer">Giriş Yap</button>
+                <button id="tabRegisterBtn" type="button" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all cursor-pointer">Kayıt Ol</button>
             </div>
 
             <!-- Google İle Giriş Butonu -->
-            <button id="btnGoogleLogin" class="w-full flex items-center justify-center space-x-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 py-3 rounded-xl font-semibold shadow-sm hover:bg-gray-50 transition-all">
+            <button id="btnGoogleLogin" type="button" class="w-full flex items-center justify-center space-x-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 py-3 rounded-xl font-semibold shadow-sm hover:bg-gray-50 transition-all cursor-pointer">
                 <i class="fa-brands fa-google text-red-500"></i>
                 <span>Google ile Devam Et</span>
             </button>
@@ -121,8 +121,272 @@
 
             <!-- Form Alanları -->
             <div class="space-y-4">
-                <!-- Sadece Kayıt Olurken Görünecek Alanlar -->
                 <div id="registerExtraFields" class="space-y-4 hidden">
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-gray-500">Ad Soyad</label>
-                        <input type="text"
+                        <input type="text" id="regFullName" placeholder="Örn: Ahmet Yılmaz" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-gray-500">Kullanıcı Adı</label>
+                        <input type="text" id="regUsername" placeholder="Örn: ahmetyilmaz" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-gray-500">E-Posta Adresi</label>
+                    <input type="email" id="authEmail" placeholder="ornek@gmail.com" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-gray-500">Şifre</label>
+                    <input type="password" id="authPassword" placeholder="******" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Dinamik İşlem Butonu -->
+                <button id="authActionBtn" type="button" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold shadow-md transition-all cursor-pointer">Giriş Yap</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBxhs8iwlepLjGPbezGKDu8HhFxJICEVIo",
+          authDomain: "bigaconnect-56469.firebaseapp.com",
+          projectId: "bigaconnect-56469",
+          storageBucket: "bigaconnect-56469.firebasestorage.app",
+          messagingSenderId: "312522372786",
+          appId: "1:312522372786:web:bdddcf9161fc03fd3b7bab",
+          measurementId: "G-9KMN1XX61F"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        let currentMode = 'login';
+
+        // Sekme Değiştirme
+        const tabLoginBtn = document.getElementById('tabLoginBtn');
+        const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+        const extraFields = document.getElementById('registerExtraFields');
+        const actionBtn = document.getElementById('authActionBtn');
+
+        function setAuthMode(mode) {
+            currentMode = mode;
+            if(mode === 'register') {
+                extraFields.classList.remove('hidden');
+                actionBtn.innerText = "Kayıt Ol";
+                tabRegisterBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all cursor-pointer";
+                tabLoginBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all cursor-pointer";
+            } else {
+                extraFields.classList.add('hidden');
+                actionBtn.innerText = "Giriş Yap";
+                tabLoginBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all cursor-pointer";
+                tabRegisterBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all cursor-pointer";
+            }
+        }
+
+        tabLoginBtn.addEventListener('click', () => setAuthMode('login'));
+        tabRegisterBtn.addEventListener('click', () => setAuthMode('register'));
+
+        // Sayfa Sekmeleri (Akış / Profil)
+        document.getElementById('btnNavFeed').addEventListener('click', () => switchTab('feed'));
+        document.getElementById('btnNavProfile').addEventListener('click', () => switchTab('profile'));
+
+        function switchTab(tab) {
+            document.getElementById('tab-feed').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('hidden');
+            if(tab === 'feed') document.getElementById('tab-feed').classList.remove('hidden');
+            if(tab === 'profile') document.getElementById('tab-profile').classList.remove('hidden');
+        }
+
+        // Ana İşlem (Giriş Yap / Kayıt Ol)
+        actionBtn.addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPassword').value.trim();
+
+            if(!email || !pass) return alert("Lütfen e-posta ve şifre alanlarını doldurun.");
+
+            if(currentMode === 'register') {
+                const fullName = document.getElementById('regFullName').value.trim();
+                const username = document.getElementById('regUsername').value.trim();
+                if(!fullName || !username) return alert("Lütfen ad-soyad ve kullanıcı adı alanlarını doldurun.");
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                    const user = userCredential.user;
+                    
+                    await setDoc(doc(db, "users", user.uid), {
+                        fullName: fullName,
+                        username: username,
+                        email: email,
+                        createdAt: serverTimestamp()
+                    });
+
+                    alert("Kayıt başarılı! Hoş geldin.");
+                } catch(error) {
+                    alert("Kayıt Hatası: " + error.message);
+                }
+            } else {
+                try {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } catch(error) {
+                    alert("Giriş Hatası: " + error.message);
+                }
+            }
+        });
+
+        // Google ile Giriş
+        document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                if(!userSnap.exists()) {
+                    await setDoc(userRef, {
+                        fullName: user.displayName || "Kullanıcı",
+                        username: user.email.split('@')[0],
+                        email: user.email,
+                        createdAt: serverTimestamp()
+                    });
+                }
+            } catch(error) {
+                alert("Google ile giriş hatası: " + error.message);
+            }
+        });
+
+        // Çıkış
+        document.getElementById('btnLogout').addEventListener('click', async () => {
+            await signOut(auth);
+        });
+
+        // Fotoğraf Adı Gösterme
+        document.getElementById('postImageFile').addEventListener('change', function() {
+            document.getElementById('selectedFileName').innerText = this.files[0] ? this.files[0].name : 'Fotoğraf Ekle';
+        });
+
+        // Gönderi Paylaşma
+        document.getElementById('btnCreatePost').addEventListener('click', async () => {
+            const content = document.getElementById('postInput').value;
+            const fileInput = document.getElementById('postImageFile');
+            let imageUrl = "";
+
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.readAsDataURL(fileInput.files[0]);
+                reader.onload = async function() {
+                    imageUrl = reader.result;
+                    await savePost(content, imageUrl);
+                }
+            } else {
+                await savePost(content, "");
+            }
+        });
+
+        async function savePost(content, imageUrl) {
+            if(!content.trim() && !imageUrl) return alert("Boş gönderi paylaşılamaz.");
+            try {
+                const user = auth.currentUser;
+                let authorName = user.email;
+                
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if(userDoc.exists()) {
+                    authorName = `@${userDoc.data().username} (${userDoc.data().fullName})`;
+                }
+
+                await addDoc(collection(db, "posts"), {
+                    content: content,
+                    imageUrl: imageUrl,
+                    author: authorName,
+                    createdAt: serverTimestamp()
+                });
+                document.getElementById('postInput').value = "";
+                document.getElementById('postImageFile').value = "";
+                document.getElementById('selectedFileName').innerText = "Fotoğraf Ekle";
+                loadPosts();
+            } catch(e) {
+                alert("Paylaşım hatası: " + e.message);
+            }
+        }
+
+        async function loadPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '<p class="text-center text-gray-400">Yükleniyor...</p>';
+            try {
+                const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                container.innerHTML = "";
+                
+                if(querySnapshot.empty) {
+                    container.innerHTML = '<p class="text-center text-gray-400">Henüz hiç gönderi paylaşılmadı. İlk paylaşımı sen yap! 🐝</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((docSnap) => {
+                    const post = docSnap.data();
+                    container.innerHTML += `
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-brand-500 rounded-full flex items-center text-white justify-center font-bold">🐝</div>
+                                <div>
+                                    <h4 class="font-bold text-sm">${post.author}</h4>
+                                    <span class="text-xs text-gray-400">ÇOMÜ Biga Kampüsü</span>
+                                </div>
+                            </div>
+                            ${post.content ? `<p class="text-gray-700 dark:text-gray-200">${post.content}</p>` : ''}
+                            ${post.imageUrl ? `<img src="${post.imageUrl}" class="rounded-xl max-h-96 w-full object-cover">` : ''}
+                        </div>
+                    `;
+                });
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = '<p class="text-center text-red-400">Gönderiler yüklenirken hata oluştu.</p>';
+            }
+        }
+
+        // Profil Fotoğrafı Önizleme
+        document.getElementById('profileAvatarInput').addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileAvatarPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Oturum Durumu Dinleyicisi
+        onAuthStateChanged(auth, async (user) => {
+            const modal = document.getElementById('authModal');
+            if (user) {
+                modal.classList.add('hidden');
+                
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if(userDoc.exists()) {
+                    const data = userDoc.data();
+                    document.getElementById('profileNameDisplay').innerText = data.fullName;
+                    document.getElementById('profileUsernameDisplay').innerText = "@" + data.username;
+                    document.getElementById('profileEmailDisplay').innerText = data.email;
+                    document.getElementById('userDisplayUsername').innerText = "@" + data.username;
+                } else {
+                    document.getElementById('profileNameDisplay').innerText = user.displayName || "Kullanıcı";
+                    document.getElementById('profileUsernameDisplay').innerText = "@kullanici";
+                    document.getElementById('profileEmailDisplay').innerText = user.email;
+                    document.getElementById('userDisplayUsername').innerText = user.email;
+                }
+                loadPosts();
+            } else {
+                modal.classList.remove('hidden');
+                document.getElementById('userDisplayUsername').innerText = "";
+            }
+        });
+    </script>
+</body>
+</html>
