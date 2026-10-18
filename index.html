@@ -532,11 +532,11 @@
     </div>
   </div>
 
-  <!-- Firebase Entegrasyonu ve Fotoğraflı Yanıt Mantığı -->
+  <!-- Firebase Entegrasyonu ve Kararlı Yanıt/Ment Yapısı -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp, deleteDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBxhs8iwlepLjGPbezGKDu8HhFxJICEVIo",
@@ -764,7 +764,6 @@
       reader.readAsDataURL(file);
     };
 
-    // Gönderiye Fotoğraf Ekleme
     window.triggerPostImageUpload = function() {
       document.getElementById('hiddenPostImageInput').click();
     };
@@ -788,7 +787,6 @@
       document.getElementById('hiddenPostImageInput').value = "";
     };
 
-    // Yanıta Fotoğraf Ekleme Tetikleyicisi
     window.triggerReplyImageUpload = function(postId) {
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
@@ -848,7 +846,6 @@
       }
     };
 
-    // Twitter Tarzı Yanıt ve Fotoğraf Gönderme
     window.sendReply = async function(postId) {
       if (!auth.currentUser) return alert("Yanıt vermek için giriş yapmalısın.");
       const inputEl = document.getElementById(`replyInput_${postId}`);
@@ -859,25 +856,22 @@
 
       try {
         const postRef = doc(db, "posts", postId);
-        const postSnap = await getDoc(postRef);
-        if (postSnap.exists()) {
-          const postData = postSnap.data();
-          const replies = postData.replies || [];
-          
-          replies.push({
-            name: currentUserData.name,
-            handle: '@' + currentUserData.handle.replace('@',''),
-            avatarUrl: currentUserData.avatarUrl || '',
-            text: replyText,
-            replyImageUrl: replyImage,
-            time: 'Az önce'
-          });
+        const newReply = {
+          name: currentUserData.name,
+          handle: '@' + currentUserData.handle.replace('@',''),
+          avatarUrl: currentUserData.avatarUrl || '',
+          text: replyText,
+          replyImageUrl: replyImage,
+          time: 'Az önce'
+        };
 
-          await setDoc(postRef, { replies }, { merge: true });
-          inputEl.value = '';
-          activeReplyImageBase64[postId] = "";
-          loadPostsFromFirestore();
-        }
+        await updateDoc(postRef, {
+          replies: arrayUnion(newReply)
+        });
+
+        inputEl.value = '';
+        activeReplyImageBase64[postId] = "";
+        loadPostsFromFirestore();
       } catch (error) {
         alert("Yanıt gönderilemedi: " + error.message);
       }
@@ -1225,7 +1219,7 @@
     });
 
     function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
-    function closeProfileModal() { document.getElementById('profileModal'].classList.add('hidden'); }
+    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
   </script>
 </body>
 </html>
