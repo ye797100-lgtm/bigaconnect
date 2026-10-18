@@ -237,20 +237,20 @@
         <div id="profileLoggedInView" class="space-y-4">
           <div class="bg-white dark:bg-gray-800 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm overflow-hidden">
             
-            <div id="profileBannerContainer" class="h-36 sm:h-48 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 relative overflow-hidden group">
+            <div id="profileBannerContainer" class="h-36 sm:h-48 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 relative overflow-hidden group cursor-pointer" onclick="triggerBannerUpload()">
               <img id="profileBannerImg" src="" class="w-full h-full object-cover hidden" alt="Banner">
-              <div id="bannerEditOverlay" class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5 cursor-pointer hidden" onclick="triggerBannerUpload()">
-                <i class="fa-solid fa-camera"></i> Bannerı Değiştir
+              <div id="bannerEditOverlay" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                <i class="fa-solid fa-camera"></i> Banner Fotoğrafını Değiştir
               </div>
             </div>
 
             <div class="px-5 pb-6 pt-0 relative">
               <div class="flex justify-between items-end -mt-12 sm:-mt-14 mb-3">
-                <div id="profileAvatarContainer" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-300 flex items-center justify-center text-4xl border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden relative bg-white group">
+                <div id="profileAvatarContainer" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-300 flex items-center justify-center text-4xl border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden relative bg-white group cursor-pointer" onclick="triggerAvatarUpload()">
                   <i id="profileAvatarDefaultIcon" class="fa-solid fa-user"></i>
                   <img id="profileAvatarImg" src="" class="w-full h-full object-cover hidden" alt="PP">
-                  <div id="avatarEditOverlay" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold text-center p-1 cursor-pointer hidden" onclick="triggerAvatarUpload()">
-                    <i class="fa-solid fa-camera"></i>
+                  <div id="avatarEditOverlay" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold text-center p-1">
+                    <i class="fa-solid fa-camera"></i> Değiştir
                   </div>
                 </div>
                 
@@ -420,13 +420,6 @@
           <input type="password" id="loginPassword" required placeholder="******" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
         
-        <div class="flex items-center justify-between text-xs">
-          <label class="flex items-center gap-2 cursor-pointer text-gray-700 dark:text-gray-300 font-medium">
-            <input type="checkbox" id="rememberMe" checked class="w-4 h-4 text-yellow-500 rounded border-gray-300 focus:ring-yellow-400">
-            Beni Hatırla
-          </label>
-        </div>
-
         <button type="submit" class="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition cursor-pointer">Giriş Yap</button>
       </form>
 
@@ -446,53 +439,23 @@
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümünüz</label>
           <select id="regDept" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
             <option value="" disabled selected>Bölümünüzü Seçin</option>
-            <optgroup label="İktisadi ve İdari Bilimler Fakültesi (İİBF)">
-              <option value="İktisat">İktisat</option>
-              <option value="İşletme">İşletme</option>
-              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
-              <option value="Maliye">Maliye</option>
-              <option value="Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)">Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)</option>
-              <option value="Ekonometri">Ekonometri</option>
-              <option value="Siyaset Bilimi ve Kamu Yönetimi">Siyaset Bilimi ve Kamu Yönetimi</option>
-              <option value="Yönetim Bilişim Sistemleri (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
-            </optgroup>
-            <optgroup label="Uygulamalı Bilimler Fakültesi (UBF)">
-              <option value="Uluslararası Ticaret ve Lojistik">Uluslararası Ticaret ve Lojistik</option>
-              <option value="Finans ve Bankacılık">Finans ve Bankacılık</option>
-              <option value="Muhasebe ve Finans Yönetimi">Muhasebe ve Finans Yönetimi</option>
-              <option value="Gayrimenkul Gelişimi ve Yönetimi">Gayrimenkul Gelişimi ve Yönetimi</option>
-            </optgroup>
-            <optgroup label="Biga Meslek Yüksekokulu (MYO)">
-              <option value="Muhasebe ve Vergi Uygulamaları">Muhasebe ve Vergi Uygulamaları</option>
-              <option value="İşletme Yönetimi">İşletme Yönetimi</option>
-              <option value="Pazarlama">Pazarlama</option>
-              <option value="Otomotiv Teknolojisi">Otomotiv Teknolojisi</option>
-              <option value="Elektrik">Elektrik</option>
-              <option value="Makine">Makine</option>
-              <option value="Gıda Teknolojisi">Gıda Teknolojisi</option>
-              <option value="Süt ve Ürünleri Teknolojisi">Süt ve Ürünleri Teknolojisi</option>
-              <option value="Yerel Yönetimler">Yerel Yönetimler</option>
-              <option value="Kooperatifçilik">Kooperatifçilik</option>
-            </optgroup>
+            <option value="İktisat">İktisat</option>
+            <option value="İşletme">İşletme</option>
+            <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+            <option value="Maliye">Maliye</option>
+            <option value="Yönetim Bilişim Sistemleri (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
+            <option value="Biga MYO">Biga MYO</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfınız</label>
           <select id="regClass" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
             <option value="" disabled selected>Sınıfınızı Seçin</option>
-            <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
+            <option value="Hazırlık">Hazırlık Sınıfı</option>
             <option value="1. Sınıf">1. Sınıf</option>
             <option value="2. Sınıf">2. Sınıf</option>
             <option value="3. Sınıf">3. Sınıf</option>
             <option value="4. Sınıf">4. Sınıf</option>
-            <option value="Mezun">Mezun</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Hesap Gizliliği</label>
-          <select id="regIsPrivate" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
-            <option value="false">Açık Hesap (Herkes takip edebilir)</option>
-            <option value="true">Gizli Hesap (Takip istekleri onay gerektirir)</option>
           </select>
         </div>
         <div>
@@ -509,7 +472,7 @@
     </div>
   </div>
 
-  <!-- PROFİL DÜZENLEME MODALI -->
+  <!-- PROFİL DÜZENLEME MODALI (Tek Tuşla Gizli/Açık Hesap & Bio) -->
   <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -527,52 +490,29 @@
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümünüz</label>
           <select id="editDept" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
-            <optgroup label="İktisadi ve İdari Bilimler Fakültesi (İİBF)">
-              <option value="İktisat">İktisat</option>
-              <option value="İşletme">İşletme</option>
-              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
-              <option value="Maliye">Maliye</option>
-              <option value="Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)">Çalışma Ekonomisi ve End. İlişkileri (ÇEKO)</option>
-              <option value="Ekonometri">Ekonometri</option>
-              <option value="Siyaset Bilimi ve Kamu Yönetimi">Siyaset Bilimi ve Kamu Yönetimi</option>
-              <option value="Yönetim Bilişim Sistemleri (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
-            </optgroup>
-            <optgroup label="Uygulamalı Bilimler Fakültesi (UBF)">
-              <option value="Uluslararası Ticaret ve Lojistik">Uluslararası Ticaret ve Lojistik</option>
-              <option value="Finans ve Bankacılık">Finans ve Bankacılık</option>
-              <option value="Muhasebe ve Finans Yönetimi">Muhasebe ve Finans Yönetimi</option>
-              <option value="Gayrimenkul Gelişimi ve Yönetimi">Gayrimenkul Gelişimi ve Yönetimi</option>
-            </optgroup>
-            <optgroup label="Biga Meslek Yüksekokulu (MYO)">
-              <option value="Muhasebe ve Vergi Uygulamaları">Muhasebe ve Vergi Uygulamaları</option>
-              <option value="İşletme Yönetimi">İşletme Yönetimi</option>
-              <option value="Pazarlama">Pazarlama</option>
-              <option value="Otomotiv Teknolojisi">Otomotiv Teknolojisi</option>
-              <option value="Elektrik">Elektrik</option>
-              <option value="Makine">Makine</option>
-              <option value="Gıda Teknolojisi">Gıda Teknolojisi</option>
-              <option value="Süt ve Ürünleri Teknolojisi">Süt ve Ürünleri Teknolojisi</option>
-              <option value="Yerel Yönetimler">Yerel Yönetimler</option>
-              <option value="Kooperatifçilik">Kooperatifçilik</option>
-            </optgroup>
+            <option value="İktisat">İktisat</option>
+            <option value="İşletme">İşletme</option>
+            <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+            <option value="Maliye">Maliye</option>
+            <option value="Yönetim Bilişim Sistemleri (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
+            <option value="Biga MYO">Biga MYO</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfınız</label>
           <select id="editClass" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
-            <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
+            <option value="Hazırlık">Hazırlık Sınıfı</option>
             <option value="1. Sınıf">1. Sınıf</option>
             <option value="2. Sınıf">2. Sınıf</option>
             <option value="3. Sınıf">3. Sınıf</option>
             <option value="4. Sınıf">4. Sınıf</option>
-            <option value="Mezun">Mezun</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Hesap Gizliliği</label>
           <select id="editIsPrivate" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
-            <option value="false">Açık Hesap</option>
-            <option value="true">Gizli Hesap</option>
+            <option value="false">Açık Hesap (Herkes görebilir)</option>
+            <option value="true">Gizli Hesap (Sadece takipçiler görebilir)</option>
           </select>
         </div>
         <div>
@@ -584,7 +524,7 @@
     </div>
   </div>
 
-  <!-- Firebase ve Akıllı Oturum Entegrasyonu -->
+  <!-- Firebase ve Uygulama Kodları -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -612,7 +552,6 @@
     let viewedProfileUserId = null;
     let currentProfileSubTab = 'posts';
 
-    // Oturum kalıcılığını garantiye al
     setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Kalıcılık hatası:", err));
 
     onAuthStateChanged(auth, async (user) => {
@@ -682,7 +621,6 @@
       const handle = document.getElementById('regHandle').value.replace('@','');
       const dept = document.getElementById('regDept').value;
       const classNum = document.getElementById('regClass').value;
-      const isPrivate = document.getElementById('regIsPrivate').value === 'true';
       const email = document.getElementById('regEmail').value;
       const password = document.getElementById('regPassword').value;
 
@@ -700,7 +638,7 @@
           avatarUrl: "",
           bannerUrl: "",
           bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
-          isPrivate,
+          isPrivate: false,
           vizzScore: 0,
           notifications: [],
           followRequests: [],
@@ -1210,6 +1148,12 @@
         viewedProfileUserId = userId;
         const uData = snap.data();
 
+        // Gizlilik Kontrolü: Gizli hesap ve takip etmiyorsa içerikleri gösterme
+        const isFollowing = (currentUserData.following || []).includes(userId);
+        if (uData.isPrivate && !isFollowing) {
+          alert("Bu hesap gizli! Gönderileri görebilmek için takip etmelisin.");
+        }
+
         switchTab('profile');
 
         document.getElementById('profileNameDisplay').innerText = uData.name;
@@ -1223,7 +1167,6 @@
         updateAvatarUI(uData.avatarUrl, uData.bannerUrl, false);
 
         const actionsContainer = document.getElementById('profileActionsContainer');
-        const isFollowing = (currentUserData.following || []).includes(userId);
         const hasVizzled = (currentUserData.vizzledUsers || []).includes(userId);
 
         let buttonsHTML = `
@@ -1251,7 +1194,7 @@
         }
 
         actionsContainer.innerHTML = buttonsHTML;
-        loadProfileSubContent(userId);
+        loadProfileSubContent(userId, uData.isPrivate && !isFollowing);
       } catch (e) {
         console.error("Profil açılırken hata:", e);
       }
@@ -1267,11 +1210,17 @@
           btn.className = "flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition min-w-[70px]";
         }
       });
-      loadProfileSubContent(viewedProfileUserId || auth.currentUser.uid);
+      const targetUid = viewedProfileUserId || auth.currentUser.uid;
+      loadProfileSubContent(targetUid);
     };
 
-    async function loadProfileSubContent(targetUid) {
+    async function loadProfileSubContent(targetUid, isLocked = false) {
       const container = document.getElementById('profileSubContent');
+      if (isLocked) {
+        container.innerHTML = `<div class="text-center py-8 text-xs text-gray-400"><i class="fa-solid fa-lock text-2xl text-yellow-500 mb-2"></i><p>Bu hesap gizli. İçerikleri görmek için takip etmelisin.</p></div>`;
+        return;
+      }
+
       container.innerHTML = `<div class="text-center py-6 text-xs text-gray-400">Yükleniyor...</div>`;
 
       try {
@@ -1588,43 +1537,4 @@
         if (btn.id === activeBtnId) {
           btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
         } else {
-          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
-        }
-      });
-    }
-
-    function toggleDarkMode() {
-      const html = document.documentElement;
-      const themeIcon = document.getElementById('themeIcon');
-      const themeText = document.getElementById('themeText');
-      
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        localStorage.setItem('biga_theme', 'light');
-        if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
-        if (themeText) themeText.innerText = "Gece Modu";
-      } else {
-        html.classList.add('dark');
-        localStorage.setItem('biga_theme', 'dark');
-        if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
-        if (themeText) themeText.innerText = "Gündüz Modu";
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const themeIcon = document.getElementById('themeIcon');
-      const themeText = document.getElementById('themeText');
-      if (document.documentElement.classList.contains('dark')) {
-        if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
-        if (themeText) themeText.innerText = "Gündüz Modu";
-      } else {
-        if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
-        if (themeText) themeText.innerText = "Gece Modu";
-      }
-    });
-
-    function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
-    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
-  </script>
-</body>
-</html>
+          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100
