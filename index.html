@@ -30,50 +30,89 @@
                 <div class="w-10 h-10 bg-brand-500 rounded-full flex items-center justify-center shadow-md text-white font-bold text-xl">
                     🐝
                 </div>
-                <span class="text-xl font-black bg-gradient-to-r from-brand-600 to-amber-500 bg-clip-text text-transparent">BigaConnect</span>
+                <div>
+                    <span class="text-xl font-black bg-gradient-to-r from-brand-600 to-amber-500 bg-clip-text text-transparent">BigaConnect</span>
+                    <span class="block text-[10px] text-gray-400 font-semibold leading-none">Ramazan Aydın Yerleşkesi</span>
+                </div>
             </div>
+
+            <!-- Arama Çubuğu -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Kampüste ara (Öğrenci, İlan, Not, Etkinlik)..." class="w-full bg-gray-100 dark:bg-gray-700/50 pl-10 pr-4 py-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+            </div>
+
             <div id="navAuthArea" class="flex items-center space-x-3">
                 <span id="userDisplayUsername" class="text-sm font-bold text-gray-700 dark:text-gray-200"></span>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content Grid -->
     <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-        <!-- Sidebar -->
-        <div class="md:col-span-1 space-y-2">
+        
+        <!-- Sol Sidebar (Tüm Zengin Navigasyon) -->
+        <div class="md:col-span-1 space-y-4">
             <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
                 <nav class="space-y-1">
-                    <button id="btnNavFeed" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-brand-600 bg-brand-50 dark:bg-brand-900/20"><i class="fa-solid fa-house"></i><span>Akış</span></button>
-                    <button id="btnNavProfile" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"><i class="fa-solid fa-user"></i><span>Profil</span></button>
+                    <button id="btnNavFeed" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-brand-600 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100/50 transition-all">
+                        <i class="fa-solid fa-house text-lg"></i><span>Ana Akış</span>
+                    </button>
+                    <button id="btnNavProfile" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                        <i class="fa-solid fa-user text-lg"></i><span>Profilim</span>
+                    </button>
+                    <button id="btnNavEvents" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                        <i class="fa-solid fa-calendar-days text-lg text-amber-500"></i><span>Kampüs Etkinlikleri</span>
+                    </button>
+                    <button id="btnNavMarket" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                        <i class="fa-solid fa-store text-lg text-emerald-500"></i><span>İkinci El / Pazaryeri</span>
+                    </button>
+                    <button id="btnNavNotes" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                        <i class="fa-solid fa-book-bookmark text-lg text-blue-500"></i><span>Ders Notları & ASO</span>
+                    </button>
+                    <button id="btnNavFood" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                        <i class="fa-solid fa-utensils text-lg text-rose-500"></i><span>Yemekhane Menüsü</span>
+                    </button>
                 </nav>
+            </div>
+
+            <!-- Kampüs Bilgi Kartı -->
+            <div class="bg-gradient-to-br from-brand-500 to-amber-600 text-white rounded-2xl p-4 shadow-md space-y-2">
+                <h3 class="font-bold text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>ÇOMÜ Biga Kampüsü</span>
+                </h3>
+                <p class="text-xs opacity-90">İİBF, Uygulamalı Bilimler Fakültesi ve Biga MYO öğrencileri burada buluşuyor!</p>
             </div>
         </div>
 
-        <!-- Feed & Dynamic Area -->
+        <!-- Orta Alan (Dinamik İçerikler) -->
         <div class="md:col-span-3 space-y-6">
-            <!-- Feed Tab -->
+            
+            <!-- Feed Tab (Ana Akış) -->
             <div id="tab-feed" class="space-y-6">
-                <!-- Post Creator Box -->
+                <!-- Post Gönderici -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <textarea id="postInput" placeholder="Biga kampüsünde neler oluyor? İİBF, UBF, MYO..." class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none h-24"></textarea>
+                    <textarea id="postInput" placeholder="Biga kampüsünde neler oluyor? İİBF, UBF, MYO..." class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none h-24 text-sm"></textarea>
                     <div class="flex justify-between items-center mt-3">
                         <label class="cursor-pointer text-brand-600 hover:text-brand-700 flex items-center space-x-2 font-medium text-sm">
                             <i class="fa-solid fa-image text-lg"></i>
                             <span id="selectedFileName">Fotoğraf Ekle</span>
                             <input type="file" id="postImageFile" accept="image/*" class="hidden">
                         </label>
-                        <button id="btnCreatePost" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-xl font-bold shadow-md transition-all">Paylaş 🐝</button>
+                        <button id="btnCreatePost" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-xl font-bold shadow-md transition-all text-sm">Paylaş 🐝</button>
                     </div>
                 </div>
 
-                <!-- Posts Container -->
+                <!-- Gönderiler Kutusu -->
                 <div id="postsContainer" class="space-y-4">
-                    <p class="text-center text-gray-400">Yükleniyor...</p>
+                    <p class="text-center text-gray-400">Gönderiler yükleniyor...</p>
                 </div>
             </div>
 
-            <!-- Profile Tab -->
+            <!-- Profile Tab (Profil Sekmesi) -->
             <div id="tab-profile" class="hidden space-y-6">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 text-center space-y-4">
                     <div class="relative w-24 h-24 mx-auto">
@@ -86,9 +125,50 @@
                     <h2 id="profileNameDisplay" class="text-xl font-bold">Ad Soyad</h2>
                     <p id="profileUsernameDisplay" class="text-sm text-brand-600 font-semibold">@kullaniciadi</p>
                     <p id="profileEmailDisplay" class="text-xs text-gray-400">eposta@adresin.com</p>
-                    <button id="btnLogout" class="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-sm shadow hover:bg-red-600">Çıkış Yap</button>
+                    <button id="btnLogout" class="bg-red-500 text-white px-6 py-2 rounded-xl font-bold text-sm shadow hover:bg-red-600 transition-all">Çıkış Yap</button>
                 </div>
             </div>
+
+            <!-- Etkinlikler Tab -->
+            <div id="tab-events" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-amber-500">
+                    <i class="fa-solid fa-calendar-days"></i><span>Yaklaşan Kampüs Etkinlikleri</span>
+                </h2>
+                <div class="space-y-3">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border-l-4 border-amber-500">
+                        <h3 class="font-bold text-sm">Biga Kampüs Bahar Şenliği Görüşmeleri</h3>
+                        <p class="text-xs text-gray-500 mt-1">Öğrenci kulüpleri buluşması Amfi-2 salonda yapılacaktır.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pazaryeri Tab -->
+            <div id="tab-market" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-emerald-500">
+                    <i class="fa-solid fa-store"></i><span>Öğrenci İkinci El İlanları</span>
+                </h2>
+                <p class="text-sm text-gray-500">Çok yakında Biga içi eşya ve kitap alım-satım ilanları burada listelenecek!</p>
+            </div>
+
+            <!-- Ders Notları Tab -->
+            <div id="tab-notes" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-blue-500">
+                    <i class="fa-solid fa-book-bookmark"></i><span>Ders Notları & Sınav Soruları</span>
+                </h2>
+                <p class="text-sm text-gray-500">İktisat, İşletme, Eko, Uluslararası İlişkiler ve MYO ders notları yükleniyor...</p>
+            </div>
+
+            <!-- Yemekhane Tab -->
+            <div id="tab-food" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-rose-500">
+                    <i class="fa-solid fa-utensils"></i><span>Günlük Yemekhane Menüsü</span>
+                </h2>
+                <div class="p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-800 dark:text-rose-200 rounded-xl">
+                    <p class="font-bold text-sm">ÇOMÜ Biga Yemekhane</p>
+                    <p class="text-xs mt-1">Bugün: Mercimek Çorbası, Tavuk Sote, Pirinç Pilavı, Meyve.</p>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -147,7 +227,7 @@
         </div>
     </div>
 
-    <!-- Firebase Script -->
+    <!-- Firebase Script & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -194,18 +274,26 @@
         tabLoginBtn.addEventListener('click', () => setAuthMode('login'));
         tabRegisterBtn.addEventListener('click', () => setAuthMode('register'));
 
-        // Sayfa Sekmeleri (Akış / Profil)
-        document.getElementById('btnNavFeed').addEventListener('click', () => switchTab('feed'));
-        document.getElementById('btnNavProfile').addEventListener('click', () => switchTab('profile'));
+        // Sayfa Sekmeleri Kontrolü
+        const allTabs = ['feed', 'profile', 'events', 'market', 'notes', 'food'];
 
-        function switchTab(tab) {
-            document.getElementById('tab-feed').classList.add('hidden');
-            document.getElementById('tab-profile').classList.add('hidden');
-            if(tab === 'feed') document.getElementById('tab-feed').classList.remove('hidden');
-            if(tab === 'profile') document.getElementById('tab-profile').classList.remove('hidden');
+        function switchTab(targetTab) {
+            allTabs.forEach(t => {
+                const el = document.getElementById('tab-' + t);
+                if(el) el.classList.add('hidden');
+            });
+            const activeEl = document.getElementById('tab-' + targetTab);
+            if(activeEl) activeEl.classList.remove('hidden');
         }
 
-        // Ana İşlem (Giriş Yap / Kayıt Ol)
+        document.getElementById('btnNavFeed').addEventListener('click', () => switchTab('feed'));
+        document.getElementById('btnNavProfile').addEventListener('click', () => switchTab('profile'));
+        document.getElementById('btnNavEvents').addEventListener('click', () => switchTab('events'));
+        document.getElementById('btnNavMarket').addEventListener('click', () => switchTab('market'));
+        document.getElementById('btnNavNotes').addEventListener('click', () => switchTab('notes'));
+        document.getElementById('btnNavFood').addEventListener('click', () => switchTab('food'));
+
+        // Giriş Yap / Kayıt Ol Ana Buton
         actionBtn.addEventListener('click', async () => {
             const email = document.getElementById('authEmail').value.trim();
             const pass = document.getElementById('authPassword').value.trim();
@@ -228,7 +316,7 @@
                         createdAt: serverTimestamp()
                     });
 
-                    alert("Kayıt başarılı! Hoş geldin.");
+                    alert("Kayıt başarılı! Aramıza hoş geldin.");
                 } catch(error) {
                     alert("Kayıt Hatası: " + error.message);
                 }
@@ -262,17 +350,17 @@
             }
         });
 
-        // Çıkış
+        // Çıkış Yap
         document.getElementById('btnLogout').addEventListener('click', async () => {
             await signOut(auth);
         });
 
-        // Fotoğraf Adı Gösterme
+        // Görsel Seçilince İsmini Göster
         document.getElementById('postImageFile').addEventListener('change', function() {
             document.getElementById('selectedFileName').innerText = this.files[0] ? this.files[0].name : 'Fotoğraf Ekle';
         });
 
-        // Gönderi Paylaşma
+        // Post Paylaş
         document.getElementById('btnCreatePost').addEventListener('click', async () => {
             const content = document.getElementById('postInput').value;
             const fileInput = document.getElementById('postImageFile');
@@ -340,7 +428,7 @@
                                     <span class="text-xs text-gray-400">ÇOMÜ Biga Kampüsü</span>
                                 </div>
                             </div>
-                            ${post.content ? `<p class="text-gray-700 dark:text-gray-200">${post.content}</p>` : ''}
+                            ${post.content ? `<p class="text-gray-700 dark:text-gray-200 text-sm">${post.content}</p>` : ''}
                             ${post.imageUrl ? `<img src="${post.imageUrl}" class="rounded-xl max-h-96 w-full object-cover">` : ''}
                         </div>
                     `;
@@ -351,7 +439,7 @@
             }
         }
 
-        // Profil Fotoğrafı Önizleme
+        // Profil Fotoğrafı
         document.getElementById('profileAvatarInput').addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
@@ -362,7 +450,7 @@
             }
         });
 
-        // Oturum Durumu Dinleyicisi
+        // Auth Dinleyici
         onAuthStateChanged(auth, async (user) => {
             const modal = document.getElementById('authModal');
             if (user) {
