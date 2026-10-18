@@ -95,8 +95,14 @@
         <button onclick="switchTab('profile'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></button>
         <button onclick="switchTab('explore'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></button>
         <button onclick="switchTab('dm'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></button>
-        <button onclick="switchTab('notifications'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></button>
-        <button onclick="switchTab('requests'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></button>
+        <button onclick="switchTab('notifications'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <span class="flex items-center gap-3"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></span>
+          <span id="mobileNotifBadge" class="hidden bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+        </button>
+        <button onclick="switchTab('requests'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
+          <span class="flex items-center gap-3"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></span>
+          <span id="mobileReqBadge" class="hidden bg-yellow-500 text-gray-900 text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+        </button>
         <button onclick="switchTab('map'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></button>
       </nav>
     </div>
@@ -138,8 +144,14 @@
           <button onclick="switchTab('profile')" id="menuProfile" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></button>
           <button onclick="switchTab('explore')" id="menuExplore" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></button>
           <button onclick="switchTab('dm')" id="menuDm" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></button>
-          <button onclick="switchTab('notifications')" id="menuNotifications" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></button>
-          <button onclick="switchTab('requests')" id="menuRequests" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></button>
+          <button onclick="switchTab('notifications')" id="menuNotifications" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <span class="flex items-center gap-3"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></span>
+            <span id="desktopNotifBadge" class="hidden bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+          </button>
+          <button onclick="switchTab('requests')" id="menuRequests" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
+            <span class="flex items-center gap-3"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></span>
+            <span id="desktopReqBadge" class="hidden bg-yellow-500 text-gray-900 text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
+          </button>
           <button onclick="switchTab('map')" id="menuMap" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></button>
         </nav>
       </div>
@@ -226,48 +238,76 @@
         <div id="profileLoggedInView" class="space-y-4">
           <div class="bg-white dark:bg-gray-800 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm overflow-hidden">
             
-            <div onclick="triggerBannerUpload()" title="Bannerı Değiştirmek İçin Tıkla" class="h-36 sm:h-48 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 relative overflow-hidden cursor-pointer group">
+            <div id="profileBannerContainer" class="h-36 sm:h-48 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 relative overflow-hidden group">
               <img id="profileBannerImg" src="" class="w-full h-full object-cover hidden" alt="Banner">
-              <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5">
+              <div id="bannerEditOverlay" class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5 cursor-pointer hidden" onclick="triggerBannerUpload()">
                 <i class="fa-solid fa-camera"></i> Bannerı Değiştir
               </div>
             </div>
 
             <div class="px-5 pb-6 pt-0 relative">
               <div class="flex justify-between items-end -mt-12 sm:-mt-14 mb-3">
-                <div onclick="triggerAvatarUpload()" title="Profil Fotoğrafını Değiştirmek İçin Tıkla" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-300 flex items-center justify-center text-4xl border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden relative bg-white cursor-pointer group">
+                <div id="profileAvatarContainer" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-300 flex items-center justify-center text-4xl border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden relative bg-white group">
                   <i id="profileAvatarDefaultIcon" class="fa-solid fa-user"></i>
                   <img id="profileAvatarImg" src="" class="w-full h-full object-cover hidden" alt="PP">
-                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold text-center p-1">
+                  <div id="avatarEditOverlay" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-[10px] font-bold text-center p-1 cursor-pointer hidden" onclick="triggerAvatarUpload()">
                     <i class="fa-solid fa-camera"></i>
                   </div>
                 </div>
-                <button onclick="openProfileModal()" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs sm:text-sm shadow transition cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> Profili Düzenle</button>
+                
+                <div id="profileActionsContainer" class="flex gap-2"></div>
               </div>
 
               <div class="space-y-1">
-                <h3 id="profileNameDisplay" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">---</h3>
+                <div class="flex items-center gap-2">
+                  <h3 id="profileNameDisplay" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">---</h3>
+                  <span id="profileAccountTypeBadge" class="text-[10px] bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-md font-bold">Açık Hesap</span>
+                </div>
                 <p id="profileHandleDisplay" class="text-xs text-gray-400 font-medium">@---</p>
                 
                 <div class="flex flex-wrap gap-2 pt-2">
                   <span class="bg-yellow-100 dark:bg-gray-700 text-yellow-900 dark:text-yellow-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-graduation-cap mr-1"></i> <span id="profileDeptDisplay">---</span></span>
                   <span class="bg-amber-100 dark:bg-gray-700 text-amber-900 dark:text-amber-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-layer-group mr-1"></i> <span id="profileClassDisplay">---</span></span>
+                  <span class="bg-yellow-400/20 text-yellow-800 dark:text-yellow-300 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-bolt mr-1"></i> Vızz Puan: <span id="profileVizzScoreDisplay">0</span></span>
                 </div>
               </div>
 
               <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
                 <p id="profileBioDisplay" class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝</p>
               </div>
+
+              <!-- Twitter Tarzı Profil Sekmeleri -->
+              <div class="flex border-b border-gray-200 dark:border-gray-700 mt-5 text-xs font-bold text-gray-500">
+                <button onclick="switchProfileSubTab('posts')" id="subTabPosts" class="flex-1 py-3 border-b-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 text-center transition">Gönderiler</button>
+                <button onclick="switchProfileSubTab('replies')" id="subTabReplies" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition">Yanıtlar</button>
+                <button onclick="switchProfileSubTab('media')" id="subTabMedia" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition">Medya</button>
+                <button onclick="switchProfileSubTab('likes')" id="subTabLikes" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition">Beğeniler</button>
+              </div>
+
+              <div id="profileSubContent" class="mt-4 space-y-3"></div>
+
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 3. KEŞFET SEKMESİ -->
+      <!-- 3. KEŞFET SEKMESİ (Mobilde Haftanın Arıları Burada) -->
       <div id="contentExplore" class="page-content hidden space-y-4">
+        <!-- Mobil için Haftanın Arıları Kartı -->
+        <div class="block lg:hidden bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-2.5">
+            <h3 class="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">🏆 Haftanın Popüler Arıları</h3>
+            <span class="text-[10px] bg-yellow-400 text-gray-900 font-extrabold px-2 py-0.5 rounded-full shadow-xs">Top 3</span>
+          </div>
+          <div id="mobileTopBeesList" class="space-y-2">
+            <div class="text-center py-4 text-xs text-gray-400">Puanlar hesaplanıyor...</div>
+          </div>
+        </div>
+
         <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
-          <h3 class="font-black text-gray-900 dark:text-white text-base mb-3">🔥 Biga Kampüs Gündemi</h3>
-          <p class="text-xs text-gray-400">Canlı paylaşımlar yapıldıkça popüler konular ve etiketler burada görünecek.</p>
+          <h3 class="font-black text-gray-900 dark:text-white text-base mb-3">🔥 Biga Kampüs Gündemi & Kullanıcılar</h3>
+          <p class="text-xs text-gray-400 mb-4">Kampüsteki tüm kullanıcıları buradan keşfedebilir, profillerine gidebilirsin.</p>
+          <div id="exploreUserList" class="space-y-2"></div>
         </div>
       </div>
 
@@ -302,9 +342,11 @@
       <!-- 6. İSTEKLER SEKMESİ -->
       <div id="contentRequests" class="page-content hidden space-y-4">
         <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
-          <h3 class="font-black text-gray-900 dark:text-white text-base sm:text-lg mb-1 flex items-center gap-2"><i class="fa-solid fa-user-plus text-yellow-500"></i> Arkadaşlık İstekleri</h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Gelen istekler bu alanda listelenecek.</p>
-          <div class="text-center py-6 text-xs text-gray-400">Bekleyen istek bulunmuyor.</div>
+          <h3 class="font-black text-gray-900 dark:text-white text-base sm:text-lg mb-1 flex items-center gap-2"><i class="fa-solid fa-user-plus text-yellow-500"></i> Takip İstekleri</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Gizli hesabına gelen takip istekleri bu alanda listelenecek.</p>
+          <div id="requestsListContainer" class="space-y-3">
+            <div class="text-center py-6 text-xs text-gray-400">Bekleyen istek bulunmuyor.</div>
+          </div>
         </div>
       </div>
 
@@ -329,18 +371,16 @@
 
     </main>
 
-    <!-- SAĞ PANEL -->
+    <!-- SAĞ PANEL (Masaüstü Haftanın Arıları) -->
     <aside class="hidden lg:block w-80 p-6 bg-white/50 dark:bg-gray-800/50 sticky top-0 h-screen overflow-y-auto space-y-4">
       <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-2.5">
           <h3 class="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">🏆 Haftanın Popüler Arıları</h3>
           <span class="text-[10px] bg-yellow-400 text-gray-900 font-extrabold px-2 py-0.5 rounded-full shadow-xs">Top 3</span>
         </div>
-        <p class="text-[11px] text-gray-400 leading-tight">Bu hafta kampüste en çok vızıldayan ve etkileşim alan öğrenciler!</p>
-        <div class="pt-2 text-center py-6 bg-yellow-50/50 dark:bg-gray-700/30 rounded-xl border border-dashed border-yellow-200 dark:border-gray-600">
-          <span class="text-2xl mb-1 block">🏆</span>
-          <h4 class="font-bold text-xs text-gray-800 dark:text-gray-200">Kürsü henüz boş!</h4>
-          <p class="text-[10px] text-gray-400 mt-0.5">İlk vızıldayan sen ol, haftanın arısı seçil!</p>
+        <p class="text-[11px] text-gray-400 leading-tight">Kampüste en çok vızzlanan ve vızz puan toplayan öğrenciler!</p>
+        <div id="desktopTopBeesList" class="pt-2 space-y-2">
+          <div class="text-center py-4 text-xs text-gray-400">Puanlar hesaplanıyor...</div>
         </div>
       </div>
     </aside>
@@ -385,7 +425,7 @@
         <div class="flex items-center justify-between text-xs">
           <label class="flex items-center gap-2 cursor-pointer text-gray-700 dark:text-gray-300 font-medium">
             <input type="checkbox" id="rememberMe" checked class="w-4 h-4 text-yellow-500 rounded border-gray-300 focus:ring-yellow-400">
-            Beni Hatırla (Asla Oturumdan Atma)
+            Beni Hatırla
           </label>
         </div>
 
@@ -448,6 +488,13 @@
             <option value="3. Sınıf">3. Sınıf</option>
             <option value="4. Sınıf">4. Sınıf</option>
             <option value="Mezun">Mezun</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Hesap Gizliliği</label>
+          <select id="regIsPrivate" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <option value="false">Açık Hesap (Herkes takip edebilir)</option>
+            <option value="true">Gizli Hesap (Takip istekleri onay gerektirir)</option>
           </select>
         </div>
         <div>
@@ -524,6 +571,13 @@
           </select>
         </div>
         <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Hesap Gizliliği</label>
+          <select id="editIsPrivate" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <option value="false">Açık Hesap</option>
+            <option value="true">Gizli Hesap</option>
+          </select>
+        </div>
+        <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Biyografi</label>
           <textarea id="editBio" rows="2" placeholder="Hakkında kısa bir şeyler yaz..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
         </div>
@@ -532,11 +586,11 @@
     </div>
   </div>
 
-  <!-- Firebase Entegrasyonu ve Kararlı Yanıt/Ment Yapısı -->
+  <!-- Firebase ve Akıllı Zaman / Vızz Puan Entegrasyonu -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp, deleteDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBxhs8iwlepLjGPbezGKDu8HhFxJICEVIo",
@@ -557,6 +611,8 @@
     let currentUserData = null;
     let currentPostImageBase64 = "";
     let activeReplyImageBase64 = {};
+    let viewedProfileUserId = null;
+    let currentProfileSubTab = 'posts';
 
     onAuthStateChanged(auth, async (user) => {
       const modal = document.getElementById('authModal');
@@ -577,17 +633,27 @@
             avatarUrl: user.photoURL || "",
             bannerUrl: "",
             bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
-            notifications: []
+            isPrivate: false,
+            vizzScore: 0,
+            notifications: [],
+            followRequests: [],
+            followers: [],
+            following: [],
+            vizzledUsers: [],
+            likes: []
           };
           await setDoc(userDocRef, currentUserData);
         }
         updateLoginState(true, currentUserData);
         loadNotifications();
+        loadRequests();
       } else {
         modal.classList.remove('hidden');
         updateLoginState(false, null);
       }
       loadPostsFromFirestore();
+      loadExploreUsers();
+      loadTopBees();
     });
 
     window.switchAuthTab = function(tab) {
@@ -615,6 +681,7 @@
       const handle = document.getElementById('regHandle').value.replace('@','');
       const dept = document.getElementById('regDept').value;
       const classNum = document.getElementById('regClass').value;
+      const isPrivate = document.getElementById('regIsPrivate').value === 'true';
       const email = document.getElementById('regEmail').value;
       const password = document.getElementById('regPassword').value;
 
@@ -633,7 +700,14 @@
           avatarUrl: "",
           bannerUrl: "",
           bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
-          notifications: []
+          isPrivate,
+          vizzScore: 0,
+          notifications: [],
+          followRequests: [],
+          followers: [],
+          following: [],
+          vizzledUsers: [],
+          likes: []
         };
 
         await setDoc(doc(db, "users", user.uid), userData);
@@ -680,7 +754,14 @@
             avatarUrl: user.photoURL || "",
             bannerUrl: "",
             bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
-            notifications: []
+            isPrivate: false,
+            vizzScore: 0,
+            notifications: [],
+            followRequests: [],
+            followers: [],
+            following: [],
+            vizzledUsers: [],
+            likes: []
           });
         }
         alert("🐝 Google ile giriş başarılı!");
@@ -704,10 +785,11 @@
       const handle = document.getElementById('editHandle').value.replace('@','');
       const dept = document.getElementById('editDept').value;
       const classNum = document.getElementById('editClass').value;
+      const isPrivate = document.getElementById('editIsPrivate').value === 'true';
       const bio = document.getElementById('editBio').value;
 
       const userRef = doc(db, "users", auth.currentUser.uid);
-      const updateData = { name, handle, dept, classNum, bio };
+      const updateData = { name, handle, dept, classNum, isPrivate, bio };
       
       await setDoc(userRef, updateData, { merge: true });
 
@@ -715,6 +797,7 @@
       currentUserData.handle = handle;
       currentUserData.dept = dept;
       currentUserData.classNum = classNum;
+      currentUserData.isPrivate = isPrivate;
       currentUserData.bio = bio;
 
       updateLoginState(true, currentUserData);
@@ -723,6 +806,7 @@
     };
 
     window.triggerAvatarUpload = function() {
+      if (viewedProfileUserId && viewedProfileUserId !== auth.currentUser.uid) return;
       document.getElementById('hiddenAvatarInput').click();
     };
 
@@ -744,6 +828,7 @@
     };
 
     window.triggerBannerUpload = function() {
+      if (viewedProfileUserId && viewedProfileUserId !== auth.currentUser.uid) return;
       document.getElementById('hiddenBannerInput').click();
     };
 
@@ -817,6 +902,22 @@
       return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1.5 py-0.5 rounded">@$1</span>');
     }
 
+    // Akıllı Zaman Hesaplama (Az önce, X dk önce, X saat önce)
+    function formatTimeAgo(timestamp) {
+      if (!timestamp) return 'Az önce';
+      const now = new Date();
+      const postDate = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      const diffSeconds = Math.floor((now - postDate) / 1000);
+
+      if (diffSeconds < 60) return 'Az önce';
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      if (diffMinutes < 60) return `${diffMinutes} dakika önce`;
+      const diffHours = Math.floor(diffMinutes / 60);
+      if (diffHours < 24) return `${diffHours} saat önce`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays} gün önce`;
+    }
+
     window.sharePost = async function() {
       if (!auth.currentUser) {
         alert("Paylaşım yapmak için lütfen giriş yapın.");
@@ -835,6 +936,7 @@
           text: text,
           postImageUrl: currentPostImageBase64 || '',
           replies: [],
+          likes: [],
           createdAt: serverTimestamp()
         });
 
@@ -857,12 +959,13 @@
       try {
         const postRef = doc(db, "posts", postId);
         const newReply = {
+          uid: auth.currentUser.uid,
           name: currentUserData.name,
           handle: '@' + currentUserData.handle.replace('@',''),
           avatarUrl: currentUserData.avatarUrl || '',
           text: replyText,
           replyImageUrl: replyImage,
-          time: 'Az önce'
+          createdAt: new Date().toISOString()
         };
 
         await updateDoc(postRef, {
@@ -877,29 +980,114 @@
       }
     };
 
-    window.vizzlaUser = async function(postOwnerUid, postOwnerName) {
+    // Vızzlama Mantığı ve Vızz Puan (+1)
+    window.vizzlaUser = async function(targetUserId, targetUserName) {
       if (!auth.currentUser) return;
-      if (postOwnerUid === auth.currentUser.uid) return;
+      if (targetUserId === auth.currentUser.uid) return;
 
       try {
-        const ownerRef = doc(db, "users", postOwnerUid);
-        const ownerSnap = await getDoc(ownerRef);
-        
+        const currentUserRef = doc(db, "users", auth.currentUser.uid);
+        const targetUserRef = doc(db, "users", targetUserId);
+        const targetSnap = await getDoc(targetUserRef);
+
         let notifs = [];
-        if (ownerSnap.exists()) {
-          notifs = ownerSnap.data().notifications || [];
+        let currentScore = 0;
+        if (targetSnap.exists()) {
+          notifs = targetSnap.data().notifications || [];
+          currentScore = targetSnap.data().vizzScore || 0;
         }
 
         notifs.unshift({
           text: `🐝 <strong>${currentUserData.name}</strong> (@${currentUserData.handle}) seni vızzladı!`,
-          time: 'Az önce'
+          time: 'Az önce',
+          unread: true
         });
 
-        await setDoc(ownerRef, { notifications: notifs }, { merge: true });
-        alert(`🐝 Bzzz! ${postOwnerName} kişisini başarıyla vızzladın ve bildirim gönderildi!`);
+        await updateDoc(targetUserRef, { 
+          notifications: notifs,
+          vizzScore: currentScore + 1
+        });
+        await updateDoc(currentUserRef, { vizzledUsers: arrayUnion(targetUserId) });
+
+        currentUserData.vizzledUsers = currentUserData.vizzledUsers || [];
+        currentUserData.vizzledUsers.push(targetUserId);
+
+        alert(`🐝 Bzzz! ${targetUserName} kişisini başarıyla vızzladın (+1 Vızz Puan)!`);
+        openUserProfile(targetUserId);
+        loadTopBees();
       } catch (e) {
         console.error("Vızzlatma hatası:", e);
       }
+    };
+
+    // Takip Et / İstek Gönder
+    window.toggleFollowUser = async function(targetUserId) {
+      if (!auth.currentUser) return;
+      const targetUserRef = doc(db, "users", targetUserId);
+      const currentUserRef = doc(db, "users", auth.currentUser.uid);
+      const targetSnap = await getDoc(targetUserRef);
+      if (!targetSnap.exists()) return;
+
+      const targetData = targetSnap.data();
+      const isPrivate = targetData.isPrivate;
+      const following = currentUserData.following || [];
+      const isAlreadyFollowing = following.includes(targetUserId);
+
+      if (isAlreadyFollowing) {
+        await updateDoc(currentUserRef, { following: arrayRemove(targetUserId) });
+        await updateDoc(targetUserRef, { followers: arrayRemove(auth.currentUser.uid) });
+        currentUserData.following = following.filter(id => id !== targetUserId);
+        alert("Takipten çıkıldı.");
+      } else {
+        if (isPrivate) {
+          await updateDoc(targetUserRef, {
+            followRequests: arrayUnion({
+              uid: auth.currentUser.uid,
+              name: currentUserData.name,
+              handle: currentUserData.handle,
+              avatarUrl: currentUserData.avatarUrl || ''
+            })
+          });
+          alert("Gizli hesaba takip isteği gönderildi!");
+        } else {
+          await updateDoc(currentUserRef, { following: arrayUnion(targetUserId) });
+          await updateDoc(targetUserRef, { 
+            followers: arrayUnion(auth.currentUser.uid),
+            notifications: arrayUnion({
+              text: `👤 <strong>${currentUserData.name}</strong> (@${currentUserData.handle}) seni takip etmeye başladı.`,
+              time: 'Az önce',
+              unread: true
+            })
+          });
+          currentUserData.following.push(targetUserId);
+          alert("Takip edilmeye başlandı!");
+        }
+      }
+      openUserProfile(targetUserId);
+    };
+
+    window.acceptFollowRequest = async function(requesterUid) {
+      const requesterRef = doc(db, "users", requesterUid);
+      const currentUserRef = doc(db, "users", auth.currentUser.uid);
+
+      await updateDoc(currentUserRef, {
+        followers: arrayUnion(requesterUid),
+        followRequests: currentUserData.followRequests.filter(r => r.uid !== requesterUid)
+      });
+      await updateDoc(requesterRef, {
+        following: arrayUnion(auth.currentUser.uid),
+        notifications: arrayUnion({
+          text: `✨ <strong>${currentUserData.name}</strong> takip isteğini kabul etti!`,
+          time: 'Az önce',
+          unread: true
+        })
+      });
+
+      currentUserData.followers = currentUserData.followers || [];
+      currentUserData.followers.push(requesterUid);
+      currentUserData.followRequests = currentUserData.followRequests.filter(r => r.uid !== requesterUid);
+      loadRequests();
+      alert("Takip isteği kabul edildi.");
     };
 
     async function loadNotifications() {
@@ -910,6 +1098,20 @@
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const notifs = userSnap.data().notifications || [];
+          const unreadCount = notifs.filter(n => n.unread).length;
+
+          const dBadge = document.getElementById('desktopNotifBadge');
+          const mBadge = document.getElementById('mobileNotifBadge');
+          if (unreadCount > 0) {
+            dBadge.innerText = unreadCount;
+            dBadge.classList.remove('hidden');
+            mBadge.innerText = unreadCount;
+            mBadge.classList.remove('hidden');
+          } else {
+            dBadge.classList.add('hidden');
+            mBadge.classList.add('hidden');
+          }
+
           if (notifs.length === 0) {
             listEl.innerHTML = `<div class="text-center py-8 text-xs text-gray-400">Henüz bir bildirim yok. Biri seni vızzlattığında burada görünecek.</div>`;
             return;
@@ -920,9 +1122,231 @@
               <span class="text-[10px] text-gray-400">${n.time}</span>
             </div>
           `).join('');
+
+          const updatedNotifs = notifs.map(n => ({ ...n, unread: false }));
+          await updateDoc(userRef, { notifications: updatedNotifs });
         }
       } catch (e) {
         console.error("Bildirimler yüklenirken hata:", e);
+      }
+    }
+
+    async function loadRequests() {
+      if (!auth.currentUser) return;
+      const container = document.getElementById('requestsListContainer');
+      const reqs = currentUserData.followRequests || [];
+      const reqBadge = document.getElementById('desktopReqBadge');
+      const mReqBadge = document.getElementById('mobileReqBadge');
+
+      if (reqs.length > 0) {
+        reqBadge.innerText = reqs.length;
+        reqBadge.classList.remove('hidden');
+        mReqBadge.innerText = reqs.length;
+        mReqBadge.classList.remove('hidden');
+      } else {
+        reqBadge.classList.add('hidden');
+        mReqBadge.classList.add('hidden');
+        container.innerHTML = `<div class="text-center py-6 text-xs text-gray-400">Bekleyen istek bulunmuyor.</div>`;
+        return;
+      }
+
+      container.innerHTML = reqs.map(r => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-yellow-200 dark:border-gray-700">
+          <div class="flex items-center gap-3 cursor-pointer" onclick="openUserProfile('${r.uid}')">
+            <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              ${r.avatarUrl ? `<img src="${r.avatarUrl}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user text-gray-400"></i>`}
+            </div>
+            <div>
+              <h4 class="font-bold text-xs text-gray-900 dark:text-white">${r.name}</h4>
+              <span class="text-[10px] text-gray-400">@${r.handle}</span>
+            </div>
+          </div>
+          <button onclick="acceptFollowRequest('${r.uid}')" class="px-3 py-1.5 bg-yellow-400 text-gray-900 font-extrabold text-xs rounded-lg hover:bg-yellow-500 transition">Kabul Et</button>
+        </div>
+      `).join('');
+    }
+
+    async function loadExploreUsers() {
+      const listEl = document.getElementById('exploreUserList');
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        listEl.innerHTML = '';
+        querySnapshot.forEach(docSnap => {
+          const u = docSnap.data();
+          if (auth.currentUser && u.uid === auth.currentUser.uid) return;
+
+          listEl.innerHTML += `
+            <div class="flex items-center justify-between p-3 bg-yellow-50/40 dark:bg-gray-700/30 rounded-xl border border-yellow-200 dark:border-gray-700">
+              <div class="flex items-center gap-3 cursor-pointer" onclick="openUserProfile('${u.uid}')">
+                <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  ${u.avatarUrl ? `<img src="${u.avatarUrl}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user text-gray-400"></i>`}
+                </div>
+                <div>
+                  <h4 class="font-bold text-xs text-gray-900 dark:text-white">${u.name} ${u.isPrivate ? '<i class="fa-solid fa-lock text-[10px] text-yellow-600"></i>' : ''}</h4>
+                  <span class="text-[10px] text-gray-400">@${u.handle} · ${u.dept || 'İktisat'} (Vızz Puan: ${u.vizzScore || 0})</span>
+                </div>
+              </div>
+              <button onclick="openUserProfile('${u.uid}')" class="px-3 py-1.5 bg-yellow-400 text-gray-900 font-bold text-xs rounded-lg hover:bg-yellow-500 transition">Profili Gör</button>
+            </div>
+          `;
+        });
+      } catch (e) {
+        console.error("Keşfet kullanıcıları yüklenirken hata:", e);
+      }
+    }
+
+    // Haftanın Arıları (Top 3 Vızz Puan Sıralaması) - Hem Masaüstü hem Mobil
+    async function loadTopBees() {
+      const deskList = document.getElementById('desktopTopBeesList');
+      const mobList = document.getElementById('mobileTopBeesList');
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        let users = [];
+        querySnapshot.forEach(d => users.push(d.data()));
+        users.sort((a, b) => (b.vizzScore || 0) - (a.vizzScore || 0));
+        const top3 = users.slice(0, 3);
+
+        const renderHTML = top3.length === 0 ? `<div class="text-center py-4 text-xs text-gray-400">Kürsü henüz boş!</div>` : top3.map((u, i) => `
+          <div class="flex items-center justify-between p-2.5 bg-yellow-50/60 dark:bg-gray-700/40 rounded-xl border border-yellow-200 dark:border-gray-600 cursor-pointer" onclick="openUserProfile('${u.uid}')">
+            <div class="flex items-center gap-2.5">
+              <span class="font-black text-xs text-yellow-600">#${i+1}</span>
+              <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                ${u.avatarUrl ? `<img src="${u.avatarUrl}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user text-gray-400"></i>`}
+              </div>
+              <div>
+                <h4 class="font-bold text-xs text-gray-900 dark:text-white leading-tight">${u.name}</h4>
+                <span class="text-[10px] text-gray-400">@${u.handle}</span>
+              </div>
+            </div>
+            <span class="text-xs font-black bg-yellow-400 text-gray-900 px-2 py-0.5 rounded-full">${u.vizzScore || 0} Puan</span>
+          </div>
+        `).join('');
+
+        if (deskList) deskList.innerHTML = renderHTML;
+        if (mobList) mobList.innerHTML = renderHTML;
+      } catch (e) {
+        console.error("Top bees yüklenirken hata:", e);
+      }
+    }
+
+    // Başkasının Profiline Gitme & Kımıldamayan Küçük Arı Butonu
+    window.openUserProfile = async function(userId) {
+      if (auth.currentUser && userId === auth.currentUser.uid) {
+        switchTab('profile');
+        updateLoginState(true, currentUserData);
+        viewedProfileUserId = null;
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", userId);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return alert("Kullanıcı bulunamadı!");
+
+        viewedProfileUserId = userId;
+        const uData = snap.data();
+
+        switchTab('profile');
+
+        document.getElementById('profileNameDisplay').innerText = uData.name;
+        document.getElementById('profileHandleDisplay').innerText = '@' + uData.handle;
+        document.getElementById('profileDeptDisplay').innerText = uData.dept || 'İktisat';
+        document.getElementById('profileClassDisplay').innerText = uData.classNum || '1. Sınıf';
+        document.getElementById('profileBioDisplay').innerText = uData.bio || 'Biga kampüsünde vızıldamaya hazır! 🐝';
+        document.getElementById('profileAccountTypeBadge').innerText = uData.isPrivate ? 'Gizli Hesap' : 'Açık Hesap';
+        document.getElementById('profileVizzScoreDisplay').innerText = uData.vizzScore || 0;
+
+        updateAvatarUI(uData.avatarUrl, uData.bannerUrl, false);
+
+        const actionsContainer = document.getElementById('profileActionsContainer');
+        const isFollowing = (currentUserData.following || []).includes(userId);
+        const hasVizzled = (currentUserData.vizzledUsers || []).includes(userId);
+
+        let buttonsHTML = `
+          <button onclick="toggleFollowUser('${userId}')" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs sm:text-sm shadow transition cursor-pointer">
+            ${isFollowing ? 'Takiptesin' : 'Takip Et'}
+          </button>
+        `;
+
+        // Kımıldamayan küçük arı simgeli tek seferlik vızzla butonu
+        if (!hasVizzled) {
+          buttonsHTML += `
+            <button onclick="vizzlaUser('${userId}', '${uData.name}')" class="px-3.5 py-2 bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold rounded-xl text-xs sm:text-sm border border-yellow-300 shadow transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-4 h-4" viewBox="0 0 100 100" fill="none">
+                <ellipse cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
+                <ellipse cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
+                <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
+                <path d="M42 36 C44 48, 44 68, 42 80" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+                <path d="M56 35 C58 48, 58 68, 56 81" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+                <path d="M80 58 L92 58 L80 62 Z" fill="#1F2937"/>
+                <circle cx="26" cy="54" r="16" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+                <circle cx="22" cy="50" r="4" fill="#1F2937"/>
+              </svg>
+              Vızzla!
+            </button>
+          `;
+        }
+
+        actionsContainer.innerHTML = buttonsHTML;
+        loadProfileSubContent(userId);
+      } catch (e) {
+        console.error("Profil açılırken hata:", e);
+      }
+    };
+
+    window.switchProfileSubTab = function(subTab) {
+      currentProfileSubTab = subTab;
+      ['posts', 'replies', 'media', 'likes'].forEach(t => {
+        const btn = document.getElementById('subTab' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (t === subTab) {
+          btn.className = "flex-1 py-3 border-b-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 text-center transition";
+        } else {
+          btn.className = "flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition";
+        }
+      });
+      loadProfileSubContent(viewedProfileUserId || auth.currentUser.uid);
+    };
+
+    async function loadProfileSubContent(targetUid) {
+      const container = document.getElementById('profileSubContent');
+      container.innerHTML = `<div class="text-center py-6 text-xs text-gray-400">Yükleniyor...</div>`;
+
+      try {
+        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+        let html = '';
+
+        snapshot.forEach(docSnap => {
+          const p = docSnap.data();
+          if (currentProfileSubTab === 'posts') {
+            if (p.uid === targetUid && !p.postImageUrl) {
+              html += `<div class="p-3 bg-white dark:bg-gray-800 rounded-xl border border-yellow-200 dark:border-gray-700 text-xs">${p.text}</div>`;
+            }
+          } else if (currentProfileSubTab === 'media') {
+            if (p.uid === targetUid && p.postImageUrl) {
+              html += `
+                <div class="p-3 bg-white dark:bg-gray-800 rounded-xl border border-yellow-200 dark:border-gray-700 space-y-2">
+                  <p class="text-xs">${p.text}</p>
+                  <img src="${p.postImageUrl}" class="w-full h-40 object-cover rounded-lg">
+                </div>
+              `;
+            }
+          } else if (currentProfileSubTab === 'likes') {
+            if ((p.likes || []).includes(targetUid)) {
+              html += `<div class="p-3 bg-white dark:bg-gray-800 rounded-xl border border-yellow-200 dark:border-gray-700 text-xs">Beğenilen: ${p.text}</div>`;
+            }
+          } else if (currentProfileSubTab === 'replies') {
+            (p.replies || []).forEach(r => {
+              if (r.uid === targetUid) {
+                html += `<div class="p-3 bg-white dark:bg-gray-800 rounded-xl border border-yellow-200 dark:border-gray-700 text-xs">Yanıt: ${r.text}</div>`;
+              }
+            });
+          }
+        });
+
+        container.innerHTML = html || `<div class="text-center py-6 text-xs text-gray-400">Bu sekmede henüz içerik yok.</div>`;
+      } catch (e) {
+        console.error("Profil içerikleri yüklenirken hata:", e);
       }
     }
 
@@ -948,7 +1372,8 @@
           const p = docSnap.data();
           const postId = docSnap.id;
           const isOwner = auth.currentUser && p.uid === auth.currentUser.uid;
-          appendPostToDOM(postId, p.uid, p.name, p.handle, p.avatarUrl, p.text, p.postImageUrl || '', p.replies || [], 'Az önce', isOwner);
+          const timeAgo = formatTimeAgo(p.createdAt);
+          appendPostToDOM(postId, p.uid, p.name, p.handle, p.avatarUrl, p.text, p.postImageUrl || '', p.replies || [], timeAgo, isOwner);
         });
       } catch (e) {
         console.error("Gönderiler yüklenirken hata:", e);
@@ -980,11 +1405,6 @@
           <i class="fa-solid fa-trash-can"></i>
         </button>` : '';
 
-      const vizzlaBtnHTML = !isOwner ? `
-        <button onclick="vizzlaUser('${ownerUid}', '${name}')" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95 cursor-pointer">
-          🐝 Vızzla!
-        </button>` : '';
-
       const formattedText = parseMentions(text);
 
       const postImageHTML = postImageUrl ? `
@@ -1006,13 +1426,13 @@
 
         return `
           <div class="flex gap-2.5 pt-2 border-t border-yellow-100 dark:border-gray-700/60">
-            <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center overflow-hidden shrink-0 border border-gray-300 dark:border-gray-600">
+            <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center overflow-hidden shrink-0 border border-gray-300 dark:border-gray-600 cursor-pointer" onclick="openUserProfile('${r.uid}')">
               ${replyAvatarHTML}
             </div>
             <div class="flex-1 space-y-1">
               <div class="flex justify-between items-center">
-                <span class="font-bold text-xs text-gray-900 dark:text-white">${r.name} <span class="text-[10px] text-gray-400 font-normal">${r.handle}</span></span>
-                <span class="text-[10px] text-gray-400">${r.time}</span>
+                <span class="font-bold text-xs text-gray-900 dark:text-white cursor-pointer" onclick="openUserProfile('${r.uid}')">${r.name} <span class="text-[10px] text-gray-400 font-normal">${r.handle}</span></span>
+                <span class="text-[10px] text-gray-400">${formatTimeAgo(r.createdAt)}</span>
               </div>
               <p class="text-xs text-gray-700 dark:text-gray-200 leading-relaxed">${parseMentions(r.text)}</p>
               ${replyImageHTML}
@@ -1023,7 +1443,7 @@
 
       newPost.innerHTML = `
         <div class="flex items-center justify-between mb-1">
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 cursor-pointer" onclick="openUserProfile('${ownerUid}')">
             <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center border border-gray-300 dark:border-gray-600 overflow-hidden">
               ${avatarHTML}
             </div>
@@ -1034,17 +1454,14 @@
           </div>
           <div class="flex items-center gap-2">
             ${deleteBtnHTML}
-            ${vizzlaBtnHTML}
           </div>
         </div>
         <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>
         ${postImageHTML}
         
-        <!-- Twitter Tarzı Yanıtlar Bölümü -->
         <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-3">
           <div class="space-y-2">${repliesHTML}</div>
           
-          <!-- Yanıt Yazma Alanı (Fotoğraf Destekli) -->
           <div class="bg-yellow-50/40 dark:bg-gray-900/40 p-2.5 rounded-2xl border border-yellow-200 dark:border-gray-700 space-y-2">
             <div id="replyImagePreviewBox_${postId}" class="hidden relative w-full h-28 rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700">
               <img id="replyImagePreviewImg_${postId}" src="" class="w-full h-full object-cover" alt="Yanıt Önizleme">
@@ -1078,18 +1495,30 @@
 
     function handleHeaderProfileClick() {
       if (isLoggedIn) {
+        viewedProfileUserId = null;
         switchTab('profile');
+        updateLoginState(true, currentUserData);
       } else {
         document.getElementById('authModal').classList.remove('hidden');
       }
     }
 
-    function updateAvatarUI(avatarUrl, bannerUrl) {
+    function updateAvatarUI(avatarUrl, bannerUrl, isMyProfile = true) {
       const headerImg = document.getElementById('userAvatarHeaderImg');
       const headerDefaultIcon = document.getElementById('userAvatarHeaderDefaultIcon');
       const profileImg = document.getElementById('profileAvatarImg');
       const profileDefaultIcon = document.getElementById('profileAvatarDefaultIcon');
       const profileBannerImg = document.getElementById('profileBannerImg');
+      const bannerOverlay = document.getElementById('bannerEditOverlay');
+      const avatarOverlay = document.getElementById('avatarEditOverlay');
+
+      if (isMyProfile) {
+        if (bannerOverlay) bannerOverlay.classList.remove('hidden');
+        if (avatarOverlay) avatarOverlay.classList.remove('hidden');
+      } else {
+        if (bannerOverlay) bannerOverlay.classList.add('hidden');
+        if (avatarOverlay) avatarOverlay.classList.add('hidden');
+      }
 
       if (avatarUrl && avatarUrl.trim() !== "") {
         headerImg.src = avatarUrl;
@@ -1136,19 +1565,28 @@
         document.getElementById('userHandleHeader').innerText = '@' + userData.handle.replace('@', '');
         document.getElementById('userHeaderGearIcon').className = "fa-solid fa-gear text-xs text-yellow-600 ml-0.5";
 
-        document.getElementById('profileNameDisplay').innerText = userData.name;
-        document.getElementById('profileHandleDisplay').innerText = '@' + userData.handle.replace('@', '');
-        document.getElementById('profileDeptDisplay').innerText = userData.dept || 'İktisat';
-        document.getElementById('profileClassDisplay').innerText = userData.classNum || '1. Sınıf';
-        document.getElementById('profileBioDisplay').innerText = userData.bio || 'Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝';
+        if (!viewedProfileUserId) {
+          document.getElementById('profileNameDisplay').innerText = userData.name;
+          document.getElementById('profileHandleDisplay').innerText = '@' + userData.handle.replace('@', '');
+          document.getElementById('profileDeptDisplay').innerText = userData.dept || 'İktisat';
+          document.getElementById('profileClassDisplay').innerText = userData.classNum || '1. Sınıf';
+          document.getElementById('profileBioDisplay').innerText = userData.bio || 'Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝';
+          document.getElementById('profileAccountTypeBadge').innerText = userData.isPrivate ? 'Gizli Hesap' : 'Açık Hesap';
+          document.getElementById('profileVizzScoreDisplay').innerText = userData.vizzScore || 0;
+
+          const actionsContainer = document.getElementById('profileActionsContainer');
+          actionsContainer.innerHTML = `<button onclick="openProfileModal()" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs sm:text-sm shadow transition cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> Profili Düzenle</button>`;
+
+          updateAvatarUI(userData.avatarUrl, userData.bannerUrl, true);
+          loadProfileSubContent(userData.uid);
+        }
 
         document.getElementById('editName').value = userData.name;
         document.getElementById('editHandle').value = userData.handle;
         document.getElementById('editDept').value = userData.dept || 'İktisat';
         document.getElementById('editClass').value = userData.classNum || '1. Sınıf';
+        document.getElementById('editIsPrivate').value = userData.isPrivate ? 'true' : 'false';
         document.getElementById('editBio').value = userData.bio || '';
-
-        updateAvatarUI(userData.avatarUrl, userData.bannerUrl);
       } else {
         if (logoutBtn) logoutBtn.classList.add('hidden');
         if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
@@ -1156,18 +1594,22 @@
         document.getElementById('userHeaderInfoGroup').classList.add('hidden');
         document.getElementById('userHeaderGearIcon').className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
 
-        updateAvatarUI("", "");
+        updateAvatarUI("", "", true);
       }
     }
 
     function switchTab(tabName) {
+      if (tabName !== 'profile') {
+        viewedProfileUserId = null;
+      }
+
       const titles = {
         timeline: 'Akış',
         profile: 'Profilim',
         explore: 'Keşfet & Gündem',
         dm: 'Mesajlar',
         notifications: 'Bildirimler',
-        requests: 'Arkadaşlık İstekleri',
+        requests: 'Takip İstekleri',
         map: 'Kampüs Haritası'
       };
 
@@ -1181,9 +1623,9 @@
       const activeBtnId = 'menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
       document.querySelectorAll('.menu-btn, .menu-btn-mobile').forEach(btn => {
         if (btn.id === activeBtnId) {
-          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
+          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
         } else {
-          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
+          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
         }
       });
     }
