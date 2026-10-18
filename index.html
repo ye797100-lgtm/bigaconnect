@@ -584,10 +584,10 @@
     </div>
   </div>
 
-  <!-- Firebase ve Akıllı Zaman / Kalıcı Mock Veri Entegrasyonu -->
+  <!-- Firebase ve Akıllı Oturum Entegrasyonu -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -612,6 +612,9 @@
     let viewedProfileUserId = null;
     let currentProfileSubTab = 'posts';
 
+    // Oturum kalıcılığını garantiye al
+    setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Kalıcılık hatası:", err));
+
     onAuthStateChanged(auth, async (user) => {
       const modal = document.getElementById('authModal');
       if (user) {
@@ -622,18 +625,17 @@
         if (userDocSnap.exists()) {
           currentUserData = userDocSnap.data();
         } else {
-          // Senin verilerini (Bölüm, Sınıf, Bio vb.) ve test hesaplarını garantiye alan başlangıç değerleri
           currentUserData = {
             uid: user.uid,
             name: user.displayName || "Biga Öğrencisi",
-            handle: user.email.split('@')[0],
+            handle: user.email ? user.email.split('@')[0] : "bigali",
             dept: "İktisat",
             classNum: "1. Sınıf",
             avatarUrl: user.photoURL || "",
             bannerUrl: "",
-            bio: "Biga kampüsünde vızıldamaya hazır! 🐝 İktisat Fakültesi",
+            bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
             isPrivate: false,
-            vizzScore: 5,
+            vizzScore: 0,
             notifications: [],
             followRequests: [],
             followers: [],
@@ -685,7 +687,6 @@
       const password = document.getElementById('regPassword').value;
 
       try {
-        await setPersistence(auth, browserLocalPersistence);
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
@@ -720,12 +721,8 @@
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
-      const rememberMe = document.getElementById('rememberMe').checked;
 
       try {
-        const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
-        await setPersistence(auth, persistenceType);
-
         await signInWithEmailAndPassword(auth, email, password);
         alert("🐝 Giriş başarılı!");
       } catch (error) {
@@ -735,34 +732,7 @@
 
     window.handleGoogleLogin = async function() {
       try {
-        await setPersistence(auth, browserLocalPersistence);
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (!userDocSnap.exists()) {
-          await setDoc(userDocRef, {
-            uid: user.uid,
-            name: user.displayName || "Google Kullanıcısı",
-            handle: user.email.split('@')[0],
-            dept: "İktisat",
-            classNum: "1. Sınıf",
-            email: user.email,
-            avatarUrl: user.photoURL || "",
-            bannerUrl: "",
-            bio: "Biga kampüsünde vızıldamaya hazır! 🐝",
-            isPrivate: false,
-            vizzScore: 0,
-            notifications: [],
-            followRequests: [],
-            followers: [],
-            following: [],
-            vizzledUsers: [],
-            likes: []
-          });
-        }
+        await signInWithPopup(auth, googleProvider);
         alert("🐝 Google ile giriş başarılı!");
       } catch (error) {
         alert("Google Giriş Hatası: " + error.message);
@@ -1178,8 +1148,8 @@
                   ${u.avatarUrl ? `<img src="${u.avatarUrl}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user text-gray-400"></i>`}
                 </div>
                 <div>
-                  <h4 class="font-bold text-xs text-gray-900 dark:text-white">${u.name}${u.isPrivate ? '<i class="fa-solid fa-lock text-[10px] text-yellow-600"></i>' : ''}</h4>
-                  <span class="text-[10px] text-gray-400">@${u.handle} ·${u.dept || 'İktisat'} (Vızz Puan: ${u.vizzScore || 0})</span>
+                  <h4 class="font-bold text-xs text-gray-900 dark:text-white">${u.name} ${u.isPrivate ? '<i class="fa-solid fa-lock text-[10px] text-yellow-600"></i>' : ''}</h4>
+                  <span class="text-[10px] text-gray-400">@${u.handle} · ${u.dept || 'İktisat'} (Vızz Puan: ${u.vizzScore || 0})</span>
                 </div>
               </div>
               <button onclick="openUserProfile('${u.uid}')" class="px-3 py-1.5 bg-yellow-400 text-gray-900 font-bold text-xs rounded-lg hover:bg-yellow-500 transition">Profili Gör</button>
@@ -1427,7 +1397,8 @@
                 <span class="font-bold text-xs text-gray-900 dark:text-white cursor-pointer" onclick="openUserProfile('${r.uid}')">${r.name} <span class="text-[10px] text-gray-400 font-normal">${r.handle}</span></span>
                 <span class="text-[10px] text-gray-400">${formatTimeAgo(r.createdAt)}</span>
               </div>
-              <p class="text-xs text-gray-700 dark:text-gray-200 leading-relaxed">${parseMentions(r.text)}</p>${replyImageHTML}
+              <p class="text-xs text-gray-700 dark:text-gray-200 leading-relaxed">${parseMentions(r.text)}</p>
+              ${replyImageHTML}
             </div>
           </div>
         `;
@@ -1441,14 +1412,15 @@
             </div>
             <div>
               <h4 class="font-bold text-sm text-gray-900 dark:text-white">${name}</h4>
-              <span class="text-xs text-gray-400">${handle} ·${time}</span>
+              <span class="text-xs text-gray-400">${handle} · ${time}</span>
             </div>
           </div>
           <div class="flex items-center gap-2">
             ${deleteBtnHTML}
           </div>
         </div>
-        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>${postImageHTML}
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>
+        ${postImageHTML}
         
         <div class="pt-3 border-t border-gray-100 dark:border-gray-700 space-y-3">
           <div class="space-y-2">${repliesHTML}</div>
@@ -1458,4 +1430,201 @@
               <img id="replyImagePreviewImg_${postId}" src="" class="w-full h-full object-cover" alt="Yanıt Önizleme">
               <button onclick="removeReplyImage('${postId}')" class="absolute top-1.5 right-1.5 bg-black/60 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="flex items-center gap
+            <div class="flex items-center gap-2">
+              <input type="text" id="replyInput_${postId}" placeholder="Yanıtla (@kullanici yazarak etiketle)..." class="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400">
+              <button onclick="triggerReplyImageUpload('${postId}')" type="button" class="text-gray-400 hover:text-yellow-600 px-2 py-1 text-sm cursor-pointer" title="Yanıtına Fotoğraf Ekle"><i class="fa-regular fa-image"></i></button>
+              <button onclick="sendReply('${postId}')" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs transition cursor-pointer">Yanıtla</button>
+            </div>
+          </div>
+        </div>
+      `;
+      timeline.appendChild(newPost);
+    }
+  </script>
+
+  <!-- Arayüz Kontrolleri -->
+  <script>
+    function openMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-closed');
+      document.getElementById('mobileDrawer').classList.add('drawer-open');
+      document.getElementById('mobileDrawerBackdrop').classList.remove('hidden');
+    }
+
+    function closeMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-open');
+      document.getElementById('mobileDrawer').classList.add('drawer-closed');
+      document.getElementById('mobileDrawerBackdrop').classList.add('hidden');
+    }
+
+    function handleHeaderProfileClick() {
+      if (isLoggedIn) {
+        viewedProfileUserId = null;
+        switchTab('profile');
+        updateLoginState(true, currentUserData);
+      } else {
+        document.getElementById('authModal').classList.remove('hidden');
+      }
+    }
+
+    function updateAvatarUI(avatarUrl, bannerUrl, isMyProfile = true) {
+      const headerImg = document.getElementById('userAvatarHeaderImg');
+      const headerDefaultIcon = document.getElementById('userAvatarHeaderDefaultIcon');
+      const profileImg = document.getElementById('profileAvatarImg');
+      const profileDefaultIcon = document.getElementById('profileAvatarDefaultIcon');
+      const profileBannerImg = document.getElementById('profileBannerImg');
+      const bannerOverlay = document.getElementById('bannerEditOverlay');
+      const avatarOverlay = document.getElementById('avatarEditOverlay');
+
+      if (isMyProfile) {
+        if (bannerOverlay) bannerOverlay.classList.remove('hidden');
+        if (avatarOverlay) avatarOverlay.classList.remove('hidden');
+      } else {
+        if (bannerOverlay) bannerOverlay.classList.add('hidden');
+        if (avatarOverlay) avatarOverlay.classList.add('hidden');
+      }
+
+      if (avatarUrl && avatarUrl.trim() !== "") {
+        headerImg.src = avatarUrl;
+        headerImg.classList.remove('hidden');
+        if (headerDefaultIcon) headerDefaultIcon.classList.add('hidden');
+        if (profileImg) {
+          profileImg.src = avatarUrl;
+          profileImg.classList.remove('hidden');
+          if (profileDefaultIcon) profileDefaultIcon.classList.add('hidden');
+        }
+      } else {
+        headerImg.src = "";
+        headerImg.classList.add('hidden');
+        if (headerDefaultIcon) headerDefaultIcon.classList.remove('hidden');
+        if (profileImg) {
+          profileImg.src = "";
+          profileImg.classList.add('hidden');
+          if (profileDefaultIcon) profileDefaultIcon.classList.remove('hidden');
+        }
+      }
+
+      if (bannerUrl && bannerUrl.trim() !== "") {
+        profileBannerImg.src = bannerUrl;
+        profileBannerImg.classList.remove('hidden');
+      } else {
+        profileBannerImg.src = "";
+        profileBannerImg.classList.add('hidden');
+      }
+    }
+
+    function updateLoginState(loggedIn, userData = null) {
+      isLoggedIn = loggedIn;
+      currentUserData = userData;
+
+      const logoutBtn = document.getElementById('logoutBtn');
+      const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+
+      if (loggedIn && userData) {
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.remove('hidden');
+
+        document.getElementById('userHeaderInfoGroup').classList.remove('hidden');
+        document.getElementById('userNameHeader').innerText = userData.name;
+        document.getElementById('userHandleHeader').innerText = '@' + userData.handle.replace('@', '');
+        document.getElementById('userHeaderGearIcon').className = "fa-solid fa-gear text-xs text-yellow-600 ml-0.5";
+
+        if (!viewedProfileUserId) {
+          document.getElementById('profileNameDisplay').innerText = userData.name;
+          document.getElementById('profileHandleDisplay').innerText = '@' + userData.handle.replace('@', '');
+          document.getElementById('profileDeptDisplay').innerText = userData.dept || 'İktisat';
+          document.getElementById('profileClassDisplay').innerText = userData.classNum || '1. Sınıf';
+          document.getElementById('profileBioDisplay').innerText = userData.bio || 'Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝';
+          document.getElementById('profileAccountTypeBadge').innerText = userData.isPrivate ? 'Gizli Hesap' : 'Açık Hesap';
+          document.getElementById('profileVizzScoreDisplay').innerText = userData.vizzScore || 0;
+
+          const actionsContainer = document.getElementById('profileActionsContainer');
+          actionsContainer.innerHTML = `<button onclick="openProfileModal()" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs sm:text-sm shadow transition cursor-pointer"><i class="fa-solid fa-pen-to-square mr-1"></i> Profili Düzenle</button>`;
+
+          updateAvatarUI(userData.avatarUrl, userData.bannerUrl, true);
+          loadProfileSubContent(userData.uid);
+        }
+
+        document.getElementById('editName').value = userData.name;
+        document.getElementById('editHandle').value = userData.handle;
+        document.getElementById('editDept').value = userData.dept || 'İktisat';
+        document.getElementById('editClass').value = userData.classNum || '1. Sınıf';
+        document.getElementById('editIsPrivate').value = userData.isPrivate ? 'true' : 'false';
+        document.getElementById('editBio').value = userData.bio || '';
+      } else {
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
+
+        document.getElementById('userHeaderInfoGroup').classList.add('hidden');
+        document.getElementById('userHeaderGearIcon').className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
+
+        updateAvatarUI("", "", true);
+      }
+    }
+
+    function switchTab(tabName) {
+      if (tabName !== 'profile') {
+        viewedProfileUserId = null;
+      }
+
+      const titles = {
+        timeline: 'Akış',
+        profile: 'Profilim',
+        explore: 'Keşfet & Gündem',
+        dm: 'Mesajlar',
+        notifications: 'Bildirimler',
+        requests: 'Takip İstekleri',
+        map: 'Kampüs Haritası'
+      };
+
+      const titleElement = document.getElementById('pageTitle');
+      if (titleElement) titleElement.innerText = titles[tabName.toLowerCase()] || 'BigaConnect';
+
+      document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+      const targetContent = document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (targetContent) targetContent.classList.remove('hidden');
+
+      const activeBtnId = 'menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      document.querySelectorAll('.menu-btn, .menu-btn-mobile').forEach(btn => {
+        if (btn.id === activeBtnId) {
+          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
+        } else {
+          btn.className = "menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
+        }
+      });
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+      
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('biga_theme', 'light');
+        if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
+        if (themeText) themeText.innerText = "Gece Modu";
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('biga_theme', 'dark');
+        if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
+        if (themeText) themeText.innerText = "Gündüz Modu";
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+      if (document.documentElement.classList.contains('dark')) {
+        if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
+        if (themeText) themeText.innerText = "Gündüz Modu";
+      } else {
+        if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
+        if (themeText) themeText.innerText = "Gece Modu";
+      }
+    });
+
+    function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
+    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+  </script>
+</body>
+</html>
