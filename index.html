@@ -402,19 +402,19 @@
 
   </div>
 
-  <!-- GİRİŞ YAP MODALI -->
+  <!-- GİRİŞ YAP MODALI (Mail VEYA Kullanıcı Adı ile) -->
   <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       <div class="text-center mb-5">
         <div class="text-4xl mb-1">🐝</div>
         <h3 class="font-black text-xl text-gray-900 dark:text-white">Giriş Yap</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">BigaConnect hesabınıza erişmek için bilgilerinizi girin.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">E-posta adresiniz veya kullanıcı adınızla giriş yapın.</p>
       </div>
       <form onsubmit="handleLogin(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
-          <input type="email" id="loginEmail" required placeholder="E-posta adresiniz" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta veya Kullanıcı Adı</label>
+          <input type="text" id="loginIdentifier" required placeholder="ornek@gmail.com veya @kullanici" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
@@ -435,7 +435,7 @@
       <div class="text-center mb-4">
         <div class="text-3xl mb-1">🐝</div>
         <h3 class="font-black text-xl text-gray-900 dark:text-white">Hesap Oluştur</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Biga kampüs topluluğuna katılın!</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Gerçek e-posta adresiyle tekil hesap kaydı</p>
       </div>
       <form onsubmit="handleRegister(event)" class="space-y-2.5">
         <div>
@@ -503,8 +503,8 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
-          <input type="email" id="regEmail" required placeholder="E-posta adresiniz" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Gerçek E-posta Adresi</label>
+          <input type="email" id="regEmail" required placeholder="ornek@gmail.com" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
@@ -596,7 +596,7 @@
     let isLoggedIn = false;
     let currentUserData = null;
 
-    // SAYFA AÇILDIĞINDA GÜVENLİ OTURUM VE TEMA YÜKLEME
+    // SAYFA AÇILDIĞINDA KALICI OTURUM VE TEMAYI KONTROL ET
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('biga_theme');
       if (savedTheme === 'dark') {
@@ -867,6 +867,7 @@
       localStorage.setItem('biga_registered_users', JSON.stringify(users));
     }
 
+    // GERÇEK MAİL KONTROLÜ VE TEKİL HESAP KAYDI
     function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
@@ -877,9 +878,24 @@
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const password = document.getElementById('regPassword').value;
 
+      // Basit gerçek e-posta doğrulama kontrolü (@ ve . içermeli)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert("Lütfen geçerli ve gerçek bir e-posta adresi girin!");
+        return;
+      }
+
       let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+      
+      // Bu e-posta adresiyle daha önce hesap açılmış mı kontrolü
       if (users.find(u => u.email === email)) {
-        alert("Bu e-posta adresi ile zaten kayıtlı bir hesap var! Her e-posta ile yalnızca tek bir sabit hesap açılabilir.");
+        alert("Bu e-posta adresi ile zaten kayıtlı bir hesap var! Her e-posta adresi yalnızca tek bir hesap açabilir.");
+        return;
+      }
+
+      // Kullanıcı adı çakışma kontrolü
+      if (users.find(u => u.handle.toLowerCase() === handle.toLowerCase())) {
+        alert("Bu kullanıcı adı (@" + handle + ") zaten kullanımda. Lütfen başka bir kullanıcı adı seçin.");
         return;
       }
 
@@ -902,22 +918,29 @@
       localStorage.setItem('biga_registered_users', JSON.stringify(users));
 
       updateLoginState(true, newUser);
-      alert(`🐝 Tebrikler ${name}! Hesabınız oluşturuldu ve giriş yapıldı.`);
+      alert(`🐝 Tebrikler ${name}! Hesabınız kalıcı olarak oluşturuldu ve giriş yapıldı.`);
       closeAuthModal();
     }
 
+    // MAİL, KULLANICI ADI VEYA ŞİFRE İLE ESNEK VE GÜVENLİ GİRİŞ
     function handleLogin(e) {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
 
       let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
-      const user = users.find(u => u.email === email && u.password === password);
+      
+      // E-posta VEYA kullanıcı adı (başında @ olsun veya olmasın) ile arama yap
+      const cleanId = identifier.replace('@', '');
+      const user = users.find(u => 
+        (u.email === identifier || u.handle.toLowerCase() === cleanId) && u.password === password
+      );
 
       if (!user) {
-        alert("E-posta adresi veya şifre hatalı!");
+        alert("Girdiğiniz bilgilerle eşleşen bir hesap bulunamadı! Lütfen e-posta/kullanıcı adınızı ve şifrenizi kontrol edin.");
         return;
       }
+
       if (!user.following) user.following = [];
       if (!user.buzzes) user.buzzes = [];
 
@@ -1011,9 +1034,10 @@
       }
     }
 
+    // MENTION ÖZELLİĞİ: Metin içindeki @kullaniciadi ifadelerini tıklanabilir/vurgulu renge çevirir
     function formatTextWithMentions(text) {
       if (!text) return "";
-      return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold">@$1</span>');
+      return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100/50 dark:bg-yellow-900/30 px-1 rounded">@$1</span>');
     }
 
     function loadPosts() {
