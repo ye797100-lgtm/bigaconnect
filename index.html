@@ -190,7 +190,7 @@
               <button class="hover:text-yellow-600 transition"><i class="fa-regular fa-image"></i></button>
               <button class="hover:text-yellow-600 transition"><i class="fa-solid fa-location-dot"></i></button>
             </div>
-            <button onclick="sharePost()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm transition-transform active:scale-95 shadow">Paylaş 🚀</button>
+            <button onclick="sharePost()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm transition-transform active:scale-95 shadow cursor-pointer">Paylaş 🚀</button>
           </div>
         </div>
 
@@ -203,7 +203,7 @@
         </div>
       </div>
 
-      <!-- 2. PROFİL SEKMESİ (Banner & Profil Fotoğrafı Destekli) -->
+      <!-- 2. PROFİL SEKMESİ -->
       <div id="contentProfile" class="page-content hidden space-y-4">
         <div id="profileLoggedInView" class="space-y-4">
           <div class="bg-white dark:bg-gray-800 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm overflow-hidden">
@@ -324,7 +324,7 @@
 
   </div>
 
-  <!-- AUTH MODAL (Giriş / Kayıt) -->
+  <!-- AUTH MODAL (Giriş / Kayıt + Beni Hatırla) -->
   <div id="authModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[95vh] overflow-y-auto">
       
@@ -336,8 +336,8 @@
 
       <!-- Sekmeler -->
       <div class="flex bg-gray-100 dark:bg-gray-700 p-1.5 rounded-2xl mb-4">
-        <button id="btnTabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-black rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition">GİRİŞ YAP</button>
-        <button id="btnTabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-black rounded-xl text-gray-400 hover:text-gray-600 transition">KAYIT OL</button>
+        <button id="btnTabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-black rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm transition cursor-pointer">GİRİŞ YAP</button>
+        <button id="btnTabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-black rounded-xl text-gray-400 hover:text-gray-600 transition cursor-pointer">KAYIT OL</button>
       </div>
 
       <!-- Google ile Giriş -->
@@ -361,6 +361,15 @@
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
           <input type="password" id="loginPassword" required placeholder="******" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
+        
+        <!-- Beni Hatırla Seçeneği -->
+        <div class="flex items-center justify-between text-xs">
+          <label class="flex items-center gap-2 cursor-pointer text-gray-700 dark:text-gray-300 font-medium">
+            <input type="checkbox" id="rememberMe" checked class="w-4 h-4 text-yellow-500 rounded border-gray-300 focus:ring-yellow-400">
+            Beni Hatırla (Asla Oturumdan Atma)
+          </label>
+        </div>
+
         <button type="submit" class="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition cursor-pointer">Giriş Yap</button>
       </form>
 
@@ -437,7 +446,7 @@
     </div>
   </div>
 
-  <!-- PROFİL DÜZENLEME MODALI (Kamera / Galeri İzni ve Görsel Seçimiyle) -->
+  <!-- PROFİL DÜZENLEME MODALI -->
   <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -456,28 +465,23 @@
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Biyografi</label>
           <textarea id="editBio" rows="2" placeholder="Hakkında kısa bir şeyler yaz..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
         </div>
-
-        <!-- Profil Fotoğrafı (PP) Yükleme (Kamera/Galeri İzni İster) -->
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Profil Fotoğrafı (Kamera / Galeri)</label>
           <input type="file" id="editAvatarFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-yellow-100 file:text-yellow-800 hover:file:bg-yellow-200 cursor-pointer">
         </div>
-
-        <!-- Banner / Arka Plan Fotoğrafı Yükleme (Kamera/Galeri İzni İster) -->
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Banner / Arka Plan (Kamera / Galeri)</label>
           <input type="file" id="editBannerFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-yellow-100 file:text-yellow-800 hover:file:bg-yellow-200 cursor-pointer">
         </div>
-
         <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs shadow transition mt-2 cursor-pointer">Değişiklikleri Kaydet</button>
       </form>
     </div>
   </div>
 
-  <!-- Firebase Entegrasyonu ve Mantık -->
+  <!-- Firebase Entegrasyonu ve Kesintisiz Oturum Mantığı -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -498,6 +502,7 @@
     let isLoggedIn = false;
     let currentUserData = null;
 
+    // Oturum Kalıcılığı Dinleyicisi (Asla Atılmaz)
     onAuthStateChanged(auth, async (user) => {
       const modal = document.getElementById('authModal');
       if (user) {
@@ -555,6 +560,7 @@
       const password = document.getElementById('regPassword').value;
 
       try {
+        await setPersistence(auth, browserLocalPersistence); // Beni Hatırla Sabitlendi
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
@@ -581,8 +587,13 @@
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
+      const rememberMe = document.getElementById('rememberMe').checked;
 
       try {
+        // Beni hatırla seçeneğine göre oturum süresini ayarlıyoruz
+        const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+        await setPersistence(auth, persistenceType);
+
         await signInWithEmailAndPassword(auth, email, password);
         alert("🐝 Giriş başarılı!");
       } catch (error) {
@@ -592,6 +603,7 @@
 
     window.handleGoogleLogin = async function() {
       try {
+        await setPersistence(auth, browserLocalPersistence); // Google ile girişte de kalıcı yap
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
 
@@ -624,7 +636,6 @@
       }
     };
 
-    // Profil Güncelleme (Kamera/Galeri İzinleri ve Base64 Dönüşümü)
     window.saveProfile = async function(e) {
       e.preventDefault();
       if (!auth.currentUser) return;
@@ -638,7 +649,6 @@
       let avatarUrl = currentUserData.avatarUrl || "";
       let bannerUrl = currentUserData.bannerUrl || "";
 
-      // FileReader ile yerel dosyaları Base64'e çevirip Firestore'a kaydediyoruz (Kamera/Galeri izniyle)
       const processFiles = async () => {
         if (avatarFile) {
           avatarUrl = await new Promise((resolve) => {
@@ -711,4 +721,215 @@
           timeline.innerHTML = `
             <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
               <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
-              <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm
+              <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+            </div>
+          `;
+          return;
+        }
+
+        timeline.innerHTML = '';
+        querySnapshot.forEach((docSnap) => {
+          const p = docSnap.data();
+          const postId = docSnap.id;
+          appendPostToDOM(postId, p.name, p.handle, p.avatarUrl, p.text, 'Az önce', p.uid === (auth.currentUser ? auth.currentUser.uid : null));
+        });
+      } catch (e) {
+        console.error("Gönderiler yüklenirken hata:", e);
+      }
+    }
+
+    window.deletePostFirestore = async function(postId) {
+      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
+        try {
+          await deleteDoc(doc(db, "posts", postId));
+          loadPostsFromFirestore();
+        } catch (error) {
+          alert("Silme başarısız: " + error.message);
+        }
+      }
+    };
+
+    function appendPostToDOM(postId, name, handle, avatarUrl, text, time, isOwner) {
+      const timeline = document.getElementById('timeline');
+      const newPost = document.createElement('div');
+      newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group";
+
+      const avatarHTML = (avatarUrl && avatarUrl !== '') 
+        ? `<img src="${avatarUrl}" class="w-full h-full object-cover" alt="PP">`
+        : `<i class="fa-solid fa-user text-gray-400"></i>`;
+
+      const deleteBtnHTML = isOwner ? `
+        <button onclick="deletePostFirestore('${postId}')" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition cursor-pointer" title="Paylaşımı Sil">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>` : '';
+
+      newPost.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center border border-gray-300 dark:border-gray-600 overflow-hidden">
+              ${avatarHTML}
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-gray-900 dark:text-white">${name}</h4>
+              <span class="text-xs text-gray-400">${handle} · ${time}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            ${deleteBtnHTML}
+            <button onclick="vizzla('${name}')" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95 cursor-pointer">
+              🐝 Vızzla!
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed mb-3">${text}</p>
+      `;
+      timeline.appendChild(newPost);
+    }
+  </script>
+
+  <!-- Arayüz Kontrolleri -->
+  <script>
+    function openMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-closed');
+      document.getElementById('mobileDrawer').classList.add('drawer-open');
+      document.getElementById('mobileDrawerBackdrop').classList.remove('hidden');
+    }
+
+    function closeMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-open');
+      document.getElementById('mobileDrawer').classList.add('drawer-closed');
+      document.getElementById('mobileDrawerBackdrop').classList.add('hidden');
+    }
+
+    function handleHeaderProfileClick() {
+      if (isLoggedIn) {
+        switchTab('profile');
+      } else {
+        document.getElementById('authModal').classList.remove('hidden');
+      }
+    }
+
+    function updateAvatarUI(avatarUrl, bannerUrl) {
+      const headerImg = document.getElementById('userAvatarHeaderImg');
+      const headerDefaultIcon = document.getElementById('userAvatarHeaderDefaultIcon');
+      const profileImg = document.getElementById('profileAvatarImg');
+      const profileDefaultIcon = document.getElementById('profileAvatarDefaultIcon');
+      const profileBannerImg = document.getElementById('profileBannerImg');
+
+      if (avatarUrl && avatarUrl.trim() !== "") {
+        headerImg.src = avatarUrl;
+        headerImg.classList.remove('hidden');
+        if (headerDefaultIcon) headerDefaultIcon.classList.add('hidden');
+        if (profileImg) {
+          profileImg.src = avatarUrl;
+          profileImg.classList.remove('hidden');
+          if (profileDefaultIcon) profileDefaultIcon.classList.add('hidden');
+        }
+      } else {
+        headerImg.src = "";
+        headerImg.classList.add('hidden');
+        if (headerDefaultIcon) headerDefaultIcon.classList.remove('hidden');
+        if (profileImg) {
+          profileImg.src = "";
+          profileImg.classList.add('hidden');
+          if (profileDefaultIcon) profileDefaultIcon.classList.remove('hidden');
+        }
+      }
+
+      if (bannerUrl && bannerUrl.trim() !== "") {
+        profileBannerImg.src = bannerUrl;
+        profileBannerImg.classList.remove('hidden');
+      } else {
+        profileBannerImg.src = "";
+        profileBannerImg.classList.add('hidden');
+      }
+    }
+
+    function updateLoginState(loggedIn, userData = null) {
+      isLoggedIn = loggedIn;
+      currentUserData = userData;
+
+      const logoutBtn = document.getElementById('logoutBtn');
+      const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+
+      if (loggedIn && userData) {
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.remove('hidden');
+
+        document.getElementById('userHeaderInfoGroup').classList.remove('hidden');
+        document.getElementById('userNameHeader').innerText = userData.name;
+        document.getElementById('userHandleHeader').innerText = '@' + userData.handle.replace('@', '');
+        document.getElementById('userHeaderGearIcon').className = "fa-solid fa-gear text-xs text-yellow-600 ml-0.5";
+
+        document.getElementById('profileNameDisplay').innerText = userData.name;
+        document.getElementById('profileHandleDisplay').innerText = '@' + userData.handle.replace('@', '');
+        document.getElementById('profileDeptDisplay').innerText = userData.dept || 'İktisat';
+        document.getElementById('profileClassDisplay').innerText = userData.classNum || '1. Sınıf';
+        document.getElementById('profileBioDisplay').innerText = userData.bio || 'Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝';
+
+        document.getElementById('editName').value = userData.name;
+        document.getElementById('editHandle').value = userData.handle;
+        document.getElementById('editBio').value = userData.bio || '';
+
+        updateAvatarUI(userData.avatarUrl, userData.bannerUrl);
+      } else {
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
+
+        document.getElementById('userHeaderInfoGroup').classList.add('hidden');
+        document.getElementById('userHeaderGearIcon').className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
+
+        updateAvatarUI("", "");
+      }
+    }
+
+    function switchTab(tabName) {
+      const titles = {
+        timeline: 'Akış',
+        profile: 'Profilim',
+        explore: 'Keşfet & Gündem',
+        dm: 'Mesajlar',
+        notifications: 'Bildirimler',
+        requests: 'Arkadaşlık İstekleri',
+        map: 'Kampüs Haritası'
+      };
+
+      const titleElement = document.getElementById('pageTitle');
+      if (titleElement) titleElement.innerText = titles[tabName.toLowerCase()] || 'BigaConnect';
+
+      document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+      const targetContent = document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (targetContent) targetContent.classList.remove('hidden');
+
+      const activeBtnId = 'menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      document.querySelectorAll('.menu-btn, .menu-btn-mobile').forEach(btn => {
+        if (btn.id === activeBtnId) {
+          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
+        } else {
+          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
+        }
+      });
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
+        if (themeText) themeText.innerText = "Gece Modu";
+      } else {
+        html.classList.add('dark');
+        if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
+        if (themeText) themeText.innerText = "Gündüz Modu";
+      }
+    }
+
+    function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
+    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+    function vizzla(kullanici) { alert(`🐝 Bzzz! ${kullanici} kişisini vızzladın!`); }
+  </script>
+</body>
+</html>
