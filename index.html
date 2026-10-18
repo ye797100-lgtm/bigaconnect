@@ -91,10 +91,10 @@
       </div>
 
       <nav class="space-y-2">
-        <button onclick="switchTab('timeline'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm"><i class="fa-solid fa-house text-lg"></i><span>Akış</span></button>
-        <button onclick="switchTab('profile'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></button>
-        <button onclick="switchTab('explore'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></button>
-        <button onclick="switchTab('dm'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></button>
+        <button onclick="switchTab('timeline'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm"><span class="flex items-center gap-3"><i class="fa-solid fa-house text-lg"></i><span>Akış</span></span></button>
+        <button onclick="switchTab('profile'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><span class="flex items-center gap-3"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></span></button>
+        <button onclick="switchTab('explore'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><span class="flex items-center gap-3"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></span></button>
+        <button onclick="switchTab('dm'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><span class="flex items-center gap-3"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></span></button>
         <button onclick="switchTab('notifications'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700">
           <span class="flex items-center gap-3"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></span>
           <span id="mobileNotifBadge" class="hidden bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
@@ -103,7 +103,7 @@
           <span class="flex items-center gap-3"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></span>
           <span id="mobileReqBadge" class="hidden bg-yellow-500 text-gray-900 text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
         </button>
-        <button onclick="switchTab('map'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></button>
+        <button onclick="switchTab('map'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><span class="flex items-center gap-3"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></span></button>
       </nav>
     </div>
 
@@ -140,10 +140,10 @@
         </div>
 
         <nav class="space-y-1.5">
-          <button onclick="switchTab('timeline')" id="menuTimeline" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition"><i class="fa-solid fa-house text-lg"></i><span>Akış</span></button>
-          <button onclick="switchTab('profile')" id="menuProfile" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></button>
-          <button onclick="switchTab('explore')" id="menuExplore" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></button>
-          <button onclick="switchTab('dm')" id="menuDm" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></button>
+          <button onclick="switchTab('timeline')" id="menuTimeline" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition"><span class="flex items-center gap-3"><i class="fa-solid fa-house text-lg"></i><span>Akış</span></span></button>
+          <button onclick="switchTab('profile')" id="menuProfile" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><span class="flex items-center gap-3"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></span></button>
+          <button onclick="switchTab('explore')" id="menuExplore" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><span class="flex items-center gap-3"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></span></button>
+          <button onclick="switchTab('dm')" id="menuDm" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><span class="flex items-center gap-3"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></span></button>
           <button onclick="switchTab('notifications')" id="menuNotifications" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition">
             <span class="flex items-center gap-3"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></span>
             <span id="desktopNotifBadge" class="hidden bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
@@ -152,7 +152,7 @@
             <span class="flex items-center gap-3"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></span>
             <span id="desktopReqBadge" class="hidden bg-yellow-500 text-gray-900 text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
           </button>
-          <button onclick="switchTab('map')" id="menuMap" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></button>
+          <button onclick="switchTab('map')" id="menuMap" class="menu-btn w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><span class="flex items-center gap-3"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></span></button>
         </nav>
       </div>
 
@@ -277,11 +277,11 @@
               </div>
 
               <!-- Twitter Tarzı Profil Sekmeleri -->
-              <div class="flex border-b border-gray-200 dark:border-gray-700 mt-5 text-xs font-bold text-gray-500">
-                <button onclick="switchProfileSubTab('posts')" id="subTabPosts" class="flex-1 py-3 border-b-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 text-center transition">Gönderiler</button>
-                <button onclick="switchProfileSubTab('replies')" id="subTabReplies" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition">Yanıtlar</button>
-                <button onclick="switchProfileSubTab('media')" id="subTabMedia" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition">Medya</button>
-                <button onclick="switchProfileSubTab('likes')" id="subTabLikes" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition">Beğeniler</button>
+              <div class="flex border-b border-gray-200 dark:border-gray-700 mt-5 text-xs font-bold text-gray-500 overflow-x-auto">
+                <button onclick="switchProfileSubTab('posts')" id="subTabPosts" class="flex-1 py-3 border-b-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 text-center transition min-w-[70px]">Gönderiler</button>
+                <button onclick="switchProfileSubTab('replies')" id="subTabReplies" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition min-w-[70px]">Yanıtlar</button>
+                <button onclick="switchProfileSubTab('media')" id="subTabMedia" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition min-w-[70px]">Medya</button>
+                <button onclick="switchProfileSubTab('likes')" id="subTabLikes" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition min-w-[70px]">Beğeniler</button>
               </div>
 
               <div id="profileSubContent" class="mt-4 space-y-3"></div>
@@ -291,7 +291,7 @@
         </div>
       </div>
 
-      <!-- 3. KEŞFET SEKMESİ (Mobilde Haftanın Arıları Burada) -->
+      <!-- 3. KEŞFET SEKMESİ -->
       <div id="contentExplore" class="page-content hidden space-y-4">
         <!-- Mobil için Haftanın Arıları Kartı -->
         <div class="block lg:hidden bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
@@ -371,7 +371,7 @@
 
     </main>
 
-    <!-- SAĞ PANEL (Masaüstü Haftanın Arıları) -->
+    <!-- SAĞ PANEL -->
     <aside class="hidden lg:block w-80 p-6 bg-white/50 dark:bg-gray-800/50 sticky top-0 h-screen overflow-y-auto space-y-4">
       <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-2.5">
@@ -586,7 +586,7 @@
     </div>
   </div>
 
-  <!-- Firebase ve Akıllı Zaman / Vızz Puan Entegrasyonu -->
+  <!-- Firebase ve Uygulama Kodları -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -902,7 +902,6 @@
       return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1.5 py-0.5 rounded">@$1</span>');
     }
 
-    // Akıllı Zaman Hesaplama (Az önce, X dk önce, X saat önce)
     function formatTimeAgo(timestamp) {
       if (!timestamp) return 'Az önce';
       const now = new Date();
@@ -980,7 +979,6 @@
       }
     };
 
-    // Vızzlama Mantığı ve Vızz Puan (+1)
     window.vizzlaUser = async function(targetUserId, targetUserName) {
       if (!auth.currentUser) return;
       if (targetUserId === auth.currentUser.uid) return;
@@ -1020,7 +1018,6 @@
       }
     };
 
-    // Takip Et / İstek Gönder
     window.toggleFollowUser = async function(targetUserId) {
       if (!auth.currentUser) return;
       const targetUserRef = doc(db, "users", targetUserId);
@@ -1195,7 +1192,6 @@
       }
     }
 
-    // Haftanın Arıları (Top 3 Vızz Puan Sıralaması) - Hem Masaüstü hem Mobil
     async function loadTopBees() {
       const deskList = document.getElementById('desktopTopBeesList');
       const mobList = document.getElementById('mobileTopBeesList');
@@ -1229,12 +1225,11 @@
       }
     }
 
-    // Başkasının Profiline Gitme & Kımıldamayan Küçük Arı Butonu
     window.openUserProfile = async function(userId) {
       if (auth.currentUser && userId === auth.currentUser.uid) {
+        viewedProfileUserId = null;
         switchTab('profile');
         updateLoginState(true, currentUserData);
-        viewedProfileUserId = null;
         return;
       }
 
@@ -1268,7 +1263,6 @@
           </button>
         `;
 
-        // Kımıldamayan küçük arı simgeli tek seferlik vızzla butonu
         if (!hasVizzled) {
           buttonsHTML += `
             <button onclick="vizzlaUser('${userId}', '${uData.name}')" class="px-3.5 py-2 bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold rounded-xl text-xs sm:text-sm border border-yellow-300 shadow transition flex items-center gap-1.5 cursor-pointer">
@@ -1299,9 +1293,9 @@
       ['posts', 'replies', 'media', 'likes'].forEach(t => {
         const btn = document.getElementById('subTab' + t.charAt(0).toUpperCase() + t.slice(1));
         if (t === subTab) {
-          btn.className = "flex-1 py-3 border-b-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 text-center transition";
+          btn.className = "flex-1 py-3 border-b-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 text-center transition min-w-[70px]";
         } else {
-          btn.className = "flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition";
+          btn.className = "flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 text-center transition min-w-[70px]";
         }
       });
       loadProfileSubContent(viewedProfileUserId || auth.currentUser.uid);
