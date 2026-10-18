@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigaConnect - ÇOMÜ Biga Sosyal Ağı</title>
+  <title>BigaConnect - ÇOMÜ Biga Sosyal Ağı (Bulut Destekli)</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome İkonları -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Firebase SDK'ları -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
     tailwind.config = {
@@ -432,7 +436,7 @@
       <div class="text-center mb-4">
         <div class="text-3xl mb-1">🐝</div>
         <h3 class="font-black text-xl text-gray-900 dark:text-white">Hesap Oluştur</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Gerçek e-posta adresiyle tekil hesap kaydı</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Bulut tabanlı ortak hesap kaydı</p>
       </div>
       <form onsubmit="handleRegister(event)" class="space-y-2.5">
         <div>
@@ -590,10 +594,26 @@
   </div>
 
   <script>
+    // --- FIREBASE BAĞLANTI AYARLARI ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-ORNEK_API_KEY_BURAYA",
+      authDomain: "bigaconnect-app.firebaseapp.com",
+      projectId: "bigaconnect-app",
+      storageBucket: "bigaconnect-app.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    // Firebase Başlatma
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
     let isLoggedIn = false;
     let currentUserData = null;
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       const savedTheme = localStorage.getItem('biga_theme');
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -608,21 +628,21 @@
         try {
           currentUserData = JSON.parse(savedUser);
           if (currentUserData && currentUserData.email) {
-            let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
-            const latestUser = users.find(u => u.email === currentUserData.email);
-            if (latestUser) {
-              currentUserData = latestUser;
-            } else {
-              users.push(currentUserData);
-              localStorage.setItem('biga_registered_users', JSON.stringify(users));
-            }
+            // Firebase'den güncel kullanıcı verisini çek
+            try {
+              const userRef = db.collection('users').doc(currentUserData.email.toLowerCase());
+              const doc = await userRef.get();
+              if (doc.exists) {
+                currentUserData = doc.data();
+              }
+            } catch(e) {}
             updateLoginState(true, currentUserData);
           }
         } catch (e) {
           localStorage.removeItem('biga_current_user');
         }
       }
-      loadPosts();
+      loadPostsFromCloud();
       loadNotifications();
     });
 
@@ -744,7 +764,7 @@
         updateAvatarUI(userData.avatarUrl, userData.name);
         updateBannerUI(userData.bannerUrl);
         loadUserPosts(userData.handle);
-        loadPosts();
+        loadPostsFromCloud();
         loadNotifications();
       } else {
         localStorage.removeItem('biga_current_user');
@@ -762,7 +782,7 @@
         document.getElementById('userHeaderGearIcon').className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
 
         updateAvatarUI("", "");
-        loadPosts();
+        loadPostsFromCloud();
         loadNotifications();
       }
     }
@@ -830,7 +850,8 @@
     function openAuthModal(mode) {
       closeAuthModal();
       if (mode === 'register') document.getElementById('registerModal').classList.remove('hidden');
-      else document.getElementById('loginModal').classList.remove('hidden');
+      else document.getElementById('loginModal').classList.add('hidden'); // Düzeltme
+      if (mode === 'login') document.getElementById('loginModal').classList.remove('hidden');
     }
 
     function closeAuthModal() { 
@@ -847,10 +868,10 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(uploadEvent) {
+      reader.onload = async function(uploadEvent) {
         currentUserData.avatarUrl = uploadEvent.target.result;
         updateLoginState(true, currentUserData);
-        updateAllRegisteredUsersStorage();
+        await saveUserToCloud(currentUserData);
         alert("Profil fotoğrafınız güncellendi!");
       };
       reader.readAsDataURL(file);
@@ -860,22 +881,24 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(uploadEvent) {
+      reader.onload = async function(uploadEvent) {
         currentUserData.bannerUrl = uploadEvent.target.result;
         updateLoginState(true, currentUserData);
-        updateAllRegisteredUsersStorage();
+        await saveUserToCloud(currentUserData);
         alert("Banner fotoğrafınız güncellendi!");
       };
       reader.readAsDataURL(file);
     }
 
-    function updateAllRegisteredUsersStorage() {
-      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
-      users = users.map(u => u.email === currentUserData.email ? currentUserData : u);
-      localStorage.setItem('biga_registered_users', JSON.stringify(users));
+    async function saveUserToCloud(userData) {
+      try {
+        await db.collection('users').doc(userData.email.toLowerCase()).set(userData);
+      } catch (e) {
+        console.error("Bulut kayıt hatası:", e);
+      }
     }
 
-    function handleRegister(e) {
+    async function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
       const handle = document.getElementById('regHandle').value.trim().replace('@', '');
@@ -891,75 +914,77 @@
         return;
       }
 
-      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
-      
-      if (users.find(u => u.email === email)) {
-        alert("Bu e-posta adresi ile zaten kayıtlı bir hesap var!");
-        return;
+      try {
+        const userRef = db.collection('users').doc(email);
+        const doc = await userRef.get();
+        if (doc.exists) {
+          alert("Bu e-posta adresi ile zaten kayıtlı bir hesap var!");
+          return;
+        }
+
+        const newUser = {
+          name,
+          handle,
+          dept,
+          classNum,
+          privacy,
+          email,
+          password,
+          avatarUrl: '',
+          bannerUrl: '',
+          bio: 'Biga kampüsünde vızıldamaya hazır! 🐝',
+          following: [],
+          buzzes: [],
+          notifications: []
+        };
+
+        await userRef.set(newUser);
+        updateLoginState(true, newUser);
+        alert(`🐝 Tebrikler ${name}! Hesabınız bulutta oluşturuldu.`);
+        closeAuthModal();
+      } catch (err) {
+        alert("Kayıt sırasında bulut bağlantı hatası oluştu: " + err.message);
       }
-
-      const newUser = {
-        name,
-        handle,
-        dept,
-        classNum,
-        privacy,
-        email,
-        password,
-        avatarUrl: '',
-        bannerUrl: '',
-        bio: 'Biga kampüsünde vızıldamaya hazır! 🐝',
-        following: [],
-        buzzes: [],
-        notifications: []
-      };
-
-      users.push(newUser);
-      localStorage.setItem('biga_registered_users', JSON.stringify(users));
-
-      updateLoginState(true, newUser);
-      alert(`🐝 Tebrikler ${name}! Hesabınız oluşturuldu.`);
-      closeAuthModal();
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
       const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
-
-      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
       const cleanId = identifier.replace('@', '');
-      
-      let user = users.find(u => 
-        (u.email.toLowerCase() === identifier || u.handle.toLowerCase() === cleanId) && u.password === password
-      );
 
-      if (!user) {
-        const oldUser = localStorage.getItem('biga_current_user');
-        if (oldUser) {
-          try {
-            const parsed = JSON.parse(oldUser);
-            if ((parsed.email.toLowerCase() === identifier || parsed.handle.toLowerCase() === cleanId) && parsed.password === password) {
-              user = parsed;
-              users.push(user);
-              localStorage.setItem('biga_registered_users', JSON.stringify(users));
+      try {
+        let user = null;
+        // E-posta ile ara
+        const emailDoc = await db.collection('users').doc(identifier).get();
+        if (emailDoc.exists && emailDoc.data().password === password) {
+          user = emailDoc.data();
+        } else {
+          // Kullanıcı adı ile ara
+          const snapshot = await db.collection('users').where('handle', '==', cleanId).get();
+          if (!snapshot.empty) {
+            const found = snapshot.docs[0].data();
+            if (found.password === password) {
+              user = found;
             }
-          } catch(err){}
+          }
         }
+
+        if (!user) {
+          alert("Girdiğiniz bilgilerle eşleşen bir hesap bulunamadı!");
+          return;
+        }
+
+        if (!user.following) user.following = [];
+        if (!user.buzzes) user.buzzes = [];
+        if (!user.notifications) user.notifications = [];
+
+        updateLoginState(true, user);
+        alert(`🐝 Hoş geldiniz, ${user.name}! Buluttan giriş başarılı.`);
+        closeAuthModal();
+      } catch (err) {
+        alert("Giriş yapılırken hata oluştu: " + err.message);
       }
-
-      if (!user) {
-        alert("Girdiğiniz bilgilerle eşleşen bir hesap bulunamadı! Lütfen bilgilerinizi kontrol edin.");
-        return;
-      }
-
-      if (!user.following) user.following = [];
-      if (!user.buzzes) user.buzzes = [];
-      if (!user.notifications) user.notifications = [];
-
-      updateLoginState(true, user);
-      alert(`🐝 Hoş geldiniz, ${user.name}! Giriş başarılı.`);
-      closeAuthModal();
     }
 
     function handleLogout() {
@@ -970,7 +995,7 @@
       }
     }
 
-    function saveProfile(e) {
+    async function saveProfile(e) {
       e.preventDefault();
       currentUserData.name = document.getElementById('editName').value.trim();
       currentUserData.handle = document.getElementById('editHandle').value.trim().replace('@', '');
@@ -980,13 +1005,13 @@
       currentUserData.bio = document.getElementById('editBio').value;
 
       updateLoginState(true, currentUserData);
-      updateAllRegisteredUsersStorage();
+      await saveUserToCloud(currentUserData);
 
-      alert("Profil bilgilerin güncellendi!");
+      alert("Profil bilgilerin bulutta güncellendi!");
       closeProfileModal();
     }
 
-    function toggleFollow(targetHandle) {
+    async function toggleFollow(targetHandle) {
       if (!isLoggedIn) {
         alert("Takip etmek için giriş yapmalısınız.");
         openAuthModal('login');
@@ -1010,11 +1035,11 @@
       }
 
       updateLoginState(true, currentUserData);
-      updateAllRegisteredUsersStorage();
-      loadPosts();
+      await saveUserToCloud(currentUserData);
+      loadPostsFromCloud();
     }
 
-    function vizzlaUser(targetHandle, btnElement) {
+    async function vizzlaUser(targetHandle, btnElement) {
       if (!isLoggedIn) {
         alert("Vızzlamak için giriş yapmalısınız.");
         openAuthModal('login');
@@ -1022,12 +1047,9 @@
       }
 
       const cleanTarget = '@' + targetHandle.replace('@', '');
-      if (currentUserData.handle === targetHandle.replace('@', '')) {
-        return;
-      }
+      if (currentUserData.handle === targetHandle.replace('@', '')) return;
 
       if (!currentUserData.buzzes) currentUserData.buzzes = [];
-
       if (currentUserData.buzzes.includes(cleanTarget)) {
         alert("Bu kullanıcıyı zaten vızzladınız!");
         if (btnElement) btnElement.remove();
@@ -1036,15 +1058,11 @@
 
       currentUserData.buzzes.push(cleanTarget);
       updateLoginState(true, currentUserData);
-      updateAllRegisteredUsersStorage();
+      await saveUserToCloud(currentUserData);
 
       alert(`🐝 Bzzz! ${cleanTarget} kişisini vızzladın!`);
-      
-      if (btnElement) {
-        btnElement.remove();
-      } else {
-        loadPosts();
-      }
+      if (btnElement) btnElement.remove();
+      else loadPostsFromCloud();
     }
 
     function formatTextWithMentions(text) {
@@ -1052,33 +1070,18 @@
       return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100/50 dark:bg-yellow-900/30 px-1 rounded">@$1</span>');
     }
 
-    function notifyUser(targetHandle, notificationText) {
-      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
-      let updated = false;
-      const cleanTarget = targetHandle.replace('@', '').toLowerCase();
-
-      users = users.map(u => {
-        if (u.handle.toLowerCase() === cleanTarget) {
-          if (!u.notifications) u.notifications = [];
-          u.notifications.unshift({
-            text: notificationText,
-            time: 'Şimdi'
-          });
-          updated = true;
-
-          if (currentUserData && currentUserData.email === u.email) {
-            currentUserData = u;
-          }
+    async function notifyUser(targetHandle, notificationText) {
+      try {
+        const cleanTarget = targetHandle.replace('@', '').toLowerCase();
+        const snapshot = await db.collection('users').where('handle', '==', cleanTarget).get();
+        if (!snapshot.empty) {
+          const docRef = snapshot.docs[0].ref;
+          const userData = snapshot.docs[0].data();
+          if (!userData.notifications) userData.notifications = [];
+          userData.notifications.unshift({ text: notificationText, time: 'Şimdi' });
+          await docRef.update({ notifications: userData.notifications });
         }
-        return u;
-      });
-
-      if (updated) {
-        localStorage.setItem('biga_registered_users', JSON.stringify(users));
-        if (currentUserData) {
-          localStorage.setItem('biga_current_user', JSON.stringify(currentUserData));
-        }
-      }
+      } catch(e) {}
     }
 
     function loadNotifications() {
@@ -1118,109 +1121,80 @@
         return;
       }
       const box = document.getElementById('reply-box-' + postId);
-      if (box) {
-        box.classList.toggle('hidden');
-      }
+      if (box) box.classList.toggle('hidden');
     }
 
-    function sendReply(postId, targetHandle, originalAuthorName) {
+    async function sendReply(postId, targetHandle) {
       const input = document.getElementById('reply-input-' + postId);
       if (!input) return;
       const text = input.value.trim();
       if (!text) return alert("Lütfen bir yanıt yazın!");
 
-      const repliesContainer = document.getElementById('replies-container-' + postId);
-      if (!repliesContainer) return;
-
       const name = currentUserData.name;
       const handle = '@' + currentUserData.handle.replace('@', '');
       const avatarUrl = currentUserData.avatarUrl || '';
       const privacy = currentUserData.privacy || 'public';
-      const replyPostId = 'reply_' + Date.now();
-
       const replyData = {
-        id: replyPostId,
-        name: name,
-        handle: handle,
-        avatarUrl: avatarUrl,
-        text: text,
+        id: 'reply_' + Date.now(),
+        name,
+        handle,
+        avatarUrl,
+        text,
         time: 'Şimdi',
-        privacy: privacy
+        privacy
       };
 
-      appendReplyToDOM(postId, replyData, true);
-      input.value = '';
-      document.getElementById('reply-box-' + postId).classList.add('hidden');
+      try {
+        const postRef = db.collection('posts').doc(postId);
+        const doc = await postRef.get();
+        if (doc.exists) {
+          const postData = doc.data();
+          if (!postData.replies) postData.replies = [];
+          postData.replies.unshift(replyData);
+          await postRef.update({ replies: postData.replies });
+          
+          appendReplyToDOM(postId, replyData, true);
+          input.value = '';
+          document.getElementById('reply-box-' + postId).classList.add('hidden');
 
-      if (handle.replace('@', '') !== targetHandle.replace('@', '')) {
-        notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`);
+          if (handle.replace('@', '') !== targetHandle.replace('@', '')) {
+            await notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`);
+          }
+          alert("Yanıt gönderildi!");
+        }
+      } catch(e) {
+        alert("Yanıt gönderilirken hata oluştu.");
       }
-
-      savePostsToStorage();
-      alert("Yanıt tweeti başarıyla atıldı!");
     }
 
-    function loadPosts() {
-      const savedPosts = localStorage.getItem('biga_posts');
+    async function loadPostsFromCloud() {
       const timeline = document.getElementById('timeline');
       if (!timeline) return;
 
-      if (savedPosts) {
-        try {
-          const posts = JSON.parse(savedPosts);
-          if (Array.isArray(posts) && posts.length > 0) {
-            timeline.innerHTML = '';
-            posts.forEach(p => {
-              appendPostToDOM(p.id, p.name, p.handle, p.avatarUrl, p.text, p.time, p.privacy || 'public', p.replies || [], false);
-            });
-            return;
-          }
-        } catch (e) {
-          localStorage.removeItem('biga_posts');
+      try {
+        const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
+        if (snapshot.empty) {
+          timeline.innerHTML = `
+            <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+              <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
+              <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+            </div>
+          `;
+          return;
         }
-      }
 
-      timeline.innerHTML = `
-        <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
-          <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
-          <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
-        </div>
-      `;
-    }
-
-    function savePostsToStorage() {
-      const cards = document.querySelectorAll('.post-card');
-      const postsArray = [];
-      cards.forEach(card => {
-        const id = card.getAttribute('data-id');
-        const name = card.getAttribute('data-name');
-        const handle = card.getAttribute('data-handle');
-        const avatarUrl = card.getAttribute('data-avatar') || '';
-        const text = card.getAttribute('data-text');
-        const time = card.getAttribute('data-time');
-        const privacy = card.getAttribute('data-privacy') || 'public';
-        
-        const replies = [];
-        const replyCards = card.querySelectorAll('.reply-card');
-        replyCards.forEach(r => {
-          replies.push({
-            id: r.getAttribute('data-id'),
-            name: r.getAttribute('data-name'),
-            handle: r.getAttribute('data-handle'),
-            avatarUrl: r.getAttribute('data-avatar') || '',
-            text: r.getAttribute('data-text'),
-            time: r.getAttribute('data-time'),
-            privacy: r.getAttribute('data-privacy') || 'public'
-          });
+        timeline.innerHTML = '';
+        snapshot.forEach(doc => {
+          const p = doc.data();
+          appendPostToDOM(p.id, p.name, p.handle, p.avatarUrl, p.text, p.time, p.privacy || 'public', p.replies || [], false);
         });
-
-        postsArray.push({ id, name, handle, avatarUrl, text, time, privacy, replies });
-      });
-      localStorage.setItem('biga_posts', JSON.stringify(postsArray));
+      } catch (e) {
+        console.error("Gönderiler yüklenemedi:", e);
+      }
     }
 
-    function sharePost() {
+    async function sharePost() {
       if (!isLoggedIn) {
         alert("Paylaşım yapmak için lütfen giriş yapın.");
         openAuthModal('login');
@@ -1232,34 +1206,45 @@
       const text = textElement.value.trim();
       if (!text) return alert("Lütfen bir şeyler yazın!");
       
-      const emptyState = document.getElementById('emptyState');
-      if (emptyState) emptyState.remove();
-
-      const name = currentUserData ? currentUserData.name : 'Kullanıcı';
-      const handle = currentUserData ? '@' + currentUserData.handle.replace('@','') : '@kullanici';
-      const avatarUrl = currentUserData ? currentUserData.avatarUrl : '';
-      const privacy = currentUserData ? (currentUserData.privacy || 'public') : 'public';
+      const name = currentUserData.name;
+      const handle = '@' + currentUserData.handle.replace('@','');
+      const avatarUrl = currentUserData.avatarUrl || '';
+      const privacy = currentUserData.privacy || 'public';
       const postId = 'post_' + Date.now();
 
-      appendPostToDOM(postId, name, handle, avatarUrl, text, 'Şimdi', privacy, [], true);
-      textElement.value = '';
-      savePostsToStorage();
-      if (currentUserData) loadUserPosts(currentUserData.handle);
+      const newPostData = {
+        id: postId,
+        name,
+        handle,
+        avatarUrl,
+        text,
+        time: 'Şimdi',
+        privacy,
+        replies: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        await db.collection('posts').doc(postId).set(newPostData);
+        textElement.value = '';
+        loadPostsFromCloud();
+        if (currentUserData) loadUserPosts(currentUserData.handle);
+        alert("Gönderi buluta paylaşıldı! 🚀");
+      } catch(e) {
+        alert("Paylaşım yapılırken hata oluştu: " + e.message);
+      }
     }
 
     function appendPostToDOM(postId, name, handle, avatarUrl, text, time, privacy = 'public', replies = [], prepend = true) {
       const timeline = document.getElementById('timeline');
       if (!timeline) return;
 
+      const emptyState = document.getElementById('emptyState');
+      if (emptyState) emptyState.remove();
+
       const newPost = document.createElement('div');
       newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group space-y-3";
       newPost.setAttribute('data-id', postId);
-      newPost.setAttribute('data-name', name);
-      newPost.setAttribute('data-handle', handle);
-      newPost.setAttribute('data-avatar', avatarUrl);
-      newPost.setAttribute('data-text', text);
-      newPost.setAttribute('data-time', time);
-      newPost.setAttribute('data-privacy', privacy);
 
       const initials = getInitials(name);
       const avatarHTML = (avatarUrl && avatarUrl !== '') 
@@ -1270,24 +1255,19 @@
       const isMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === handle.replace('@', '').toLowerCase();
       
       let actionButtonHTML = '';
-
       if (isLoggedIn && !isMe) {
         const isFollowing = currentUserData.following && currentUserData.following.includes(cleanHandle);
         const isAlreadyBuzzes = currentUserData.buzzes && currentUserData.buzzes.includes(cleanHandle);
         const isPrivateAccount = privacy === 'private';
 
-        if (isAlreadyBuzzes) {
-          actionButtonHTML = '';
-        } else if (isPrivateAccount && !isFollowing) {
-          const btnText = isFollowing ? 'Takipten Çık' : 'Takip Et';
-          const btnClass = isFollowing ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white' : 'bg-yellow-400 text-gray-900';
-          actionButtonHTML = `<button onclick="toggleFollow('${cleanHandle}')" class="${btnClass} font-extrabold text-xs px-3.5 py-1.5 rounded-full transition active:scale-95"><i class="fa-solid fa-user-plus mr-1"></i> ${btnText}</button>`;
-        } else {
-          actionButtonHTML = `<button onclick="vizzlaUser('${cleanHandle}', this)" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95">🐝 Vızzla!</button>`;
+        if (!isAlreadyBuzzes) {
+          if (isPrivateAccount && !isFollowing) {
+            actionButtonHTML = `<button onclick="toggleFollow('${cleanHandle}')" class="bg-yellow-400 text-gray-900 font-extrabold text-xs px-3.5 py-1.5 rounded-full transition active:scale-95"><i class="fa-solid fa-user-plus mr-1"></i> Takip Et</button>`;
+          } else if (!isPrivateAccount) {
+            actionButtonHTML = `<button onclick="vizzlaUser('${cleanHandle}', this)" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95">🐝 Vızzla!</button>`;
+          }
         }
       }
-
-      const formattedText = formatTextWithMentions(text);
 
       let repliesHTML = '';
       replies.forEach(r => {
@@ -1298,20 +1278,18 @@
         const rIsMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === r.handle.replace('@', '').toLowerCase();
 
         repliesHTML += `
-          <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2" data-id="${r.id}" data-name="${r.name}" data-handle="${r.handle}" data-avatar="${r.avatarUrl || ''}" data-text="${r.text}" data-time="${r.time}" data-privacy="${r.privacy || 'public'}">
+          <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
                 <div class="w-7 h-7 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border border-gray-300 dark:border-gray-600">
                   ${rAvatarHTML}
                 </div>
                 <div>
-                  <h5 class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1">
-                    ${r.name}
-                  </h5>
+                  <h5 class="font-bold text-xs text-gray-900 dark:text-white">${r.name}</h5>
                   <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
                 </div>
               </div>
-              ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition" title="Yanıtı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+              ${rIsMe ? `<button onclick="deleteReply('${postId}', '${r.id}')" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>` : ''}
             </div>
             <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
           </div>
@@ -1333,23 +1311,20 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            ${isMe ? `<button onclick="deletePost(this)" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition" title="Paylaşımı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+            ${isMe ? `<button onclick="deletePost('${postId}')" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 transition" title="Paylaşımı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
             ${actionButtonHTML}
           </div>
         </div>
-        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formatTextWithMentions(text)}</p>
 
-        <!-- YANITLA BUTONU -->
         <div class="flex items-center gap-4 pt-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500">
           <button onclick="toggleReplyBox('${postId}')" class="hover:text-yellow-600 transition flex items-center gap-1.5 font-bold"><i class="fa-regular fa-comment"></i> Yanıtla</button>
         </div>
 
-        <!-- YANIT TWEETLERİNİN LİSTELENDİĞİ ALAN -->
         <div id="replies-container-${postId}" class="space-y-2.5 pl-4 sm:pl-6 border-l-2 border-yellow-300 dark:border-yellow-600/50 mt-2">
           ${repliesHTML}
         </div>
 
-        <!-- TWEET ATMA MANTIĞIYLA YANIT GİRME KUTUSU -->
         <div id="reply-box-${postId}" class="hidden pt-3 space-y-2.5 border-t border-gray-100 dark:border-gray-700 mt-2">
           <div class="flex items-center gap-2 text-xs font-bold text-gray-500">
             <i class="fa-solid fa-reply text-yellow-500"></i> ${name} kişisinin gönderisine yanıt tweeti atıyorsun
@@ -1357,16 +1332,13 @@
           <textarea id="reply-input-${postId}" rows="2" placeholder="Düşüncelerini yanıt olarak vızılda..." class="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
           <div class="flex justify-end gap-2">
             <button onclick="toggleReplyBox('${postId}')" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-lg text-xs">İptal</button>
-            <button onclick="sendReply('${postId}', '${cleanHandle}', '${name}')" class="px-4 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-black rounded-lg text-xs shadow-sm transition-transform active:scale-95">Yanıtı Gönder 🚀</button>
+            <button onclick="sendReply('${postId}', '${cleanHandle}')" class="px-4 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-black rounded-lg text-xs shadow-sm transition-transform active:scale-95">Yanıtı Gönder 🚀</button>
           </div>
         </div>
       `;
 
-      if (prepend) {
-        timeline.prepend(newPost);
-      } else {
-        timeline.appendChild(newPost);
-      }
+      if (prepend) timeline.prepend(newPost);
+      else timeline.appendChild(newPost);
     }
 
     function appendReplyToDOM(postId, r, prepend = true) {
@@ -1381,14 +1353,6 @@
 
       const replyCard = document.createElement('div');
       replyCard.className = "reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2";
-      replyCard.setAttribute('data-id', r.id);
-      replyCard.setAttribute('data-name', r.name);
-      replyCard.setAttribute('data-handle', r.handle);
-      replyCard.setAttribute('data-avatar', r.avatarUrl || '');
-      replyCard.setAttribute('data-text', r.text);
-      replyCard.setAttribute('data-time', r.time);
-      replyCard.setAttribute('data-privacy', r.privacy || 'public');
-
       replyCard.innerHTML = `
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
@@ -1396,57 +1360,66 @@
               ${rAvatarHTML}
             </div>
             <div>
-              <h5 class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1">
-                ${r.name}
-              </h5>
+              <h5 class="font-bold text-xs text-gray-900 dark:text-white">${r.name}</h5>
               <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
             </div>
           </div>
-          ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition" title="Yanıtı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+          ${rIsMe ? `<button onclick="deleteReply('${postId}', '${r.id}')" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>` : ''}
         </div>
         <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
       `;
 
-      if (prepend) {
-        container.prepend(replyCard);
-      } else {
-        container.appendChild(replyCard);
-      }
+      if (prepend) container.prepend(replyCard);
+      else container.appendChild(replyCard);
     }
 
-    function deleteReply(btnElement) {
-      if (confirm("Bu yanıt tweetini silmek istediğinize emin misiniz?")) {
-        const replyCard = btnElement.closest('.reply-card');
-        if (replyCard) {
-          replyCard.remove();
-          savePostsToStorage();
-          alert("Yanıt silindi.");
+    async function deletePost(postId) {
+      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
+        try {
+          await db.collection('posts').doc(postId).delete();
+          loadPostsFromCloud();
+          if (currentUserData) loadUserPosts(currentUserData.handle);
+          alert("Paylaşım silindi.");
+        } catch(e) {
+          alert("Silme sırasında hata oluştu.");
         }
       }
     }
 
-    function loadUserPosts(userHandle) {
+    async function deleteReply(postId, replyId) {
+      if (confirm("Bu yanıtı silmek istediğinize emin misiniz?")) {
+        try {
+          const postRef = db.collection('posts').doc(postId);
+          const doc = await postRef.get();
+          if (doc.exists) {
+            let replies = doc.data().replies || [];
+            replies = replies.filter(r => r.id !== replyId);
+            await postRef.update({ replies });
+            loadPostsFromCloud();
+            alert("Yanıt silindi.");
+          }
+        } catch(e) {
+          alert("Yanıt silinirken hata oluştu.");
+        }
+      }
+    }
+
+    async function loadUserPosts(userHandle) {
       const container = document.getElementById('userPostsContainer');
       if (!container) return;
 
-      const savedPosts = localStorage.getItem('biga_posts');
-      if (!savedPosts) {
-        container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
-        return;
-      }
-
       try {
-        const posts = JSON.parse(savedPosts);
         const cleanHandle = '@' + userHandle.replace('@', '');
-        const userPosts = posts.filter(p => p.handle.toLowerCase() === cleanHandle.toLowerCase());
+        const snapshot = await db.collection('posts').where('handle', '==', cleanHandle).get();
 
-        if (userPosts.length === 0) {
+        if (snapshot.empty) {
           container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
           return;
         }
 
         container.innerHTML = '';
-        userPosts.forEach(p => {
+        snapshot.forEach(doc => {
+          const p = doc.data();
           const initials = getInitials(p.name);
           const avatarHTML = (p.avatarUrl && p.avatarUrl !== '') 
             ? `<img src="${p.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
@@ -1470,28 +1443,6 @@
         });
       } catch (e) {
         container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
-      }
-    }
-
-    function deletePost(btnElement) {
-      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
-        const postCard = btnElement.closest('.post-card');
-        if (postCard) {
-          postCard.remove();
-          savePostsToStorage();
-          if (currentUserData) loadUserPosts(currentUserData.handle);
-          
-          const timeline = document.getElementById('timeline');
-          if (timeline && timeline.children.length === 0) {
-            timeline.innerHTML = `
-              <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
-                <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
-                <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
-              </div>
-            `;
-          }
-        }
       }
     }
 
