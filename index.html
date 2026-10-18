@@ -1,480 +1,912 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BigaConnect - ÇOMÜ Biga Kampüs Sosyal Ağı</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 600: '#d97706', 700: '#b45309' }
-                    }
-                }
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigaConnect - ÇOMÜ Biga Sosyal Ağı</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome İkonları -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brandYellow: '#FACC15',
+            brandDarkYellow: '#EAB308',
+            brandLightYellow: '#FEF08A'
+          }
         }
-    </script>
+      }
+    }
+  </script>
+  <style>
+    @keyframes beeFly {
+      0% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-4px) rotate(-6deg); }
+      50% { transform: translateY(2px) rotate(4deg); }
+      75% { transform: translateY(-3px) rotate(-3deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+    @keyframes wingFlutter {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.6); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .animate-bee { animation: beeFly 2.5s ease-in-out infinite; }
+    .bee-wing { transform-origin: bottom center; animation: wingFlutter 0.15s ease-in-out infinite; }
+    .coming-soon-card { animation: pulseGlow 3s ease-in-out infinite; }
+    #mobileDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .drawer-closed { transform: translateX(-100%); }
+    .drawer-open { transform: translateX(0); }
+  </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-200">
+<body class="bg-yellow-50/30 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
 
-    <!-- Navbar -->
-    <header class="sticky top-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-brand-500 rounded-full flex items-center justify-center shadow-md text-white font-bold text-xl">
-                    🐝
-                </div>
-                <div>
-                    <span class="text-xl font-black bg-gradient-to-r from-brand-600 to-amber-500 bg-clip-text text-transparent">BigaConnect</span>
-                    <span class="block text-[10px] text-gray-400 font-semibold leading-none">Ramazan Aydın Yerleşkesi</span>
-                </div>
-            </div>
-
-            <!-- Arama Çubuğu -->
-            <div class="hidden md:flex flex-1 max-w-md mx-8">
-                <div class="relative w-full">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Kampüste ara (Öğrenci, İlan, Not, Etkinlik)..." class="w-full bg-gray-100 dark:bg-gray-700/50 pl-10 pr-4 py-2 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                </div>
-            </div>
-
-            <div id="navAuthArea" class="flex items-center space-x-3">
-                <span id="userDisplayUsername" class="text-sm font-bold text-gray-700 dark:text-gray-200"></span>
-            </div>
+  <!-- MOBİL YAN BAR OVERLAY -->
+  <div id="mobileDrawerBackdrop" onclick="closeMobileDrawer()" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden backdrop-blur-xs"></div>
+  
+  <aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-gray-800 z-50 p-5 flex flex-col justify-between shadow-2xl lg:hidden drawer-closed border-r border-yellow-200 dark:border-gray-700">
+    <div>
+      <div class="flex items-center justify-between mb-6 pb-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-black text-gray-900 dark:text-white tracking-tight">Biga<span class="text-yellow-500">Connect</span></span>
+          <div class="animate-bee">
+            <svg class="w-7 h-7 drop-shadow-sm" viewBox="0 0 100 100" fill="none">
+              <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse class="bee-wing" cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
+              <path d="M42 36 C44 48, 44 68, 42 80" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M56 35 C58 48, 58 68, 56 81" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M80 58 L92 58 L80 62 Z" fill="#1F2937"/>
+              <circle cx="26" cy="54" r="16" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+              <circle cx="22" cy="50" r="4" fill="#1F2937"/>
+              <circle cx="20" cy="48" r="1.5" fill="white"/>
+              <circle cx="26" cy="60" r="3" fill="#F87171" opacity="0.6"/>
+              <path d="M18 58 Q22 64 26 58" stroke="#1F2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M22 40 Q16 30 12 32" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="11" cy="32" r="2.5" fill="#1F2937"/>
+            </svg>
+          </div>
         </div>
-    </header>
+        <button onclick="closeMobileDrawer()" class="text-gray-400 hover:text-gray-600 p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
 
-    <!-- Main Content Grid -->
-    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-        
-        <!-- Sol Sidebar (Tüm Zengin Navigasyon) -->
-        <div class="md:col-span-1 space-y-4">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                <nav class="space-y-1">
-                    <button id="btnNavFeed" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-brand-600 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100/50 transition-all">
-                        <i class="fa-solid fa-house text-lg"></i><span>Ana Akış</span>
-                    </button>
-                    <button id="btnNavProfile" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
-                        <i class="fa-solid fa-user text-lg"></i><span>Profilim</span>
-                    </button>
-                    <button id="btnNavEvents" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
-                        <i class="fa-solid fa-calendar-days text-lg text-amber-500"></i><span>Kampüs Etkinlikleri</span>
-                    </button>
-                    <button id="btnNavMarket" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
-                        <i class="fa-solid fa-store text-lg text-emerald-500"></i><span>İkinci El / Pazaryeri</span>
-                    </button>
-                    <button id="btnNavNotes" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
-                        <i class="fa-solid fa-book-bookmark text-lg text-blue-500"></i><span>Ders Notları & ASO</span>
-                    </button>
-                    <button id="btnNavFood" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
-                        <i class="fa-solid fa-utensils text-lg text-rose-500"></i><span>Yemekhane Menüsü</span>
-                    </button>
-                </nav>
-            </div>
-
-            <!-- Kampüs Bilgi Kartı -->
-            <div class="bg-gradient-to-br from-brand-500 to-amber-600 text-white rounded-2xl p-4 shadow-md space-y-2">
-                <h3 class="font-bold text-sm flex items-center space-x-2">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                    <span>ÇOMÜ Biga Kampüsü</span>
-                </h3>
-                <p class="text-xs opacity-90">İİBF, Uygulamalı Bilimler Fakültesi ve Biga MYO öğrencileri burada buluşuyor!</p>
-            </div>
-        </div>
-
-        <!-- Orta Alan (Dinamik İçerikler) -->
-        <div class="md:col-span-3 space-y-6">
-            
-            <!-- Feed Tab (Ana Akış) -->
-            <div id="tab-feed" class="space-y-6">
-                <!-- Post Gönderici -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <textarea id="postInput" placeholder="Biga kampüsünde neler oluyor? İİBF, UBF, MYO..." class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none h-24 text-sm"></textarea>
-                    <div class="flex justify-between items-center mt-3">
-                        <label class="cursor-pointer text-brand-600 hover:text-brand-700 flex items-center space-x-2 font-medium text-sm">
-                            <i class="fa-solid fa-image text-lg"></i>
-                            <span id="selectedFileName">Fotoğraf Ekle</span>
-                            <input type="file" id="postImageFile" accept="image/*" class="hidden">
-                        </label>
-                        <button id="btnCreatePost" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-xl font-bold shadow-md transition-all text-sm">Paylaş 🐝</button>
-                    </div>
-                </div>
-
-                <!-- Gönderiler Kutusu -->
-                <div id="postsContainer" class="space-y-4">
-                    <p class="text-center text-gray-400">Gönderiler yükleniyor...</p>
-                </div>
-            </div>
-
-            <!-- Profile Tab (Profil Sekmesi) -->
-            <div id="tab-profile" class="hidden space-y-6">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 text-center space-y-4">
-                    <div class="relative w-24 h-24 mx-auto">
-                        <img id="profileAvatarPreview" src="https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" class="w-24 h-24 rounded-full object-cover border-4 border-brand-500 shadow-md">
-                        <label class="absolute bottom-0 right-0 bg-brand-500 text-white p-2 rounded-full cursor-pointer hover:bg-brand-600 shadow">
-                            <i class="fa-solid fa-camera text-xs"></i>
-                            <input type="file" id="profileAvatarInput" accept="image/*" class="hidden">
-                        </label>
-                    </div>
-                    <h2 id="profileNameDisplay" class="text-xl font-bold">Ad Soyad</h2>
-                    <p id="profileUsernameDisplay" class="text-sm text-brand-600 font-semibold">@kullaniciadi</p>
-                    <p id="profileEmailDisplay" class="text-xs text-gray-400">eposta@adresin.com</p>
-                    <button id="btnLogout" class="bg-red-500 text-white px-6 py-2 rounded-xl font-bold text-sm shadow hover:bg-red-600 transition-all">Çıkış Yap</button>
-                </div>
-            </div>
-
-            <!-- Etkinlikler Tab -->
-            <div id="tab-events" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-amber-500">
-                    <i class="fa-solid fa-calendar-days"></i><span>Yaklaşan Kampüs Etkinlikleri</span>
-                </h2>
-                <div class="space-y-3">
-                    <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border-l-4 border-amber-500">
-                        <h3 class="font-bold text-sm">Biga Kampüs Bahar Şenliği Görüşmeleri</h3>
-                        <p class="text-xs text-gray-500 mt-1">Öğrenci kulüpleri buluşması Amfi-2 salonda yapılacaktır.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pazaryeri Tab -->
-            <div id="tab-market" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-emerald-500">
-                    <i class="fa-solid fa-store"></i><span>Öğrenci İkinci El İlanları</span>
-                </h2>
-                <p class="text-sm text-gray-500">Çok yakında Biga içi eşya ve kitap alım-satım ilanları burada listelenecek!</p>
-            </div>
-
-            <!-- Ders Notları Tab -->
-            <div id="tab-notes" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-blue-500">
-                    <i class="fa-solid fa-book-bookmark"></i><span>Ders Notları & Sınav Soruları</span>
-                </h2>
-                <p class="text-sm text-gray-500">İktisat, İşletme, Eko, Uluslararası İlişkiler ve MYO ders notları yükleniyor...</p>
-            </div>
-
-            <!-- Yemekhane Tab -->
-            <div id="tab-food" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <h2 class="text-lg font-bold mb-4 flex items-center space-x-2 text-rose-500">
-                    <i class="fa-solid fa-utensils"></i><span>Günlük Yemekhane Menüsü</span>
-                </h2>
-                <div class="p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-800 dark:text-rose-200 rounded-xl">
-                    <p class="font-bold text-sm">ÇOMÜ Biga Yemekhane</p>
-                    <p class="text-xs mt-1">Bugün: Mercimek Çorbası, Tavuk Sote, Pirinç Pilavı, Meyve.</p>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Auth Modal (Giriş / Kayıt Sekmeli) -->
-    <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-3xl max-w-md w-full p-8 shadow-2xl border border-gray-100 dark:border-gray-700 space-y-6">
-            <div class="text-center space-y-2">
-                <div class="w-16 h-16 bg-brand-500 rounded-full flex items-center justify-center mx-auto text-3xl shadow-lg">🐝</div>
-                <h2 class="text-2xl font-black">BigaConnect</h2>
-                <p class="text-sm text-gray-500">Kampüsün Sosyal Ağı</p>
-            </div>
-
-            <!-- Sekme Seçici -->
-            <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
-                <button id="tabLoginBtn" type="button" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all cursor-pointer">Giriş Yap</button>
-                <button id="tabRegisterBtn" type="button" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all cursor-pointer">Kayıt Ol</button>
-            </div>
-
-            <!-- Google İle Giriş Butonu -->
-            <button id="btnGoogleLogin" type="button" class="w-full flex items-center justify-center space-x-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 py-3 rounded-xl font-semibold shadow-sm hover:bg-gray-50 transition-all cursor-pointer">
-                <i class="fa-brands fa-google text-red-500"></i>
-                <span>Google ile Devam Et</span>
-            </button>
-
-            <div class="relative flex py-2 items-center">
-                <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-                <span class="flex-shrink mx-4 text-xs text-gray-400">VEYA E-POSTA İLE</span>
-                <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-            </div>
-
-            <!-- Form Alanları -->
-            <div class="space-y-4">
-                <div id="registerExtraFields" class="space-y-4 hidden">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-gray-500">Ad Soyad</label>
-                        <input type="text" id="regFullName" placeholder="Örn: Ahmet Yılmaz" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-gray-500">Kullanıcı Adı</label>
-                        <input type="text" id="regUsername" placeholder="Örn: ahmetyilmaz" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-gray-500">E-Posta Adresi</label>
-                    <input type="email" id="authEmail" placeholder="ornek@gmail.com" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold mb-1 text-gray-500">Şifre</label>
-                    <input type="password" id="authPassword" placeholder="******" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                </div>
-
-                <!-- Dinamik İşlem Butonu -->
-                <button id="authActionBtn" type="button" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold shadow-md transition-all cursor-pointer">Giriş Yap</button>
-            </div>
-        </div>
+      <nav class="space-y-2">
+        <button onclick="switchTab('timeline'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm"><i class="fa-solid fa-house text-lg"></i><span>Akış</span></button>
+        <button onclick="switchTab('profile'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></button>
+        <button onclick="switchTab('explore'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></button>
+        <button onclick="switchTab('dm'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></button>
+        <button onclick="switchTab('notifications'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></button>
+        <button onclick="switchTab('requests'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></button>
+        <button onclick="switchTab('map'); closeMobileDrawer();" class="menu-btn-mobile w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></button>
+      </nav>
     </div>
 
-    <!-- Firebase Script & App Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <div class="pt-4 border-t border-yellow-100 dark:border-gray-700 space-y-3">
+      <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200"><span class="flex items-center gap-2"><i class="fa-solid fa-moon text-yellow-600"></i><span>Gece / Gündüz Modu</span></span></button>
+      <div id="mobileDrawerAuthGroup" class="grid grid-cols-2 gap-2">
+        <button onclick="openAuthModal('login'); closeMobileDrawer();" class="py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-extrabold rounded-xl text-xs text-center">Giriş Yap</button>
+        <button onclick="openAuthModal('register'); closeMobileDrawer();" class="py-2.5 bg-yellow-400 text-gray-900 font-extrabold rounded-xl text-xs text-center">Kaydol</button>
+      </div>
+      <button id="mobileDrawerLogoutBtn" onclick="handleLogout(); closeMobileDrawer();" class="w-full py-2.5 bg-red-100 text-red-700 font-extrabold rounded-xl text-xs hidden">Çıkış Yap</button>
+    </div>
+  </aside>
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyBxhs8iwlepLjGPbezGKDu8HhFxJICEVIo",
-          authDomain: "bigaconnect-56469.firebaseapp.com",
-          projectId: "bigaconnect-56469",
-          storageBucket: "bigaconnect-56469.firebasestorage.app",
-          messagingSenderId: "312522372786",
-          appId: "1:312522372786:web:bdddcf9161fc03fd3b7bab",
-          measurementId: "G-9KMN1XX61F"
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row min-h-screen">
+
+    <!-- DESKTOP SOL MENÜ -->
+    <aside class="hidden lg:flex w-64 bg-white dark:bg-gray-800 border-r border-yellow-200 dark:border-gray-700 p-4 flex-col justify-between sticky top-0 h-screen z-30 shadow-sm">
+      <div>
+        <div class="flex items-center justify-between mb-6 pt-2 px-2">
+          <span class="text-2xl font-black text-gray-900 dark:text-white tracking-tight cursor-pointer" onclick="switchTab('timeline')">Biga<span class="text-yellow-500">Connect</span></span>
+          <div class="relative animate-bee">
+            <svg class="w-11 h-11 drop-shadow-md" viewBox="0 0 100 100" fill="none">
+              <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse class="bee-wing" cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
+              <path d="M42 36 C44 48, 44 68, 42 80" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M56 35 C58 48, 58 68, 56 81" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M80 58 L92 58 L80 62 Z" fill="#1F2937"/>
+              <circle cx="26" cy="54" r="16" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+              <circle cx="22" cy="50" r="4" fill="#1F2937"/>
+              <circle cx="20" cy="48" r="1.5" fill="white"/>
+              <circle cx="26" cy="60" r="3" fill="#F87171" opacity="0.6"/>
+              <path d="M18 58 Q22 64 26 58" stroke="#1F2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M22 40 Q16 30 12 32" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="11" cy="32" r="2.5" fill="#1F2937"/>
+            </svg>
+          </div>
+        </div>
+
+        <nav class="space-y-1.5">
+          <button onclick="switchTab('timeline')" id="menuTimeline" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition"><i class="fa-solid fa-house text-lg"></i><span>Akış</span></button>
+          <button onclick="switchTab('profile')" id="menuProfile" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-user text-lg text-yellow-600"></i><span>Profilim</span></button>
+          <button onclick="switchTab('explore')" id="menuExplore" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-compass text-lg text-yellow-600"></i><span>Keşfet & Gündem</span></button>
+          <button onclick="switchTab('dm')" id="menuDm" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-comments text-lg text-yellow-600"></i><span>Mesajlar</span></button>
+          <button onclick="switchTab('notifications')" id="menuNotifications" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-bell text-lg text-yellow-600"></i><span>Bildirimler</span></button>
+          <button onclick="switchTab('requests')" id="menuRequests" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-user-plus text-lg text-yellow-600"></i><span>İstekler</span></button>
+          <button onclick="switchTab('map')" id="menuMap" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition"><i class="fa-solid fa-map-location-dot text-lg text-yellow-600"></i><span>Kampüs Haritası</span></button>
+        </nav>
+      </div>
+
+      <div class="pt-4 border-t border-yellow-100 dark:border-gray-700 space-y-2">
+        <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-yellow-200 dark:hover:bg-gray-600 transition"><span class="flex items-center gap-2"><i id="themeIcon" class="fa-solid fa-moon text-yellow-600"></i><span id="themeText">Gece Modu</span></span><i class="fa-solid fa-circle-half-stroke text-gray-400"></i></button>
+        <div id="authButtonsGroup" class="grid grid-cols-2 gap-2">
+          <button onclick="openAuthModal('login')" class="py-2 px-2 bg-gray-100 dark:bg-gray-700 hover:bg-yellow-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-extrabold rounded-xl text-[11px] transition text-center shadow-xs">Giriş Yap</button>
+          <button onclick="openAuthModal('register')" class="py-2 px-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-[11px] transition text-center shadow-xs">Hesap Oluştur</button>
+        </div>
+        <button id="logoutBtn" onclick="handleLogout()" class="w-full py-2 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 font-extrabold rounded-xl text-xs transition hidden"><i class="fa-solid fa-right-from-bracket mr-1"></i> Çıkış Yap</button>
+      </div>
+    </aside>
+
+    <!-- ORTA İÇERİK ALANI -->
+    <main class="flex-1 p-3 sm:p-6 border-r border-yellow-200 dark:border-gray-700">
+
+      <!-- ÜST BAR -->
+      <div class="flex justify-between items-center mb-4 sm:mb-6 pb-3 border-b border-yellow-200 dark:border-gray-700">
+        <div class="flex items-center gap-2.5">
+          <button onclick="openMobileDrawer()" class="lg:hidden p-2 rounded-xl bg-yellow-400 text-gray-900 font-bold active:scale-95 transition shadow-xs"><i class="fa-solid fa-bars text-base"></i></button>
+          <h2 id="pageTitle" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Akış</h2>
+          
+          <div class="lg:hidden relative animate-bee ml-1">
+            <svg class="w-8 h-8 drop-shadow-md" viewBox="0 0 100 100" fill="none">
+              <ellipse class="bee-wing" cx="42" cy="28" rx="14" ry="22" fill="#E0F2FE" opacity="0.8" transform="rotate(-20 42 28)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse class="bee-wing" cx="58" cy="26" rx="12" ry="18" fill="#E0F2FE" opacity="0.7" transform="rotate(15 58 26)" stroke="#BAE6FD" stroke-width="2"/>
+              <ellipse cx="50" cy="58" rx="30" ry="24" fill="#FACC15" stroke="#EAB308" stroke-width="3"/>
+              <path d="M42 36 C44 48, 44 68, 42 80" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M56 35 C58 48, 58 68, 56 81" stroke="#1F2937" stroke-width="6" stroke-linecap="round"/>
+              <path d="M80 58 L92 58 L80 62 Z" fill="#1F2937"/>
+              <circle cx="26" cy="54" r="16" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+              <circle cx="22" cy="50" r="4" fill="#1F2937"/>
+              <circle cx="20" cy="48" r="1.5" fill="white"/>
+              <circle cx="26" cy="60" r="3" fill="#F87171" opacity="0.6"/>
+              <path d="M18 58 Q22 64 26 58" stroke="#1F2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M22 40 Q16 30 12 32" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="11" cy="32" r="2.5" fill="#1F2937"/>
+            </svg>
+          </div>
+        </div>
+        
+        <div onclick="handleHeaderProfileClick()" class="flex items-center gap-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
+          <div id="userAvatarHeader" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center text-xs border border-gray-300 dark:border-gray-600 overflow-hidden">
+            <i id="userAvatarHeaderDefaultIcon" class="fa-solid fa-user"></i>
+            <img id="userAvatarHeaderImg" src="" class="w-full h-full object-cover hidden" alt="Avatar">
+          </div>
+          <div id="userHeaderInfoGroup" class="hidden sm:block text-left">
+            <h4 id="userNameHeader" class="font-bold text-xs text-gray-900 dark:text-white leading-tight">Giriş Yapılmadı</h4>
+            <span id="userHandleHeader" class="text-[10px] text-gray-400 block">@hesap_yok</span>
+          </div>
+          <i id="userHeaderGearIcon" class="fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5"></i>
+        </div>
+      </div>
+
+      <!-- 1. AKIŞ SEKMESİ -->
+      <div id="contentTimeline" class="page-content space-y-4 sm:space-y-5">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm border-2 border-yellow-200 dark:border-gray-700 relative">
+          
+          <div id="postAreaOverlay" class="absolute inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-[2px] z-10 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-xl mb-2 shadow-xs"><i class="fa-solid fa-lock"></i></div>
+            <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Paylaşım yapmak için üye olun</h4>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3">Akışta düşüncelerini paylaşmak ve vızıldamak için giriş yapın.</p>
+            <div class="flex gap-2">
+              <button onclick="openAuthModal('login')" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-xl text-xs hover:bg-yellow-200 transition">Giriş Yap</button>
+              <button onclick="openAuthModal('register')" class="px-3 py-1.5 bg-yellow-400 text-gray-900 font-black rounded-xl text-xs hover:bg-yellow-500 transition shadow-sm">Hesap Oluştur</button>
+            </div>
+          </div>
+
+          <textarea id="postText" rows="3" placeholder="Biga kampüsünde ne oluyor? Düşüncelerini vızıldat..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none text-sm dark:text-white"></textarea>
+          <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+            <div class="flex gap-4 text-gray-400 text-base">
+              <button class="hover:text-yellow-600 transition"><i class="fa-regular fa-image"></i></button>
+              <button class="hover:text-yellow-600 transition"><i class="fa-solid fa-location-dot"></i></button>
+            </div>
+            <button onclick="sharePost()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm transition-transform active:scale-95 shadow">Paylaş 🚀</button>
+          </div>
+        </div>
+
+        <div id="timeline" class="space-y-4">
+          <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+            <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
+            <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. PROFİL SEKMESİ -->
+      <div id="contentProfile" class="page-content hidden space-y-4">
+        <div id="profileLoggedOutView" class="bg-white dark:bg-gray-800 p-8 sm:p-12 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center flex flex-col items-center justify-center space-y-4">
+          <div class="w-16 h-16 rounded-3xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-3xl shadow-sm"><i class="fa-solid fa-user-lock"></i></div>
+          <div class="max-w-xs space-y-1">
+            <h3 class="font-black text-lg text-gray-900 dark:text-white">Profiline Erişmek İçin Giriş Yap</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Profilini özelleştirmek, fotoğraf eklemek ve paylaşımlarını yönetmek için hesabına giriş yapmalısın.</p>
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button onclick="openAuthModal('login')" class="px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-extrabold rounded-xl text-xs hover:bg-yellow-200 transition">Giriş Yap</button>
+            <button onclick="openAuthModal('register')" class="px-5 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-black rounded-xl text-xs transition shadow-sm">Hesap Oluştur</button>
+          </div>
+        </div>
+
+        <div id="profileLoggedInView" class="hidden space-y-4">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 p-5 sm:p-6 shadow-sm">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-300 flex items-center justify-center text-3xl border-4 border-yellow-300 dark:border-yellow-500/50 shadow-md overflow-hidden relative">
+                <i id="profileAvatarDefaultIcon" class="fa-solid fa-user"></i>
+                <img id="profileAvatarImg" src="" class="w-full h-full object-cover hidden" alt="PP">
+              </div>
+              <button onclick="openProfileModal()" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs sm:text-sm shadow transition"><i class="fa-solid fa-pen-to-square mr-1"></i> Profili Düzenle</button>
+            </div>
+
+            <div class="space-y-1">
+              <h3 id="profileNameDisplay" class="text-lg sm:text-xl font-black text-gray-900 dark:text-white">---</h3>
+              <p id="profileHandleDisplay" class="text-xs text-gray-400 font-medium">@---</p>
+              
+              <div class="flex flex-wrap gap-2 pt-2">
+                <span class="bg-yellow-100 dark:bg-gray-700 text-yellow-900 dark:text-yellow-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-graduation-cap mr-1"></i> <span id="profileDeptDisplay">---</span></span>
+                <span class="bg-amber-100 dark:bg-gray-700 text-amber-900 dark:text-amber-400 text-[11px] font-bold px-2.5 py-1 rounded-lg"><i class="fa-solid fa-layer-group mr-1"></i> <span id="profileClassDisplay">---</span></span>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+              <p id="profileBioDisplay" class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. KEŞFET SEKMESİ -->
+      <div id="contentExplore" class="page-content hidden space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
+          <h3 class="font-black text-gray-900 dark:text-white text-base mb-3">🔥 Biga Kampüs Gündemi</h3>
+          <p class="text-xs text-gray-400">Canlı paylaşımlar yapıldıkça popüler konular ve etiketler burada görünecek.</p>
+        </div>
+      </div>
+
+      <!-- 4. MESAJLAR SEKMESİ -->
+      <div id="contentDm" class="page-content hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border-2 border-yellow-200 dark:border-gray-700 overflow-hidden flex flex-col sm:flex-row h-[500px]">
+        <div class="w-full sm:w-1/3 border-b sm:border-b-0 sm:border-r border-yellow-100 dark:border-gray-700 p-3 bg-yellow-50/30 dark:bg-gray-900/30 overflow-y-auto">
+          <h4 class="font-black text-xs uppercase tracking-wider text-gray-500 mb-2 px-2">Sohbetler</h4>
+          <div class="space-y-1"><div id="emptyChatNotice" class="text-center py-8 text-xs text-gray-400">Henüz sohbetiniz yok.</div></div>
+        </div>
+        <div class="flex-1 flex flex-col h-full bg-white dark:bg-gray-800">
+          <div id="chatHeader" class="p-3 border-b border-gray-100 dark:border-gray-700 font-bold text-xs text-gray-500 bg-gray-50/50 dark:bg-gray-900/50">Sohbet Seçilmedi</div>
+          <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/30 dark:bg-gray-900/20 flex flex-col items-center justify-center">
+            <div class="text-center text-gray-400 text-xs"><i class="fa-solid fa-comments text-3xl mb-2 text-yellow-500 opacity-60"></i><p>Mesajlaşmaya başlamak için sol taraftan bir sohbet seçin.</p></div>
+          </div>
+          <div class="p-3 border-t border-gray-100 dark:border-gray-700 flex gap-2">
+            <input type="text" id="dmInput" disabled placeholder="Önce bir sohbet seçin..." class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:outline-none text-sm dark:text-white opacity-50 cursor-not-allowed">
+            <button id="dmSendBtn" disabled class="bg-yellow-400 text-gray-900 font-bold px-4 py-2.5 rounded-xl text-sm opacity-50 cursor-not-allowed"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. BİLDİRİMLER SEKMESİ -->
+      <div id="contentNotifications" class="page-content hidden space-y-3">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-12 flex flex-col items-center justify-center">
+          <div class="w-14 h-14 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl mb-3 shadow-xs"><i class="fa-solid fa-bell"></i></div>
+          <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
+          <p class="text-xs text-gray-400 mt-1 max-w-xs">Biri seni vızzladığında veya paylaşımını beğendiğinde burada görünecek.</p>
+        </div>
+      </div>
+
+      <!-- 6. İSTEKLER SEKMESİ -->
+      <div id="contentRequests" class="page-content hidden space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm">
+          <h3 class="font-black text-gray-900 dark:text-white text-base sm:text-lg mb-1 flex items-center gap-2"><i class="fa-solid fa-user-plus text-yellow-500"></i> Arkadaşlık İstekleri</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Gelen istekler bu alanda listelenecek.</p>
+          <div class="text-center py-6 text-xs text-gray-400">Bekleyen istek bulunmuyor.</div>
+        </div>
+      </div>
+
+      <!-- 7. KAMPÜS HARİTASI -->
+      <div id="contentMap" class="page-content hidden space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+            <div>
+              <h3 class="font-black text-gray-900 dark:text-white text-sm sm:text-lg flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-yellow-500"></i> ÇOMÜ Biga Ramazan Aydın Yerleşkesi</h3>
+              <p class="text-xs text-gray-400 mt-0.5">BigaConnect Canlı Konum Radarı</p>
+            </div>
+            <span class="text-[10px] sm:text-xs bg-yellow-400 text-gray-900 font-black px-2.5 py-1 rounded-full shadow-sm">Biga Kampüs</span>
+          </div>
+          <div class="relative w-full h-[380px] sm:h-[440px] bg-gradient-to-br from-yellow-100 via-amber-50 to-yellow-200 dark:from-gray-800 dark:via-gray-900 dark:to-yellow-950/30 rounded-2xl border-2 border-dashed border-yellow-400 dark:border-yellow-600 flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-hidden shadow-inner coming-soon-card">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-yellow-400/90 text-gray-900 rounded-3xl flex items-center justify-center text-3xl sm:text-4xl shadow-xl border-2 border-yellow-500 mb-3 sm:mb-4 animate-bounce">📍</div>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-200 dark:bg-yellow-900/50 px-3 py-1 rounded-full mb-2">BigaConnect Canlı Radar</span>
+            <h3 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-2">Çok Yakında! 🐝✨</h3>
+            <p class="text-xs text-gray-600 dark:text-gray-300 max-w-md leading-relaxed font-medium mb-4">ÇOMÜ Biga Ramazan Aydın Yerleşkesi’nde arkadaşlarının anlık konumlarını harita üzerinde görebileceğin interaktif radar sistemi çok yakında!</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- SAĞ PANEL -->
+    <aside class="hidden lg:block w-80 p-6 bg-white/50 dark:bg-gray-800/50 sticky top-0 h-screen overflow-y-auto space-y-4">
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
+        <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-2.5">
+          <h3 class="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">🏆 Haftanın Popüler Arıları</h3>
+          <span class="text-[10px] bg-yellow-400 text-gray-900 font-extrabold px-2 py-0.5 rounded-full shadow-xs">Top 3</span>
+        </div>
+        <p class="text-[11px] text-gray-400 leading-tight">Bu hafta kampüste en çok vızıldayan ve etkileşim alan öğrenciler!</p>
+        <div class="pt-2 text-center py-6 bg-yellow-50/50 dark:bg-gray-700/30 rounded-xl border border-dashed border-yellow-200 dark:border-gray-600">
+          <span class="text-2xl mb-1 block">🏆</span>
+          <h4 class="font-bold text-xs text-gray-800 dark:text-gray-200">Kürsü henüz boş!</h4>
+          <p class="text-[10px] text-gray-400 mt-0.5">İlk vızıldayan sen ol, haftanın arısı seçil!</p>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- GİRİŞ YAP MODALI -->
+  <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-1">🐝</div>
+        <h3 class="font-black text-xl text-gray-900 dark:text-white">Giriş Yap</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">BigaConnect hesabınıza erişin.</p>
+      </div>
+
+      <!-- Google ile Giriş Butonu -->
+      <button type="button" onclick="handleGoogleLogin()" class="w-full mb-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs transition">
+        <i class="fa-brands fa-google text-red-500"></i> Google ile Devam Et
+      </button>
+
+      <div class="relative flex py-2 items-center">
+        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+        <span class="flex-shrink mx-3 text-[10px] text-gray-400 font-bold uppercase">veya e-posta ile</span>
+        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-3 mt-1">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
+          <input type="email" id="loginEmail" required placeholder="ornek@gmail.com" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
+          <input type="password" id="loginPassword" required placeholder="******" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <button type="submit" class="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition">Giriş Yap</button>
+      </form>
+      <div class="text-center mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Hesabınız yok mu? <a href="#" onclick="openAuthModal('register')" class="text-yellow-600 font-bold hover:underline">Kaydol</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HESAP OLUŞTUR MODALI -->
+  <div id="registerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <div class="text-center mb-3">
+        <div class="text-3xl mb-1">🐝</div>
+        <h3 class="font-black text-xl text-gray-900 dark:text-white">Hesap Oluştur</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Biga kampüs topluluğuna katılın!</p>
+      </div>
+
+      <!-- Google ile Kayıt Butonu -->
+      <button type="button" onclick="handleGoogleLogin()" class="w-full mb-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 text-gray-700 dark:text-gray-200 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs transition">
+        <i class="fa-brands fa-google text-red-500"></i> Google ile Kaydol
+      </button>
+
+      <div class="relative flex py-1 items-center">
+        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+        <span class="flex-shrink mx-3 text-[10px] text-gray-400 font-bold uppercase">veya e-posta ile</span>
+        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+      </div>
+
+      <form onsubmit="handleRegister(event)" class="space-y-2.5 mt-1">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
+          <input type="text" id="regName" required placeholder="Ahmet Yılmaz" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2 text-xs text-gray-400">@</span>
+            <input type="text" id="regHandle" required placeholder="ahmetyilmaz" class="w-full pl-7 pr-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümünüz</label>
+          <select id="regDept" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <option value="" disabled selected>Bölümünüzü Seçin</option>
+            <optgroup label="İktisadi ve İdari Bilimler Fakültesi (İİBF)">
+              <option value="İktisat">İktisat</option>
+              <option value="İşletme">İşletme</option>
+              <option value="Uluslararası İlişkiler">Uluslararası İlişkiler</option>
+              <option value="Maliye">Maliye</option>
+              <option value="Çalışma Ekonomisi (ÇEKO)">Çalışma Ekonomisi (ÇEKO)</option>
+              <option value="Ekonometri">Ekonometri</option>
+              <option value="Kamu Yönetimi">Kamu Yönetimi</option>
+              <option value="Yönetim Bilişim Sistemleri (YBS)">Yönetim Bilişim Sistemleri (YBS)</option>
+            </optgroup>
+            <optgroup label="Uygulamalı Bilimler Fakültesi (UBF)">
+              <option value="Uluslararası Ticaret ve Lojistik">Uluslararası Ticaret ve Lojistik</option>
+              <option value="Finans ve Bankacılık">Finans ve Bankacılık</option>
+            </optgroup>
+            <optgroup label="Biga Meslek Yüksekokulu (MYO)">
+              <option value="Bilgisayar Programcılığı">Bilgisayar Programcılığı</option>
+              <option value="İşletme Yönetimi">İşletme Yönetimi</option>
+              <option value="Muhasebe ve Vergi">Muhasebe ve Vergi</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfınız</label>
+          <select id="regClass" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <option value="" disabled selected>Sınıfınızı Seçin</option>
+            <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
+            <option value="1. Sınıf">1. Sınıf</option>
+            <option value="2. Sınıf">2. Sınıf</option>
+            <option value="3. Sınıf">3. Sınıf</option>
+            <option value="4. Sınıf">4. Sınıf</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Gerçek E-posta Adresi</label>
+          <input type="email" id="regEmail" required placeholder="ornek@gmail.com" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre (En az 6 karakter)</label>
+          <input type="password" id="regPassword" required placeholder="******" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs shadow transition mt-2">Kayıt Ol ve Katıl</button>
+      </form>
+      <div class="text-center mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Zaten hesabınız var mı? <a href="#" onclick="openAuthModal('login')" class="text-yellow-600 font-bold hover:underline">Giriş Yap</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFİL DÜZENLEME MODALI -->
+  <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <h3 class="font-black text-lg text-gray-900 dark:text-white mb-4">Profilini Özelleştir</h3>
+      <form onsubmit="saveProfile(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
+          <input type="text" id="editName" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
+          <input type="text" id="editHandle" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Biyografi</label>
+          <textarea id="editBio" rows="2" placeholder="Hakkında kısa bir şeyler yaz..." class="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs shadow transition mt-2">Değişiklikleri Kaydet</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDK'ları -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxhs8iwlepLjGPbezGKDu8HhFxJICEVIo",
+      authDomain: "bigaconnect-56469.firebaseapp.com",
+      projectId: "bigaconnect-56469",
+      storageBucket: "bigaconnect-56469.firebasestorage.app",
+      messagingSenderId: "312522372786",
+      appId: "1:312522372786:web:bdddcf9161fc03fd3b7bab",
+      measurementId: "G-9KMN1XX61F"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    let isLoggedIn = false;
+    let currentUserData = null;
+
+    // Oturum Durumu Takibi
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Firestore'dan kullanıcı detaylarını çek
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          currentUserData = userDocSnap.data();
+        } else {
+          currentUserData = {
+            name: user.displayName || "Biga Öğrencisi",
+            handle: user.email.split('@')[0],
+            dept: "İktisat",
+            classNum: "1. Sınıf",
+            avatarUrl: user.photoURL || "",
+            bio: "Biga kampüsünde vızıldamaya hazır! 🐝"
+          };
+        }
+        updateLoginState(true, currentUserData);
+      } else {
+        updateLoginState(false, null);
+      }
+      loadPostsFromFirestore();
+    });
+
+    window.handleRegister = async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value;
+      const handle = document.getElementById('regHandle').value;
+      const dept = document.getElementById('regDept').value;
+      const classNum = document.getElementById('regClass').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const userData = {
+          uid: user.uid,
+          name,
+          handle,
+          dept,
+          classNum,
+          email,
+          avatarUrl: "",
+          bio: "Biga kampüsünde vızıldamaya hazır! 🐝"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
+        await setDoc(doc(db, "users", user.uid), userData);
+        alert(`🐝 Tebrikler ${name}! Hesabınız başarıyla oluşturuldu.`);
+        closeAuthModal();
+      } catch (error) {
+        alert("Kayıt Hatası: " + error.message);
+      }
+    };
 
-        let currentMode = 'login';
+    window.handleLogin = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
 
-        // Sekme Değiştirme
-        const tabLoginBtn = document.getElementById('tabLoginBtn');
-        const tabRegisterBtn = document.getElementById('tabRegisterBtn');
-        const extraFields = document.getElementById('registerExtraFields');
-        const actionBtn = document.getElementById('authActionBtn');
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("🐝 Giriş başarılı!");
+        closeAuthModal();
+      } catch (error) {
+        alert("Giriş Hatası: " + error.message);
+      }
+    };
 
-        function setAuthMode(mode) {
-            currentMode = mode;
-            if(mode === 'register') {
-                extraFields.classList.remove('hidden');
-                actionBtn.innerText = "Kayıt Ol";
-                tabRegisterBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all cursor-pointer";
-                tabLoginBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all cursor-pointer";
-            } else {
-                extraFields.classList.add('hidden');
-                actionBtn.innerText = "Giriş Yap";
-                tabLoginBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all cursor-pointer";
-                tabRegisterBtn.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all cursor-pointer";
-            }
+    window.handleGoogleLogin = async function() {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (!userDocSnap.exists()) {
+          await setDoc(userDocRef, {
+            uid: user.uid,
+            name: user.displayName || "Google Kullanıcısı",
+            handle: user.email.split('@')[0],
+            dept: "İktisat",
+            classNum: "1. Sınıf",
+            email: user.email,
+            avatarUrl: user.photoURL || "",
+            bio: "Biga kampüsünde vızıldamaya hazır! 🐝"
+          });
+        }
+        alert("🐝 Google ile giriş başarılı!");
+        closeAuthModal();
+      } catch (error) {
+        alert("Google Giriş Hatası: " + error.message);
+      }
+    };
+
+    window.handleLogout = async function() {
+      if (confirm("Çıkış yapmak istediğinize emin misiniz?")) {
+        await signOut(auth);
+        alert("Başarıyla çıkış yapıldı.");
+        switchTab('timeline');
+      }
+    };
+
+    window.saveProfile = async function(e) {
+      e.preventDefault();
+      if (!auth.currentUser) return;
+
+      const name = document.getElementById('editName').value;
+      const handle = document.getElementById('editHandle').value;
+      const bio = document.getElementById('editBio').value;
+
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await setDoc(userRef, { name, handle, bio }, { merge: true });
+
+      currentUserData.name = name;
+      currentUserData.handle = handle;
+      currentUserData.bio = bio;
+      updateLoginState(true, currentUserData);
+
+      alert("Profil bilgilerin güncellendi!");
+      closeProfileModal();
+    };
+
+    window.sharePost = async function() {
+      if (!auth.currentUser) {
+        alert("Paylaşım yapmak için lütfen giriş yapın.");
+        openAuthModal('login');
+        return;
+      }
+
+      const text = document.getElementById('postText').value;
+      if (!text.trim()) return alert("Lütfen bir şeyler yazın!");
+
+      try {
+        await addDoc(collection(db, "posts"), {
+          uid: auth.currentUser.uid,
+          name: currentUserData.name,
+          handle: '@' + currentUserData.handle.replace('@',''),
+          avatarUrl: currentUserData.avatarUrl || '',
+          text: text,
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById('postText').value = '';
+        loadPostsFromFirestore();
+      } catch (error) {
+        alert("Paylaşım gönderilemedi: " + error.message);
+      }
+    };
+
+    async function loadPostsFromFirestore() {
+      const timeline = document.getElementById('timeline');
+      try {
+        const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          timeline.innerHTML = `
+            <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+              <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
+              <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+            </div>
+          `;
+          return;
         }
 
-        tabLoginBtn.addEventListener('click', () => setAuthMode('login'));
-        tabRegisterBtn.addEventListener('click', () => setAuthMode('register'));
+        timeline.innerHTML = '';
+        querySnapshot.forEach((docSnap) => {
+          const p = docSnap.data();
+          const postId = docSnap.id;
+          appendPostToDOM(postId, p.name, p.handle, p.avatarUrl, p.text, 'Az önce', p.uid === (auth.currentUser ? auth.currentUser.uid : null));
+        });
+      } catch (e) {
+        console.error("Gönderiler yüklenirken hata:", e);
+      }
+    }
 
-        // Sayfa Sekmeleri Kontrolü
-        const allTabs = ['feed', 'profile', 'events', 'market', 'notes', 'food'];
-
-        function switchTab(targetTab) {
-            allTabs.forEach(t => {
-                const el = document.getElementById('tab-' + t);
-                if(el) el.classList.add('hidden');
-            });
-            const activeEl = document.getElementById('tab-' + targetTab);
-            if(activeEl) activeEl.classList.remove('hidden');
+    window.deletePostFirestore = async function(postId) {
+      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
+        try {
+          await deleteDoc(doc(db, "posts", postId));
+          loadPostsFromFirestore();
+        } catch (error) {
+          alert("Silme başarısız: " + error.message);
         }
+      }
+    };
 
-        document.getElementById('btnNavFeed').addEventListener('click', () => switchTab('feed'));
-        document.getElementById('btnNavProfile').addEventListener('click', () => switchTab('profile'));
-        document.getElementById('btnNavEvents').addEventListener('click', () => switchTab('events'));
-        document.getElementById('btnNavMarket').addEventListener('click', () => switchTab('market'));
-        document.getElementById('btnNavNotes').addEventListener('click', () => switchTab('notes'));
-        document.getElementById('btnNavFood').addEventListener('click', () => switchTab('food'));
+    function appendPostToDOM(postId, name, handle, avatarUrl, text, time, isOwner) {
+      const timeline = document.getElementById('timeline');
+      const newPost = document.createElement('div');
+      newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group";
 
-        // Giriş Yap / Kayıt Ol Ana Buton
-        actionBtn.addEventListener('click', async () => {
-            const email = document.getElementById('authEmail').value.trim();
-            const pass = document.getElementById('authPassword').value.trim();
+      const avatarHTML = (avatarUrl && avatarUrl !== '') 
+        ? `<img src="${avatarUrl}" class="w-full h-full object-cover" alt="PP">`
+        : `<i class="fa-solid fa-user text-gray-400"></i>`;
 
-            if(!email || !pass) return alert("Lütfen e-posta ve şifre alanlarını doldurun.");
+      const deleteBtnHTML = isOwner ? `
+        <button onclick="deletePostFirestore('${postId}')" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition" title="Paylaşımı Sil">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>` : '';
 
-            if(currentMode === 'register') {
-                const fullName = document.getElementById('regFullName').value.trim();
-                const username = document.getElementById('regUsername').value.trim();
-                if(!fullName || !username) return alert("Lütfen ad-soyad ve kullanıcı adı alanlarını doldurun.");
+      newPost.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center border border-gray-300 dark:border-gray-600 overflow-hidden">
+              ${avatarHTML}
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-gray-900 dark:text-white">${name}</h4>
+              <span class="text-xs text-gray-400">${handle} · ${time}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            ${deleteBtnHTML}
+            <button onclick="vizzla('${name}')" class="bg-yellow-100 hover:bg-yellow-300 text-yellow-900 font-extrabold text-xs px-3 py-1.5 rounded-full border border-yellow-300 transition flex items-center gap-1 active:scale-95">
+              🐝 Vızzla!
+            </button>
+          </div>
+        </div>
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed mb-3">${text}</p>
+      `;
+      timeline.appendChild(newPost);
+    }
+  </script>
 
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                    const user = userCredential.user;
-                    
-                    await setDoc(doc(db, "users", user.uid), {
-                        fullName: fullName,
-                        username: username,
-                        email: email,
-                        createdAt: serverTimestamp()
-                    });
+  <!-- Arayüz Yardımcı Scriptleri -->
+  <script>
+    function openMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-closed');
+      document.getElementById('mobileDrawer').classList.add('drawer-open');
+      document.getElementById('mobileDrawerBackdrop').classList.remove('hidden');
+    }
 
-                    alert("Kayıt başarılı! Aramıza hoş geldin.");
-                } catch(error) {
-                    alert("Kayıt Hatası: " + error.message);
-                }
-            } else {
-                try {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                } catch(error) {
-                    alert("Giriş Hatası: " + error.message);
-                }
-            }
-        });
+    function closeMobileDrawer() {
+      document.getElementById('mobileDrawer').classList.remove('drawer-open');
+      document.getElementById('mobileDrawer').classList.add('drawer-closed');
+      document.getElementById('mobileDrawerBackdrop').classList.add('hidden');
+    }
 
-        // Google ile Giriş
-        document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
-            try {
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                if(!userSnap.exists()) {
-                    await setDoc(userRef, {
-                        fullName: user.displayName || "Kullanıcı",
-                        username: user.email.split('@')[0],
-                        email: user.email,
-                        createdAt: serverTimestamp()
-                    });
-                }
-            } catch(error) {
-                alert("Google ile giriş hatası: " + error.message);
-            }
-        });
+    function handleHeaderProfileClick() {
+      if (isLoggedIn) {
+        switchTab('profile');
+      } else {
+        openAuthModal('login');
+      }
+    }
 
-        // Çıkış Yap
-        document.getElementById('btnLogout').addEventListener('click', async () => {
-            await signOut(auth);
-        });
+    function updateAvatarUI(avatarUrl) {
+      const headerImg = document.getElementById('userAvatarHeaderImg');
+      const headerDefaultIcon = document.getElementById('userAvatarHeaderDefaultIcon');
+      const profileImg = document.getElementById('profileAvatarImg');
+      const profileDefaultIcon = document.getElementById('profileAvatarDefaultIcon');
 
-        // Görsel Seçilince İsmini Göster
-        document.getElementById('postImageFile').addEventListener('change', function() {
-            document.getElementById('selectedFileName').innerText = this.files[0] ? this.files[0].name : 'Fotoğraf Ekle';
-        });
-
-        // Post Paylaş
-        document.getElementById('btnCreatePost').addEventListener('click', async () => {
-            const content = document.getElementById('postInput').value;
-            const fileInput = document.getElementById('postImageFile');
-            let imageUrl = "";
-
-            if(fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.readAsDataURL(fileInput.files[0]);
-                reader.onload = async function() {
-                    imageUrl = reader.result;
-                    await savePost(content, imageUrl);
-                }
-            } else {
-                await savePost(content, "");
-            }
-        });
-
-        async function savePost(content, imageUrl) {
-            if(!content.trim() && !imageUrl) return alert("Boş gönderi paylaşılamaz.");
-            try {
-                const user = auth.currentUser;
-                let authorName = user.email;
-                
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if(userDoc.exists()) {
-                    authorName = `@${userDoc.data().username} (${userDoc.data().fullName})`;
-                }
-
-                await addDoc(collection(db, "posts"), {
-                    content: content,
-                    imageUrl: imageUrl,
-                    author: authorName,
-                    createdAt: serverTimestamp()
-                });
-                document.getElementById('postInput').value = "";
-                document.getElementById('postImageFile').value = "";
-                document.getElementById('selectedFileName').innerText = "Fotoğraf Ekle";
-                loadPosts();
-            } catch(e) {
-                alert("Paylaşım hatası: " + e.message);
-            }
+      if (avatarUrl && avatarUrl.trim() !== "") {
+        headerImg.src = avatarUrl;
+        headerImg.classList.remove('hidden');
+        if (headerDefaultIcon) headerDefaultIcon.classList.add('hidden');
+        if (profileImg) {
+          profileImg.src = avatarUrl;
+          profileImg.classList.remove('hidden');
+          if (profileDefaultIcon) profileDefaultIcon.classList.add('hidden');
         }
-
-        async function loadPosts() {
-            const container = document.getElementById('postsContainer');
-            container.innerHTML = '<p class="text-center text-gray-400">Yükleniyor...</p>';
-            try {
-                const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                container.innerHTML = "";
-                
-                if(querySnapshot.empty) {
-                    container.innerHTML = '<p class="text-center text-gray-400">Henüz hiç gönderi paylaşılmadı. İlk paylaşımı sen yap! 🐝</p>';
-                    return;
-                }
-
-                querySnapshot.forEach((docSnap) => {
-                    const post = docSnap.data();
-                    container.innerHTML += `
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 bg-brand-500 rounded-full flex items-center text-white justify-center font-bold">🐝</div>
-                                <div>
-                                    <h4 class="font-bold text-sm">${post.author}</h4>
-                                    <span class="text-xs text-gray-400">ÇOMÜ Biga Kampüsü</span>
-                                </div>
-                            </div>
-                            ${post.content ? `<p class="text-gray-700 dark:text-gray-200 text-sm">${post.content}</p>` : ''}
-                            ${post.imageUrl ? `<img src="${post.imageUrl}" class="rounded-xl max-h-96 w-full object-cover">` : ''}
-                        </div>
-                    `;
-                });
-            } catch(e) {
-                console.error(e);
-                container.innerHTML = '<p class="text-center text-red-400">Gönderiler yüklenirken hata oluştu.</p>';
-            }
+      } else {
+        headerImg.src = "";
+        headerImg.classList.add('hidden');
+        if (headerDefaultIcon) headerDefaultIcon.classList.remove('hidden');
+        if (profileImg) {
+          profileImg.src = "";
+          profileImg.classList.add('hidden');
+          if (profileDefaultIcon) profileDefaultIcon.classList.remove('hidden');
         }
+      }
+    }
 
-        // Profil Fotoğrafı
-        document.getElementById('profileAvatarInput').addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profileAvatarPreview').src = e.target.result;
-                }
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
+    function updateLoginState(loggedIn, userData = null) {
+      isLoggedIn = loggedIn;
+      currentUserData = userData;
 
-        // Auth Dinleyici
-        onAuthStateChanged(auth, async (user) => {
-            const modal = document.getElementById('authModal');
-            if (user) {
-                modal.classList.add('hidden');
-                
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if(userDoc.exists()) {
-                    const data = userDoc.data();
-                    document.getElementById('profileNameDisplay').innerText = data.fullName;
-                    document.getElementById('profileUsernameDisplay').innerText = "@" + data.username;
-                    document.getElementById('profileEmailDisplay').innerText = data.email;
-                    document.getElementById('userDisplayUsername').innerText = "@" + data.username;
-                } else {
-                    document.getElementById('profileNameDisplay').innerText = user.displayName || "Kullanıcı";
-                    document.getElementById('profileUsernameDisplay').innerText = "@kullanici";
-                    document.getElementById('profileEmailDisplay').innerText = user.email;
-                    document.getElementById('userDisplayUsername').innerText = user.email;
-                }
-                loadPosts();
-            } else {
-                modal.classList.remove('hidden');
-                document.getElementById('userDisplayUsername').innerText = "";
-            }
-        });
-    </script>
+      const overlay = document.getElementById('postAreaOverlay');
+      const authGroup = document.getElementById('authButtonsGroup');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const mobileAuthGroup = document.getElementById('mobileDrawerAuthGroup');
+      const mobileLogoutBtn = document.getElementById('mobileDrawerLogoutBtn');
+
+      const profileLoggedOutView = document.getElementById('profileLoggedOutView');
+      const profileLoggedInView = document.getElementById('profileLoggedInView');
+
+      if (loggedIn && userData) {
+        if (overlay) overlay.classList.add('hidden');
+        if (authGroup) authGroup.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+        if (mobileAuthGroup) mobileAuthGroup.classList.add('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.remove('hidden');
+
+        if (profileLoggedOutView) profileLoggedOutView.classList.add('hidden');
+        if (profileLoggedInView) profileLoggedInView.classList.remove('hidden');
+
+        document.getElementById('userHeaderInfoGroup').classList.remove('hidden');
+        document.getElementById('userNameHeader').innerText = userData.name;
+        document.getElementById('userHandleHeader').innerText = '@' + userData.handle.replace('@', '');
+        document.getElementById('userHeaderGearIcon').className = "fa-solid fa-gear text-xs text-yellow-600 ml-0.5";
+
+        document.getElementById('profileNameDisplay').innerText = userData.name;
+        document.getElementById('profileHandleDisplay').innerText = '@' + userData.handle.replace('@', '');
+        document.getElementById('profileDeptDisplay').innerText = userData.dept || 'İktisat';
+        document.getElementById('profileClassDisplay').innerText = userData.classNum || '1. Sınıf';
+        document.getElementById('profileBioDisplay').innerText = userData.bio || 'Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝';
+
+        document.getElementById('editName').value = userData.name;
+        document.getElementById('editHandle').value = userData.handle;
+        document.getElementById('editBio').value = userData.bio || '';
+
+        updateAvatarUI(userData.avatarUrl);
+      } else {
+        if (overlay) overlay.classList.remove('hidden');
+        if (authGroup) authGroup.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (mobileAuthGroup) mobileAuthGroup.classList.remove('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
+
+        if (profileLoggedOutView) profileLoggedOutView.classList.remove('hidden');
+        if (profileLoggedInView) profileLoggedInView.classList.add('hidden');
+
+        document.getElementById('userHeaderInfoGroup').classList.add('hidden');
+        document.getElementById('userHeaderGearIcon').className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
+
+        updateAvatarUI("");
+      }
+    }
+
+    function switchTab(tabName) {
+      const titles = {
+        timeline: 'Akış',
+        profile: 'Profilim',
+        explore: 'Keşfet & Gündem',
+        dm: 'Mesajlar',
+        notifications: 'Bildirimler',
+        requests: 'Arkadaşlık İstekleri',
+        map: 'Kampüs Haritası'
+      };
+
+      const titleElement = document.getElementById('pageTitle');
+      if (titleElement) titleElement.innerText = titles[tabName.toLowerCase()] || 'BigaConnect';
+
+      document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+      const targetContent = document.getElementById('content' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (targetContent) targetContent.classList.remove('hidden');
+
+      const activeBtnId = 'menu' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      document.querySelectorAll('.menu-btn, .menu-btn-mobile').forEach(btn => {
+        if (btn.id === activeBtnId) {
+          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-yellow-400 text-gray-900 shadow-sm transition";
+        } else {
+          btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-100 dark:hover:bg-gray-700 transition";
+        }
+      });
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        if (themeIcon) themeIcon.className = "fa-solid fa-moon text-yellow-600";
+        if (themeText) themeText.innerText = "Gece Modu";
+      } else {
+        html.classList.add('dark');
+        if (themeIcon) themeIcon.className = "fa-solid fa-sun text-yellow-400";
+        if (themeText) themeText.innerText = "Gündüz Modu";
+      }
+    }
+
+    function openAuthModal(mode) {
+      closeAuthModal();
+      if (mode === 'register') document.getElementById('registerModal').classList.remove('hidden');
+      else document.getElementById('loginModal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() { 
+      document.getElementById('loginModal').classList.add('hidden'); 
+      document.getElementById('registerModal').classList.add('hidden'); 
+    }
+    function openProfileModal() { document.getElementById('profileModal').classList.remove('hidden'); }
+    function closeProfileModal() { document.getElementById('profileModal').classList.add('hidden'); }
+    function vizzla(kullanici) { alert(`🐝 Bzzz! ${kullanici} kişisini vızzladın!`); }
+  </script>
 </body>
 </html>
