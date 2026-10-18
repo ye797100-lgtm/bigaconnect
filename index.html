@@ -3,16 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BigaConnect - ÇOMÜ Biga Sosyal Ağı (Bulut Destekli)</title>
+  <title>BigaConnect - ÇOMÜ Biga Sosyal Ağı</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome İkonları -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Firebase SDK'ları -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
     tailwind.config = {
@@ -281,6 +277,12 @@
                 <p id="profileBioDisplay" class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">Henüz bir biyografi eklenmedi. Biga kampüsünde vızıldamaya hazır! 🐝</p>
               </div>
 
+              <!-- Cihazlar arası hesap taşıma butonu -->
+              <div class="mt-4 pt-3 border-t border-yellow-100 dark:border-gray-700 flex items-center justify-between">
+                <span class="text-[11px] text-gray-400 font-bold">Telefona / Başka Cihaza Aktar:</span>
+                <button onclick="exportUserData()" class="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-900 text-xs font-extrabold rounded-xl transition shadow-xs"><i class="fa-solid fa-key mr-1"></i> Hesap Kodumu Al</button>
+              </div>
+
               <div class="flex gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400 font-bold">
                 <span><b class="text-gray-900 dark:text-white">0</b> Takip Edilen</span>
                 <span><b class="text-gray-900 dark:text-white">0</b> Takipçi</span>
@@ -407,10 +409,10 @@
   <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-      <div class="text-center mb-5">
+      <div class="text-center mb-4">
         <div class="text-4xl mb-1">🐝</div>
         <h3 class="font-black text-xl text-gray-900 dark:text-white">Giriş Yap</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">E-posta adresiniz veya kullanıcı adınızla giriş yapın.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">E-posta veya kullanıcı adınla giriş yap.</p>
       </div>
       <form onsubmit="handleLogin(event)" class="space-y-3">
         <div>
@@ -419,12 +421,13 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
-          <input type="password" id="loginPassword" required placeholder="Şifreniz" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          <input type="password" id="loginPassword" required placeholder="Şifren" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
         <button type="submit" class="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition">Giriş Yap</button>
       </form>
-      <div class="text-center mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400">Hesabınız yok mu? <a href="#" onclick="openAuthModal('register')" class="text-yellow-600 font-bold hover:underline">Kaydol</a></p>
+      <div class="text-center mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-2">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Hesabın yok mu? <a href="#" onclick="openAuthModal('register')" class="text-yellow-600 font-bold hover:underline">Kaydol</a></p>
+        <button onclick="importUserDataPrompt()" class="text-[11px] text-yellow-600 dark:text-yellow-400 font-extrabold hover:underline block mx-auto">📱 Başka Cihazdaki Hesabımı Yükle (Kod ile)</button>
       </div>
     </div>
   </div>
@@ -436,12 +439,12 @@
       <div class="text-center mb-4">
         <div class="text-3xl mb-1">🐝</div>
         <h3 class="font-black text-xl text-gray-900 dark:text-white">Hesap Oluştur</h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Bulut tabanlı ortak hesap kaydı</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">BigaConnect topluluğuna katıl</p>
       </div>
       <form onsubmit="handleRegister(event)" class="space-y-2.5">
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
-          <input type="text" id="regName" required placeholder="Adınız ve Soyadınız" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <input type="text" id="regName" required placeholder="Adın ve Soyadın" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
@@ -451,9 +454,9 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümünüz</label>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümün</label>
           <select id="regDept" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
-            <option value="" disabled selected>Bölümünüzü Seçin</option>
+            <option value="" disabled selected>Bölümünü Seç</option>
             <optgroup label="İktisadi ve İdari Bilimler Fakültesi (İİBF)">
               <option value="İktisat">İktisat</option>
               <option value="İşletme">İşletme</option>
@@ -485,9 +488,9 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfınız</label>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfın</label>
           <select id="regClass" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
-            <option value="" disabled selected>Sınıfınızı Seçin</option>
+            <option value="" disabled selected>Sınıfını Seç</option>
             <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
             <option value="1. Sınıf">1. Sınıf</option>
             <option value="2. Sınıf">2. Sınıf</option>
@@ -499,22 +502,22 @@
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Hesap Gizliliği</label>
           <select id="regPrivacy" required class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
-            <option value="public" selected>Açık Hesap (Herkes vızzlayabilir)</option>
-            <option value="private">Gizli Hesap (Sadece takipçiler vızzlayabilir)</option>
+            <option value="public" selected>Açık Hesap</option>
+            <option value="private">Gizli Hesap</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Gerçek E-posta Adresi</label>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">E-posta Adresi</label>
           <input type="email" id="regEmail" required placeholder="ornek@gmail.com" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
-          <input type="password" id="regPassword" required placeholder="Şifreniz" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <input type="password" id="regPassword" required placeholder="Şifren" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs shadow transition mt-2">Kayıt Ol ve Katıl</button>
       </form>
       <div class="text-center mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
-        <p class="text-xs text-gray-500 dark:text-gray-400">Zaten hesabınız var mı? <a href="#" onclick="openAuthModal('login')" class="text-yellow-600 font-bold hover:underline">Giriş Yap</a></p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Zaten hesabın var mı? <a href="#" onclick="openAuthModal('login')" class="text-yellow-600 font-bold hover:underline">Giriş Yap</a></p>
       </div>
     </div>
   </div>
@@ -534,7 +537,7 @@
           <input type="text" id="editHandle" value="" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümünüz</label>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Bölümün</label>
           <select id="editDept" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
             <optgroup label="İktisadi ve İdari Bilimler Fakültesi (İİBF)">
               <option value="İktisat">İktisat</option>
@@ -567,7 +570,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfınız</label>
+          <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sınıfın</label>
           <select id="editClass" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
             <option value="Hazırlık Sınıfı">Hazırlık Sınıfı</option>
             <option value="1. Sınıf">1. Sınıf</option>
@@ -594,26 +597,10 @@
   </div>
 
   <script>
-    // --- FIREBASE BAĞLANTI AYARLARI ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-ORNEK_API_KEY_BURAYA",
-      authDomain: "bigaconnect-app.firebaseapp.com",
-      projectId: "bigaconnect-app",
-      storageBucket: "bigaconnect-app.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
-    };
-
-    // Firebase Başlatma
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
     let isLoggedIn = false;
     let currentUserData = null;
 
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('biga_theme');
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -628,21 +615,21 @@
         try {
           currentUserData = JSON.parse(savedUser);
           if (currentUserData && currentUserData.email) {
-            // Firebase'den güncel kullanıcı verisini çek
-            try {
-              const userRef = db.collection('users').doc(currentUserData.email.toLowerCase());
-              const doc = await userRef.get();
-              if (doc.exists) {
-                currentUserData = doc.data();
-              }
-            } catch(e) {}
+            let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+            const latestUser = users.find(u => u.email === currentUserData.email);
+            if (latestUser) {
+              currentUserData = latestUser;
+            } else {
+              users.push(currentUserData);
+              localStorage.setItem('biga_registered_users', JSON.stringify(users));
+            }
             updateLoginState(true, currentUserData);
           }
         } catch (e) {
           localStorage.removeItem('biga_current_user');
         }
       }
-      loadPostsFromCloud();
+      loadPosts();
       loadNotifications();
     });
 
@@ -764,7 +751,7 @@
         updateAvatarUI(userData.avatarUrl, userData.name);
         updateBannerUI(userData.bannerUrl);
         loadUserPosts(userData.handle);
-        loadPostsFromCloud();
+        loadPosts();
         loadNotifications();
       } else {
         localStorage.removeItem('biga_current_user');
@@ -782,7 +769,7 @@
         document.getElementById('userHeaderGearIcon').className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
 
         updateAvatarUI("", "");
-        loadPostsFromCloud();
+        loadPosts();
         loadNotifications();
       }
     }
@@ -850,8 +837,7 @@
     function openAuthModal(mode) {
       closeAuthModal();
       if (mode === 'register') document.getElementById('registerModal').classList.remove('hidden');
-      else document.getElementById('loginModal').classList.add('hidden'); // Düzeltme
-      if (mode === 'login') document.getElementById('loginModal').classList.remove('hidden');
+      else document.getElementById('loginModal').classList.remove('hidden');
     }
 
     function closeAuthModal() { 
@@ -868,11 +854,11 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = async function(uploadEvent) {
+      reader.onload = function(uploadEvent) {
         currentUserData.avatarUrl = uploadEvent.target.result;
         updateLoginState(true, currentUserData);
-        await saveUserToCloud(currentUserData);
-        alert("Profil fotoğrafınız güncellendi!");
+        updateAllRegisteredUsersStorage();
+        alert("Profil fotoğrafın güncellendi!");
       };
       reader.readAsDataURL(file);
     }
@@ -881,24 +867,22 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = async function(uploadEvent) {
+      reader.onload = function(uploadEvent) {
         currentUserData.bannerUrl = uploadEvent.target.result;
         updateLoginState(true, currentUserData);
-        await saveUserToCloud(currentUserData);
-        alert("Banner fotoğrafınız güncellendi!");
+        updateAllRegisteredUsersStorage();
+        alert("Banner fotoğrafın güncellendi!");
       };
       reader.readAsDataURL(file);
     }
 
-    async function saveUserToCloud(userData) {
-      try {
-        await db.collection('users').doc(userData.email.toLowerCase()).set(userData);
-      } catch (e) {
-        console.error("Bulut kayıt hatası:", e);
-      }
+    function updateAllRegisteredUsersStorage() {
+      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+      users = users.map(u => u.email === currentUserData.email ? currentUserData : u);
+      localStorage.setItem('biga_registered_users', JSON.stringify(users));
     }
 
-    async function handleRegister(e) {
+    function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
       const handle = document.getElementById('regHandle').value.trim().replace('@', '');
@@ -908,94 +892,114 @@
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const password = document.getElementById('regPassword').value;
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        alert("Lütfen geçerli ve gerçek bir e-posta adresi girin!");
+      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+      
+      if (users.find(u => u.email === email)) {
+        alert("Bu e-posta adresi ile zaten kayıtlı bir hesap var!");
         return;
       }
 
-      try {
-        const userRef = db.collection('users').doc(email);
-        const doc = await userRef.get();
-        if (doc.exists) {
-          alert("Bu e-posta adresi ile zaten kayıtlı bir hesap var!");
-          return;
-        }
+      const newUser = {
+        name,
+        handle,
+        dept,
+        classNum,
+        privacy,
+        email,
+        password,
+        avatarUrl: '',
+        bannerUrl: '',
+        bio: 'Biga kampüsünde vızıldamaya hazır! 🐝',
+        following: [],
+        buzzes: [],
+        notifications: []
+      };
 
-        const newUser = {
-          name,
-          handle,
-          dept,
-          classNum,
-          privacy,
-          email,
-          password,
-          avatarUrl: '',
-          bannerUrl: '',
-          bio: 'Biga kampüsünde vızıldamaya hazır! 🐝',
-          following: [],
-          buzzes: [],
-          notifications: []
-        };
+      users.push(newUser);
+      localStorage.setItem('biga_registered_users', JSON.stringify(users));
 
-        await userRef.set(newUser);
-        updateLoginState(true, newUser);
-        alert(`🐝 Tebrikler ${name}! Hesabınız bulutta oluşturuldu.`);
-        closeAuthModal();
-      } catch (err) {
-        alert("Kayıt sırasında bulut bağlantı hatası oluştu: " + err.message);
-      }
+      updateLoginState(true, newUser);
+      alert(`🐝 Tebrikler ${name}! Hesabın oluşturuldu.`);
+      closeAuthModal();
     }
 
-    async function handleLogin(e) {
+    function handleLogin(e) {
       e.preventDefault();
       const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
+
+      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
       const cleanId = identifier.replace('@', '');
+      
+      let user = users.find(u => 
+        (u.email.toLowerCase() === identifier || u.handle.toLowerCase() === cleanId) && u.password === password
+      );
 
-      try {
-        let user = null;
-        // E-posta ile ara
-        const emailDoc = await db.collection('users').doc(identifier).get();
-        if (emailDoc.exists && emailDoc.data().password === password) {
-          user = emailDoc.data();
-        } else {
-          // Kullanıcı adı ile ara
-          const snapshot = await db.collection('users').where('handle', '==', cleanId).get();
-          if (!snapshot.empty) {
-            const found = snapshot.docs[0].data();
-            if (found.password === password) {
-              user = found;
+      if (!user) {
+        const oldUser = localStorage.getItem('biga_current_user');
+        if (oldUser) {
+          try {
+            const parsed = JSON.parse(oldUser);
+            if ((parsed.email.toLowerCase() === identifier || parsed.handle.toLowerCase() === cleanId) && parsed.password === password) {
+              user = parsed;
+              users.push(user);
+              localStorage.setItem('biga_registered_users', JSON.stringify(users));
             }
-          }
+          } catch(err){}
         }
-
-        if (!user) {
-          alert("Girdiğiniz bilgilerle eşleşen bir hesap bulunamadı!");
-          return;
-        }
-
-        if (!user.following) user.following = [];
-        if (!user.buzzes) user.buzzes = [];
-        if (!user.notifications) user.notifications = [];
-
-        updateLoginState(true, user);
-        alert(`🐝 Hoş geldiniz, ${user.name}! Buluttan giriş başarılı.`);
-        closeAuthModal();
-      } catch (err) {
-        alert("Giriş yapılırken hata oluştu: " + err.message);
       }
+
+      if (!user) {
+        alert("Girdiğin bilgilerle eşleşen bir hesap bulunamadı! Lütfen kontrol et.");
+        return;
+      }
+
+      if (!user.following) user.following = [];
+      if (!user.buzzes) user.buzzes = [];
+      if (!user.notifications) user.notifications = [];
+
+      updateLoginState(true, user);
+      alert(`🐝 Hoş geldin, ${user.name}! Giriş başarılı.`);
+      closeAuthModal();
     }
 
     function handleLogout() {
-      if (confirm("Çıkış yapmak istediğinize emin misiniz?")) {
+      if (confirm("Çıkış yapmak istediğine emin misin?")) {
         updateLoginState(false);
         switchTab('timeline');
         alert("Başarıyla çıkış yapıldı.");
       }
     }
 
-    async function saveProfile(e) {
+    function exportUserData() {
+      if (!currentUserData) return;
+      const dataStr = btoa(encodeURIComponent(JSON.stringify(currentUserData)));
+      prompt("Bu senin hesap taşıma kodun! Başka cihazdaki giriş ekranından bu kodu yapıştırarak hesabına anında girebilirsin:", dataStr);
+    }
+
+    function importUserDataPrompt() {
+      const code = prompt("Bilgisayardan aldığın hesap kodunu buraya yapıştır:");
+      if (!code) return;
+      try {
+        const decodedData = JSON.parse(decodeURIComponent(atob(code)));
+        if (decodedData && decodedData.email) {
+          let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+          if (!users.find(u => u.email === decodedData.email)) {
+            users.push(decodedData);
+            localStorage.setItem('biga_registered_users', JSON.stringify(users));
+          }
+          updateLoginState(true, decodedData);
+          closeAuthModal();
+          alert("Hesabın bu cihaza başarıyla aktarıldı ve giriş yapıldı!");
+        } else {
+          alert("Geçersiz kod!");
+        }
+      } catch (e) {
+        alert("Kod çözülemedi! Lütfen kodu doğru kopyaladığından emin ol.");
+      }
+    }
+
+    function saveProfile(e) {
       e.preventDefault();
       currentUserData.name = document.getElementById('editName').value.trim();
       currentUserData.handle = document.getElementById('editHandle').value.trim().replace('@', '');
@@ -1005,15 +1009,15 @@
       currentUserData.bio = document.getElementById('editBio').value;
 
       updateLoginState(true, currentUserData);
-      await saveUserToCloud(currentUserData);
+      updateAllRegisteredUsersStorage();
 
-      alert("Profil bilgilerin bulutta güncellendi!");
+      alert("Profil bilgilerin güncellendi!");
       closeProfileModal();
     }
 
-    async function toggleFollow(targetHandle) {
+    function toggleFollow(targetHandle) {
       if (!isLoggedIn) {
-        alert("Takip etmek için giriş yapmalısınız.");
+        alert("Takip etmek için giriş yapmalısın.");
         openAuthModal('login');
         return;
       }
@@ -1035,13 +1039,13 @@
       }
 
       updateLoginState(true, currentUserData);
-      await saveUserToCloud(currentUserData);
-      loadPostsFromCloud();
+      updateAllRegisteredUsersStorage();
+      loadPosts();
     }
 
-    async function vizzlaUser(targetHandle, btnElement) {
+    function vizzlaUser(targetHandle, btnElement) {
       if (!isLoggedIn) {
-        alert("Vızzlamak için giriş yapmalısınız.");
+        alert("Vızzlamak için giriş yapmalısın.");
         openAuthModal('login');
         return;
       }
@@ -1051,18 +1055,18 @@
 
       if (!currentUserData.buzzes) currentUserData.buzzes = [];
       if (currentUserData.buzzes.includes(cleanTarget)) {
-        alert("Bu kullanıcıyı zaten vızzladınız!");
+        alert("Bu kullanıcıyı zaten vızzladın!");
         if (btnElement) btnElement.remove();
         return;
       }
 
       currentUserData.buzzes.push(cleanTarget);
       updateLoginState(true, currentUserData);
-      await saveUserToCloud(currentUserData);
+      updateAllRegisteredUsersStorage();
 
       alert(`🐝 Bzzz! ${cleanTarget} kişisini vızzladın!`);
       if (btnElement) btnElement.remove();
-      else loadPostsFromCloud();
+      else loadPosts();
     }
 
     function formatTextWithMentions(text) {
@@ -1070,18 +1074,25 @@
       return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100/50 dark:bg-yellow-900/30 px-1 rounded">@$1</span>');
     }
 
-    async function notifyUser(targetHandle, notificationText) {
-      try {
-        const cleanTarget = targetHandle.replace('@', '').toLowerCase();
-        const snapshot = await db.collection('users').where('handle', '==', cleanTarget).get();
-        if (!snapshot.empty) {
-          const docRef = snapshot.docs[0].ref;
-          const userData = snapshot.docs[0].data();
-          if (!userData.notifications) userData.notifications = [];
-          userData.notifications.unshift({ text: notificationText, time: 'Şimdi' });
-          await docRef.update({ notifications: userData.notifications });
+    function notifyUser(targetHandle, notificationText) {
+      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+      let updated = false;
+      const cleanTarget = targetHandle.replace('@', '').toLowerCase();
+
+      users = users.map(u => {
+        if (u.handle.toLowerCase() === cleanTarget) {
+          if (!u.notifications) u.notifications = [];
+          u.notifications.unshift({ text: notificationText, time: 'Şimdi' });
+          updated = true;
+          if (currentUserData && currentUserData.email === u.email) currentUserData = u;
         }
-      } catch(e) {}
+        return u;
+      });
+
+      if (updated) {
+        localStorage.setItem('biga_registered_users', JSON.stringify(users));
+        if (currentUserData) localStorage.setItem('biga_current_user', JSON.stringify(currentUserData));
+      }
     }
 
     function loadNotifications() {
@@ -1116,7 +1127,7 @@
 
     function toggleReplyBox(postId) {
       if (!isLoggedIn) {
-        alert("Yanıt tweeti atmak için giriş yapmalısınız.");
+        alert("Yanıt tweeti atmak için giriş yapmalısın.");
         openAuthModal('login');
         return;
       }
@@ -1124,11 +1135,11 @@
       if (box) box.classList.toggle('hidden');
     }
 
-    async function sendReply(postId, targetHandle) {
+    function sendReply(postId, targetHandle) {
       const input = document.getElementById('reply-input-' + postId);
       if (!input) return;
       const text = input.value.trim();
-      if (!text) return alert("Lütfen bir yanıt yazın!");
+      if (!text) return alert("Lütfen bir yanıt yaz!");
 
       const name = currentUserData.name;
       const handle = '@' + currentUserData.handle.replace('@', '');
@@ -1144,59 +1155,81 @@
         privacy
       };
 
-      try {
-        const postRef = db.collection('posts').doc(postId);
-        const doc = await postRef.get();
-        if (doc.exists) {
-          const postData = doc.data();
-          if (!postData.replies) postData.replies = [];
-          postData.replies.unshift(replyData);
-          await postRef.update({ replies: postData.replies });
-          
-          appendReplyToDOM(postId, replyData, true);
-          input.value = '';
-          document.getElementById('reply-box-' + postId).classList.add('hidden');
+      appendReplyToDOM(postId, replyData, true);
+      input.value = '';
+      document.getElementById('reply-box-' + postId).classList.add('hidden');
 
-          if (handle.replace('@', '') !== targetHandle.replace('@', '')) {
-            await notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`);
-          }
-          alert("Yanıt gönderildi!");
-        }
-      } catch(e) {
-        alert("Yanıt gönderilirken hata oluştu.");
+      if (handle.replace('@', '') !== targetHandle.replace('@', '')) {
+        notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`);
       }
+
+      savePostsToStorage();
+      alert("Yanıt gönderildi!");
     }
 
-    async function loadPostsFromCloud() {
+    function loadPosts() {
+      const savedPosts = localStorage.getItem('biga_posts');
       const timeline = document.getElementById('timeline');
       if (!timeline) return;
 
-      try {
-        const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
-        if (snapshot.empty) {
-          timeline.innerHTML = `
-            <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
-              <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
-              <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
-            </div>
-          `;
-          return;
+      if (savedPosts) {
+        try {
+          const posts = JSON.parse(savedPosts);
+          if (Array.isArray(posts) && posts.length > 0) {
+            timeline.innerHTML = '';
+            posts.forEach(p => {
+              appendPostToDOM(p.id, p.name, p.handle, p.avatarUrl, p.text, p.time, p.privacy || 'public', p.replies || [], false);
+            });
+            return;
+          }
+        } catch (e) {
+          localStorage.removeItem('biga_posts');
         }
-
-        timeline.innerHTML = '';
-        snapshot.forEach(doc => {
-          const p = doc.data();
-          appendPostToDOM(p.id, p.name, p.handle, p.avatarUrl, p.text, p.time, p.privacy || 'public', p.replies || [], false);
-        });
-      } catch (e) {
-        console.error("Gönderiler yüklenemedi:", e);
       }
+
+      timeline.innerHTML = `
+        <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+          <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
+          <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+        </div>
+      `;
     }
 
-    async function sharePost() {
+    function savePostsToStorage() {
+      const cards = document.querySelectorAll('.post-card');
+      const postsArray = [];
+      cards.forEach(card => {
+        const id = card.getAttribute('data-id');
+        const name = card.getAttribute('data-name');
+        const handle = card.getAttribute('data-handle');
+        const avatarUrl = card.getAttribute('data-avatar') || '';
+        const text = card.getAttribute('data-text');
+        const time = card.getAttribute('data-time');
+        const privacy = card.getAttribute('data-privacy') || 'public';
+        
+        const replies = [];
+        const replyCards = card.querySelectorAll('.reply-card');
+        replyCards.forEach(r => {
+          replies.push({
+            id: r.getAttribute('data-id'),
+            name: r.getAttribute('data-name'),
+            handle: r.getAttribute('data-handle'),
+            avatarUrl: r.getAttribute('data-avatar') || '',
+            text: r.getAttribute('data-text'),
+            time: r.getAttribute('data-time'),
+            privacy: r.getAttribute('data-privacy') || 'public'
+          });
+        });
+
+        postsArray.push({ id, name, handle, avatarUrl, text, time, privacy, replies });
+      });
+      localStorage.setItem('biga_posts', JSON.stringify(postsArray));
+    }
+
+    function sharePost() {
       if (!isLoggedIn) {
-        alert("Paylaşım yapmak için lütfen giriş yapın.");
+        alert("Paylaşım yapmak için lütfen giriş yap.");
         openAuthModal('login');
         return;
       }
@@ -1204,47 +1237,36 @@
       const textElement = document.getElementById('postText');
       if (!textElement) return;
       const text = textElement.value.trim();
-      if (!text) return alert("Lütfen bir şeyler yazın!");
+      if (!text) return alert("Lütfen bir şeyler yaz!");
       
+      const emptyState = document.getElementById('emptyState');
+      if (emptyState) emptyState.remove();
+
       const name = currentUserData.name;
       const handle = '@' + currentUserData.handle.replace('@','');
       const avatarUrl = currentUserData.avatarUrl || '';
       const privacy = currentUserData.privacy || 'public';
       const postId = 'post_' + Date.now();
 
-      const newPostData = {
-        id: postId,
-        name,
-        handle,
-        avatarUrl,
-        text,
-        time: 'Şimdi',
-        privacy,
-        replies: [],
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      try {
-        await db.collection('posts').doc(postId).set(newPostData);
-        textElement.value = '';
-        loadPostsFromCloud();
-        if (currentUserData) loadUserPosts(currentUserData.handle);
-        alert("Gönderi buluta paylaşıldı! 🚀");
-      } catch(e) {
-        alert("Paylaşım yapılırken hata oluştu: " + e.message);
-      }
+      appendPostToDOM(postId, name, handle, avatarUrl, text, 'Şimdi', privacy, [], true);
+      textElement.value = '';
+      savePostsToStorage();
+      if (currentUserData) loadUserPosts(currentUserData.handle);
     }
 
     function appendPostToDOM(postId, name, handle, avatarUrl, text, time, privacy = 'public', replies = [], prepend = true) {
       const timeline = document.getElementById('timeline');
       if (!timeline) return;
 
-      const emptyState = document.getElementById('emptyState');
-      if (emptyState) emptyState.remove();
-
       const newPost = document.createElement('div');
       newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group space-y-3";
       newPost.setAttribute('data-id', postId);
+      newPost.setAttribute('data-name', name);
+      newPost.setAttribute('data-handle', handle);
+      newPost.setAttribute('data-avatar', avatarUrl);
+      newPost.setAttribute('data-text', text);
+      newPost.setAttribute('data-time', time);
+      newPost.setAttribute('data-privacy', privacy);
 
       const initials = getInitials(name);
       const avatarHTML = (avatarUrl && avatarUrl !== '') 
@@ -1278,7 +1300,7 @@
         const rIsMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === r.handle.replace('@', '').toLowerCase();
 
         repliesHTML += `
-          <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2">
+          <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2" data-id="${r.id}" data-name="${r.name}" data-handle="${r.handle}" data-avatar="${r.avatarUrl || ''}" data-text="${r.text}" data-time="${r.time}" data-privacy="${r.privacy || 'public'}">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
                 <div class="w-7 h-7 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border border-gray-300 dark:border-gray-600">
@@ -1289,7 +1311,7 @@
                   <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
                 </div>
               </div>
-              ${rIsMe ? `<button onclick="deleteReply('${postId}', '${r.id}')" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+              ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>` : ''}
             </div>
             <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
           </div>
@@ -1311,7 +1333,7 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            ${isMe ? `<button onclick="deletePost('${postId}')" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 transition" title="Paylaşımı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+            ${isMe ? `<button onclick="deletePost(this)" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 transition" title="Paylaşımı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
             ${actionButtonHTML}
           </div>
         </div>
@@ -1353,6 +1375,14 @@
 
       const replyCard = document.createElement('div');
       replyCard.className = "reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2";
+      replyCard.setAttribute('data-id', r.id);
+      replyCard.setAttribute('data-name', r.name);
+      replyCard.setAttribute('data-handle', r.handle);
+      replyCard.setAttribute('data-avatar', r.avatarUrl || '');
+      replyCard.setAttribute('data-text', r.text);
+      replyCard.setAttribute('data-time', r.time);
+      replyCard.setAttribute('data-privacy', r.privacy || 'public');
+
       replyCard.innerHTML = `
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
@@ -1364,7 +1394,7 @@
               <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
             </div>
           </div>
-          ${rIsMe ? `<button onclick="deleteReply('${postId}', '${r.id}')" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+          ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>` : ''}
         </div>
         <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
       `;
@@ -1373,53 +1403,49 @@
       else container.appendChild(replyCard);
     }
 
-    async function deletePost(postId) {
-      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
-        try {
-          await db.collection('posts').doc(postId).delete();
-          loadPostsFromCloud();
+    function deletePost(btnElement) {
+      if (confirm("Bu paylaşımı silmek istediğine emin misin?")) {
+        const postCard = btnElement.closest('.post-card');
+        if (postCard) {
+          postCard.remove();
+          savePostsToStorage();
           if (currentUserData) loadUserPosts(currentUserData.handle);
-          alert("Paylaşım silindi.");
-        } catch(e) {
-          alert("Silme sırasında hata oluştu.");
         }
       }
     }
 
-    async function deleteReply(postId, replyId) {
-      if (confirm("Bu yanıtı silmek istediğinize emin misiniz?")) {
-        try {
-          const postRef = db.collection('posts').doc(postId);
-          const doc = await postRef.get();
-          if (doc.exists) {
-            let replies = doc.data().replies || [];
-            replies = replies.filter(r => r.id !== replyId);
-            await postRef.update({ replies });
-            loadPostsFromCloud();
-            alert("Yanıt silindi.");
-          }
-        } catch(e) {
-          alert("Yanıt silinirken hata oluştu.");
+    function deleteReply(btnElement) {
+      if (confirm("Bu yanıtı silmek istediğine emin misin?")) {
+        const replyCard = btnElement.closest('.reply-card');
+        if (replyCard) {
+          replyCard.remove();
+          savePostsToStorage();
         }
       }
     }
 
-    async function loadUserPosts(userHandle) {
+    function loadUserPosts(userHandle) {
       const container = document.getElementById('userPostsContainer');
       if (!container) return;
 
-      try {
-        const cleanHandle = '@' + userHandle.replace('@', '');
-        const snapshot = await db.collection('posts').where('handle', '==', cleanHandle).get();
+      const savedPosts = localStorage.getItem('biga_posts');
+      if (!savedPosts) {
+        container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
+        return;
+      }
 
-        if (snapshot.empty) {
+      try {
+        const posts = JSON.parse(savedPosts);
+        const cleanHandle = '@' + userHandle.replace('@', '');
+        const userPosts = posts.filter(p => p.handle.toLowerCase() === cleanHandle.toLowerCase());
+
+        if (userPosts.length === 0) {
           container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
           return;
         }
 
         container.innerHTML = '';
-        snapshot.forEach(doc => {
-          const p = doc.data();
+        userPosts.forEach(p => {
           const initials = getInitials(p.name);
           const avatarHTML = (p.avatarUrl && p.avatarUrl !== '') 
             ? `<img src="${p.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
