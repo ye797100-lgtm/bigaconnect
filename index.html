@@ -27,14 +27,13 @@
     <header class="sticky top-0 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <!-- BigaBee Vector Logo -->
                 <div class="w-10 h-10 bg-brand-500 rounded-full flex items-center justify-center shadow-md text-white font-bold text-xl">
                     🐝
                 </div>
                 <span class="text-xl font-black bg-gradient-to-r from-brand-600 to-amber-500 bg-clip-text text-transparent">BigaConnect</span>
             </div>
             <div id="navAuthArea" class="flex items-center space-x-3">
-                <!-- Dinamik Giriş/Çıkış Alanı -->
+                <span id="userDisplayEmail" class="text-sm font-medium text-gray-600 dark:text-gray-300"></span>
             </div>
         </div>
     </header>
@@ -61,16 +60,16 @@
                     <div class="flex justify-between items-center mt-3">
                         <label class="cursor-pointer text-brand-600 hover:text-brand-700 flex items-center space-x-2 font-medium text-sm">
                             <i class="fa-solid fa-image text-lg"></i>
-                            <span>Fotoğraf Ekle</span>
-                            <input type="file" id="postImageFile" accept="image/*" class="hidden">
+                            <span id="selectedFileName">Fotoğraf Ekle</span>
+                            <input type="file" id="postImageFile" accept="image/*" class="hidden" onchange="document.getElementById('selectedFileName').innerText = this.files[0] ? this.files[0].name : 'Fotoğraf Ekle'">
                         </label>
-                        <button onclick="createPost()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-xl font-bold shadow-md transition-all">Paylaş 🐝</button>
+                        <button id="btnCreatePost" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2 rounded-xl font-bold shadow-md transition-all">Paylaş 🐝</button>
                     </div>
                 </div>
 
                 <!-- Posts Container -->
                 <div id="postsContainer" class="space-y-4">
-                    <!-- Paylaşımlar buraya gelecek -->
+                    <p class="text-center text-gray-400">Giriş yapıldığında akış yüklenecektir...</p>
                 </div>
             </div>
 
@@ -78,15 +77,15 @@
             <div id="tab-profile" class="hidden space-y-6">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 text-center space-y-4">
                     <div class="relative w-24 h-24 mx-auto">
-                        <img id="profileAvatarPreview" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full object-cover border-4 border-brand-500 shadow-md">
+                        <img id="profileAvatarPreview" src="https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" class="w-24 h-24 rounded-full object-cover border-4 border-brand-500 shadow-md">
                         <label class="absolute bottom-0 right-0 bg-brand-500 text-white p-2 rounded-full cursor-pointer hover:bg-brand-600 shadow">
                             <i class="fa-solid fa-camera text-xs"></i>
                             <input type="file" id="profileAvatarInput" accept="image/*" class="hidden" onchange="updateProfileAvatar(this)">
                         </label>
                     </div>
-                    <h2 id="profileNameDisplay" class="text-xl font-bold">Öğrenci Adı</h2>
-                    <p id="profileDepartmentDisplay" class="text-sm text-gray-500">ÇOMÜ Biga İİBF</p>
-                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-sm shadow hover:bg-red-600">Çıkış Yap</button>
+                    <h2 id="profileNameDisplay" class="text-xl font-bold">Öğrenci</h2>
+                    <p id="profileDepartmentDisplay" class="text-sm text-gray-500">ÇOMÜ Biga Yerleşkesi</p>
+                    <button id="btnLogout" class="bg-red-500 text-white px-4 py-2 rounded-xl font-bold text-sm shadow hover:bg-red-600">Çıkış Yap</button>
                 </div>
             </div>
         </div>
@@ -98,20 +97,26 @@
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-brand-500 rounded-full flex items-center justify-center mx-auto text-3xl shadow-lg">🐝</div>
                 <h2 class="text-2xl font-black">BigaConnect'e Hoş Geldin</h2>
-                <p class="text-sm text-gray-500">Sadece ÇOMÜ Biga öğrencilerine özel sosyal ağ</p> fakülte mailinle giriş yap.</p>
+                <p class="text-sm text-gray-500">Biga Ramazan Aydın Yerleşkesi Sosyal Ağı</p>
             </div>
             <div class="space-y-4">
-                <input type="email" id="authEmail" placeholder="Örn: ogrenci@comu.edu.tr" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                <input type="password" id="authPassword" placeholder="Şifre" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                <div class="flex space-x-3">
-                    <button onclick="handleLogin()" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold shadow-md transition-all">Giriş Yap</button>
-                    <button onclick="handleRegister()" class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 py-3 rounded-xl font-bold transition-all">Kayıt Ol</button>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-gray-500">E-Posta Adresi</label>
+                    <input type="email" id="authEmail" placeholder="ornek@gmail.com" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1 text-gray-500">Şifre (Min 6 karakter)</label>
+                    <input type="password" id="authPassword" placeholder="******" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button id="btnLogin" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold shadow-md transition-all">Giriş Yap</button>
+                    <button id="btnRegister" class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 py-3 rounded-xl font-bold transition-all">Kayıt Ol</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK Scripts -->
+    <!-- Firebase App & Logic (Module) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -131,64 +136,37 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        window.auth = auth;
-        window.db = db;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.signOut = signOut;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.query = query;
-        window.orderBy = orderBy;
-        window.serverTimestamp = serverTimestamp;
-
-        onAuthStateChanged(auth, (user) => {
-            const modal = document.getElementById('authModal');
-            if (user) {
-                modal.classList.add('hidden');
-                document.getElementById('profileNameDisplay').innerText = user.email;
-                loadPosts();
-            } else {
-                modal.classList.remove('hidden');
+        // Dinleyiciler ve Olaylar
+        document.getElementById('btnRegister').addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPassword').value.trim();
+            if(!email || !pass) return alert("Lütfen tüm alanları doldur.");
+            
+            try {
+                await createUserWithEmailAndPassword(auth, email, pass);
+                alert("Kayıt başarılı! Giriş yapıldı.");
+            } catch (error) {
+                alert("Kayıt Hatası: " + error.message);
             }
         });
-    </script>
 
-    <script>
-        function switchTab(tab) {
-            document.getElementById('tab-feed').classList.add('hidden');
-            document.getElementById('tab-profile').classList.add('hidden');
-            if(tab === 'feed') document.getElementById('tab-feed').classList.remove('hidden');
-            if(tab === 'profile') document.getElementById('tab-profile').classList.remove('hidden');
-        }
+        document.getElementById('btnLogin').addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPassword').value.trim();
+            if(!email || !pass) return alert("Lütfen tüm alanları doldur.");
 
-        async function handleRegister() {
-            const email = document.getElementById('authEmail').value;
-            const pass = document.getElementById('authPassword').value;
             try {
-                await window.createUserWithEmailAndPassword(window.auth, email, pass);
-                alert('Kayıt başarılı! Aramıza hoş geldin.');
+                await signInWithEmailAndPassword(auth, email, pass);
             } catch (error) {
-                alert('Kayıt hatası: ' + error.message);
+                alert("Giriş Hatası: " + error.message);
             }
-        }
+        });
 
-        async function handleLogin() {
-            const email = document.getElementById('authEmail').value;
-            const pass = document.getElementById('authPassword').value;
-            try {
-                await window.signInWithEmailAndPassword(window.auth, email, pass);
-            } catch (error) {
-                alert('Giriş başarısız: ' + error.message);
-            }
-        }
+        document.getElementById('btnLogout').addEventListener('click', async () => {
+            await signOut(auth);
+        });
 
-        async function logout() {
-            await window.signOut(window.auth);
-        }
-
-        async function createPost() {
+        document.getElementById('btnCreatePost').addEventListener('click', async () => {
             const content = document.getElementById('postInput').value;
             const fileInput = document.getElementById('postImageFile');
             let imageUrl = "";
@@ -198,27 +176,28 @@
                 reader.readAsDataURL(fileInput.files[0]);
                 reader.onload = async function() {
                     imageUrl = reader.result;
-                    await savePostToFirestore(content, imageUrl);
+                    await savePost(content, imageUrl);
                 }
             } else {
-                await savePostToFirestore(content, "");
+                await savePost(content, "");
             }
-        }
+        });
 
-        async function savePostToFirestore(content, imageUrl) {
-            if(!content.trim() && !imageUrl) return;
+        async function savePost(content, imageUrl) {
+            if(!content.trim() && !imageUrl) return alert("Boş gönderi paylaşılamaz.");
             try {
-                await window.addDoc(window.collection(window.db, "posts"), {
+                await addDoc(collection(db, "posts"), {
                     content: content,
                     imageUrl: imageUrl,
-                    author: window.auth.currentUser.email,
-                    createdAt: window.serverTimestamp()
+                    author: auth.currentUser ? auth.currentUser.email : "Anonim",
+                    createdAt: serverTimestamp()
                 });
                 document.getElementById('postInput').value = "";
                 document.getElementById('postImageFile').value = "";
+                document.getElementById('selectedFileName').innerText = "Fotoğraf Ekle";
                 loadPosts();
             } catch(e) {
-                alert("Paylaşım hatası: " + e.message);
+                alert("Paylaşım gönderilirken hata oluştu: " + e.message);
             }
         }
 
@@ -226,9 +205,15 @@
             const container = document.getElementById('postsContainer');
             container.innerHTML = '<p class="text-center text-gray-400">Yükleniyor...</p>';
             try {
-                const q = window.query(window.collection(window.db, "posts"), window.orderBy("createdAt", "desc"));
-                const querySnapshot = await window.getDocs(q);
+                const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
                 container.innerHTML = "";
+                
+                if(querySnapshot.empty) {
+                    container.innerHTML = '<p class="text-center text-gray-400">Henüz hiç gönderi paylaşılmadı. İlk paylaşımı sen yap! 🐝</p>';
+                    return;
+                }
+
                 querySnapshot.forEach((doc) => {
                     const post = doc.data();
                     container.innerHTML += `
@@ -240,14 +225,37 @@
                                     <span class="text-xs text-gray-400">ÇOMÜ Biga Kampüsü</span>
                                 </div>
                             </div>
-                            <p class="text-gray-700 dark:text-gray-200">${post.content}</p>
+                            ${post.content ? `<p class="text-gray-700 dark:text-gray-200">${post.content}</p>` : ''}
                             ${post.imageUrl ? `<img src="${post.imageUrl}" class="rounded-xl max-h-96 w-full object-cover">` : ''}
                         </div>
                     `;
                 });
             } catch(e) {
                 console.error(e);
+                container.innerHTML = '<p class="text-center text-red-400">Gönderiler yüklenirken hata oluştu.</p>';
             }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            const modal = document.getElementById('authModal');
+            if (user) {
+                modal.classList.add('hidden');
+                document.getElementById('profileNameDisplay').innerText = user.email;
+                document.getElementById('userDisplayEmail').innerText = user.email;
+                loadPosts();
+            } else {
+                modal.classList.remove('hidden');
+                document.getElementById('userDisplayEmail').innerText = "";
+            }
+        });
+    </script>
+
+    <script>
+        function switchTab(tab) {
+            document.getElementById('tab-feed').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('hidden');
+            if(tab === 'feed') document.getElementById('tab-feed').classList.remove('hidden');
+            if(tab === 'profile') document.getElementById('tab-profile').classList.remove('hidden');
         }
 
         function updateProfileAvatar(input) {
