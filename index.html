@@ -237,8 +237,6 @@
 
         <div id="profileLoggedInView" class="hidden space-y-4">
           <div class="bg-white dark:bg-gray-800 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 overflow-hidden shadow-sm">
-            
-            <!-- BANNER ALANI (Tıklayarak Değiştir) -->
             <div id="profileBanner" class="h-32 sm:h-44 bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 relative cursor-pointer group" onclick="triggerBannerUpload()" title="Banner değiştirmek için tıkla">
               <input type="file" id="bannerFileInput" class="hidden" accept="image/*" onchange="handleBannerUpload(event)">
               <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
@@ -248,7 +246,6 @@
 
             <div class="px-5 pb-5 relative">
               <div class="flex justify-between items-end -mt-12 sm:-mt-16 mb-4">
-                <!-- PROFİL FOTOĞRAFI (Tıklayarak Değiştir) -->
                 <div class="relative group cursor-pointer" onclick="triggerAvatarUpload()" title="Profil fotoğrafını değiştirmek için tıkla">
                   <input type="file" id="avatarFileInput" class="hidden" accept="image/*" onchange="handleAvatarUpload(event)">
                   <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center font-black text-2xl border-4 border-white dark:border-gray-800 shadow-md overflow-hidden relative">
@@ -286,7 +283,6 @@
               </div>
             </div>
 
-            <!-- PROFİL SEKME MENÜSÜ -->
             <div class="border-t border-yellow-200 dark:border-gray-700 flex text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 text-center">
               <button onclick="switchProfileTab('posts')" id="profTabPosts" class="flex-1 py-3 border-b-2 border-yellow-500 text-gray-900 dark:text-white bg-yellow-50/50 dark:bg-gray-700/30 transition">Gönderiler</button>
               <button onclick="switchProfileTab('replies')" id="profTabReplies" class="flex-1 py-3 border-b-2 border-transparent hover:text-gray-800 dark:hover:text-gray-200 transition">Yanıtlar</button>
@@ -295,7 +291,6 @@
             </div>
           </div>
 
-          <!-- PROFİL İÇERİK ALANLARI -->
           <div id="profileTabContentPosts" class="profile-tab-pane space-y-3">
             <div id="userPostsContainer" class="space-y-3">
               <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>
@@ -335,10 +330,12 @@
 
       <!-- 5. BİLDİRİMLER SEKMESİ -->
       <div id="contentNotifications" class="page-content hidden space-y-3">
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-12 flex flex-col items-center justify-center">
-          <div class="w-14 h-14 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl mb-3 shadow-xs"><i class="fa-solid fa-bell"></i></div>
-          <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
-          <p class="text-xs text-gray-400 mt-1 max-w-xs">Biri seni vızzladığında veya paylaşımını beğendiğinde burada görünecek.</p>
+        <div id="notificationsList" class="space-y-3">
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-12 flex flex-col items-center justify-center">
+            <div class="w-14 h-14 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl mb-3 shadow-xs"><i class="fa-solid fa-bell"></i></div>
+            <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
+            <p class="text-xs text-gray-400 mt-1 max-w-xs">Biri gönderine yanıt verdiğinde veya seni etiketlediğinde burada görünecek.</p>
+          </div>
         </div>
       </div>
 
@@ -402,7 +399,7 @@
 
   </div>
 
-  <!-- GİRİŞ YAP MODALI (Mail VEYA Kullanıcı Adı ile) -->
+  <!-- GİRİŞ YAP MODALI -->
   <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full border-2 border-yellow-400 shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -596,7 +593,6 @@
     let isLoggedIn = false;
     let currentUserData = null;
 
-    // SAYFA AÇILDIĞINDA KALICI OTURUM VE TEMAYI KONTROL ET
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('biga_theme');
       if (savedTheme === 'dark') {
@@ -619,6 +615,7 @@
         }
       }
       loadPosts();
+      loadNotifications();
     });
 
     function openMobileDrawer() {
@@ -700,6 +697,7 @@
 
       if (loggedIn && userData) {
         localStorage.setItem('biga_current_user', JSON.stringify(userData));
+        if (!userData.notifications) userData.notifications = [];
 
         if (overlay) overlay.classList.add('hidden');
         if (authGroup) authGroup.classList.add('hidden');
@@ -739,6 +737,7 @@
         updateBannerUI(userData.bannerUrl);
         loadUserPosts(userData.handle);
         loadPosts();
+        loadNotifications();
       } else {
         localStorage.removeItem('biga_current_user');
 
@@ -756,6 +755,7 @@
 
         updateAvatarUI("", "");
         loadPosts();
+        loadNotifications();
       }
     }
 
@@ -867,7 +867,6 @@
       localStorage.setItem('biga_registered_users', JSON.stringify(users));
     }
 
-    // GERÇEK MAİL KONTROLÜ VE TEKİL HESAP KAYDI
     function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
@@ -878,7 +877,6 @@
       const email = document.getElementById('regEmail').value.trim().toLowerCase();
       const password = document.getElementById('regPassword').value;
 
-      // Basit gerçek e-posta doğrulama kontrolü (@ ve . içermeli)
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         alert("Lütfen geçerli ve gerçek bir e-posta adresi girin!");
@@ -887,13 +885,11 @@
 
       let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
       
-      // Bu e-posta adresiyle daha önce hesap açılmış mı kontrolü
       if (users.find(u => u.email === email)) {
         alert("Bu e-posta adresi ile zaten kayıtlı bir hesap var! Her e-posta adresi yalnızca tek bir hesap açabilir.");
         return;
       }
 
-      // Kullanıcı adı çakışma kontrolü
       if (users.find(u => u.handle.toLowerCase() === handle.toLowerCase())) {
         alert("Bu kullanıcı adı (@" + handle + ") zaten kullanımda. Lütfen başka bir kullanıcı adı seçin.");
         return;
@@ -911,7 +907,8 @@
         bannerUrl: '',
         bio: 'Biga kampüsünde vızıldamaya hazır! 🐝',
         following: [],
-        buzzes: []
+        buzzes: [],
+        notifications: []
       };
 
       users.push(newUser);
@@ -922,15 +919,12 @@
       closeAuthModal();
     }
 
-    // MAİL, KULLANICI ADI VEYA ŞİFRE İLE ESNEK VE GÜVENLİ GİRİŞ
     function handleLogin(e) {
       e.preventDefault();
       const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
 
       let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
-      
-      // E-posta VEYA kullanıcı adı (başında @ olsun veya olmasın) ile arama yap
       const cleanId = identifier.replace('@', '');
       const user = users.find(u => 
         (u.email === identifier || u.handle.toLowerCase() === cleanId) && u.password === password
@@ -943,6 +937,7 @@
 
       if (!user.following) user.following = [];
       if (!user.buzzes) user.buzzes = [];
+      if (!user.notifications) user.notifications = [];
 
       updateLoginState(true, user);
       alert(`🐝 Hoş geldiniz, ${user.name}! Giriş başarılı.`);
@@ -1034,10 +1029,118 @@
       }
     }
 
-    // MENTION ÖZELLİĞİ: Metin içindeki @kullaniciadi ifadelerini tıklanabilir/vurgulu renge çevirir
     function formatTextWithMentions(text) {
       if (!text) return "";
       return text.replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100/50 dark:bg-yellow-900/30 px-1 rounded">@$1</span>');
+    }
+
+    function notifyUser(targetHandle, notificationText) {
+      let users = JSON.parse(localStorage.getItem('biga_registered_users') || '[]');
+      let updated = false;
+      const cleanTarget = targetHandle.replace('@', '').toLowerCase();
+
+      users = users.map(u => {
+        if (u.handle.toLowerCase() === cleanTarget) {
+          if (!u.notifications) u.notifications = [];
+          u.notifications.unshift({
+            text: notificationText,
+            time: 'Şimdi'
+          });
+          updated = true;
+
+          if (currentUserData && currentUserData.email === u.email) {
+            currentUserData = u;
+          }
+        }
+        return u;
+      });
+
+      if (updated) {
+        localStorage.setItem('biga_registered_users', JSON.stringify(users));
+        if (currentUserData) {
+          localStorage.setItem('biga_current_user', JSON.stringify(currentUserData));
+        }
+      }
+    }
+
+    function loadNotifications() {
+      const container = document.getElementById('notificationsList');
+      if (!container) return;
+
+      if (!isLoggedIn || !currentUserData || !currentUserData.notifications || currentUserData.notifications.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm text-center py-12 flex flex-col items-center justify-center">
+            <div class="w-14 h-14 rounded-2xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-2xl mb-3 shadow-xs"><i class="fa-solid fa-bell"></i></div>
+            <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm">Henüz bir bildirim yok</h3>
+            <p class="text-xs text-gray-400 mt-1 max-w-xs">Biri gönderine yanıt verdiğinde veya seni etiketlediğinde burada görünecek.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      currentUserData.notifications.forEach(n => {
+        const notifDiv = document.createElement('div');
+        notifDiv.className = "bg-white dark:bg-gray-800 p-4 rounded-2xl border border-yellow-200 dark:border-gray-700 shadow-sm flex items-start gap-3";
+        notifDiv.innerHTML = `
+          <div class="w-10 h-10 rounded-xl bg-yellow-100 dark:bg-gray-700 text-yellow-600 dark:text-yellow-400 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-reply"></i></div>
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm text-gray-800 dark:text-gray-100 font-medium">${n.text}</p>
+            <span class="text-[10px] text-gray-400 mt-1 block">${n.time}</span>
+          </div>
+        `;
+        container.appendChild(notifDiv);
+      });
+    }
+
+    function toggleReplyBox(postId) {
+      if (!isLoggedIn) {
+        alert("Yanıt tweeti atmak için giriş yapmalısınız.");
+        openAuthModal('login');
+        return;
+      }
+      const box = document.getElementById('reply-box-' + postId);
+      if (box) {
+        box.classList.toggle('hidden');
+      }
+    }
+
+    // TWEET ATMA MANTIĞIYLA YANIT GÖNDERME
+    function sendReply(postId, targetHandle, originalAuthorName) {
+      const input = document.getElementById('reply-input-' + postId);
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return alert("Lütfen bir yanıt yazın!");
+
+      const repliesContainer = document.getElementById('replies-container-' + postId);
+      if (!repliesContainer) return;
+
+      const name = currentUserData.name;
+      const handle = '@' + currentUserData.handle.replace('@', '');
+      const avatarUrl = currentUserData.avatarUrl || '';
+      const privacy = currentUserData.privacy || 'public';
+      const replyPostId = 'reply_' + Date.now();
+
+      const replyData = {
+        id: replyPostId,
+        name: name,
+        handle: handle,
+        avatarUrl: avatarUrl,
+        text: text,
+        time: 'Şimdi',
+        privacy: privacy
+      };
+
+      appendReplyToDOM(postId, replyData, true);
+      input.value = '';
+      document.getElementById('reply-box-' + postId).classList.add('hidden');
+
+      if (handle.replace('@', '') !== targetHandle.replace('@', '')) {
+        notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`);
+      }
+
+      savePostsToStorage();
+      alert("Yanıt tweeti başarıyla atıldı!");
     }
 
     function loadPosts() {
@@ -1051,7 +1154,7 @@
           if (Array.isArray(posts) && posts.length > 0) {
             timeline.innerHTML = '';
             posts.forEach(p => {
-              appendPostToDOM(p.name, p.handle, p.avatarUrl, p.text, p.time, p.privacy || 'public', false);
+              appendPostToDOM(p.id, p.name, p.handle, p.avatarUrl, p.text, p.time, p.privacy || 'public', p.replies || [], false);
             });
             return;
           }
@@ -1073,13 +1176,29 @@
       const cards = document.querySelectorAll('.post-card');
       const postsArray = [];
       cards.forEach(card => {
+        const id = card.getAttribute('data-id');
         const name = card.getAttribute('data-name');
         const handle = card.getAttribute('data-handle');
         const avatarUrl = card.getAttribute('data-avatar') || '';
         const text = card.getAttribute('data-text');
         const time = card.getAttribute('data-time');
         const privacy = card.getAttribute('data-privacy') || 'public';
-        postsArray.push({ name, handle, avatarUrl, text, time, privacy });
+        
+        const replies = [];
+        const replyCards = card.querySelectorAll('.reply-card');
+        replyCards.forEach(r => {
+          replies.push({
+            id: r.getAttribute('data-id'),
+            name: r.getAttribute('data-name'),
+            handle: r.getAttribute('data-handle'),
+            avatarUrl: r.getAttribute('data-avatar') || '',
+            text: r.getAttribute('data-text'),
+            time: r.getAttribute('data-time'),
+            privacy: r.getAttribute('data-privacy') || 'public'
+          });
+        });
+
+        postsArray.push({ id, name, handle, avatarUrl, text, time, privacy, replies });
       });
       localStorage.setItem('biga_posts', JSON.stringify(postsArray));
     }
@@ -1103,19 +1222,21 @@
       const handle = currentUserData ? '@' + currentUserData.handle.replace('@','') : '@kullanici';
       const avatarUrl = currentUserData ? currentUserData.avatarUrl : '';
       const privacy = currentUserData ? (currentUserData.privacy || 'public') : 'public';
+      const postId = 'post_' + Date.now();
 
-      appendPostToDOM(name, handle, avatarUrl, text, 'Şimdi', privacy, true);
+      appendPostToDOM(postId, name, handle, avatarUrl, text, 'Şimdi', privacy, [], true);
       textElement.value = '';
       savePostsToStorage();
       if (currentUserData) loadUserPosts(currentUserData.handle);
     }
 
-    function appendPostToDOM(name, handle, avatarUrl, text, time, privacy = 'public', prepend = true) {
+    function appendPostToDOM(postId, name, handle, avatarUrl, text, time, privacy = 'public', replies = [], prepend = true) {
       const timeline = document.getElementById('timeline');
       if (!timeline) return;
 
       const newPost = document.createElement('div');
-      newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group";
+      newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group space-y-3";
+      newPost.setAttribute('data-id', postId);
       newPost.setAttribute('data-name', name);
       newPost.setAttribute('data-handle', handle);
       newPost.setAttribute('data-avatar', avatarUrl);
@@ -1151,6 +1272,35 @@
 
       const formattedText = formatTextWithMentions(text);
 
+      let repliesHTML = '';
+      replies.forEach(r => {
+        const rInitials = getInitials(r.name);
+        const rAvatarHTML = (r.avatarUrl && r.avatarUrl !== '') 
+          ? `<img src="${r.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
+          : `<span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">${rInitials}</span>`;
+        const rIsMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === r.handle.replace('@', '').toLowerCase();
+
+        repliesHTML += `
+          <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2" data-id="${r.id}" data-name="${r.name}" data-handle="${r.handle}" data-avatar="${r.avatarUrl || ''}" data-text="${r.text}" data-time="${r.time}" data-privacy="${r.privacy || 'public'}">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border border-gray-300 dark:border-gray-600">
+                  ${rAvatarHTML}
+                </div>
+                <div>
+                  <h5 class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1">
+                    ${r.name}
+                  </h5>
+                  <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
+                </div>
+              </div>
+              ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition" title="Yanıtı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+            </div>
+            <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
+          </div>
+        `;
+      });
+
       newPost.innerHTML = `
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-3">
@@ -1170,13 +1320,91 @@
             ${actionButtonHTML}
           </div>
         </div>
-        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed mb-3">${formattedText}</p>
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>
+
+        <!-- YANITLA BUTONU -->
+        <div class="flex items-center gap-4 pt-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500">
+          <button onclick="toggleReplyBox('${postId}')" class="hover:text-yellow-600 transition flex items-center gap-1.5 font-bold"><i class="fa-regular fa-comment"></i> Yanıtla</button>
+        </div>
+
+        <!-- YANIT TWEETLERİNİN LİSTELENDİĞİ ALAN -->
+        <div id="replies-container-${postId}" class="space-y-2.5 pl-4 sm:pl-6 border-l-2 border-yellow-300 dark:border-yellow-600/50 mt-2">
+          ${repliesHTML}
+        </div>
+
+        <!-- TWEET ATMA MANTIĞIYLA YANIT GİRME KUTUSU -->
+        <div id="reply-box-${postId}" class="hidden pt-3 space-y-2.5 border-t border-gray-100 dark:border-gray-700 mt-2">
+          <div class="flex items-center gap-2 text-xs font-bold text-gray-500">
+            <i class="fa-solid fa-reply text-yellow-500"></i> ${name} kişisinin gönderisine yanıt tweeti atıyorsun
+          </div>
+          <textarea id="reply-input-${postId}" rows="2" placeholder="Düşüncelerini yanıt olarak vızılda..." class="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
+          <div class="flex justify-end gap-2">
+            <button onclick="toggleReplyBox('${postId}')" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-lg text-xs">İptal</button>
+            <button onclick="sendReply('${postId}', '${cleanHandle}', '${name}')" class="px-4 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-black rounded-lg text-xs shadow-sm transition-transform active:scale-95">Yanıtı Gönder 🚀</button>
+          </div>
+        </div>
       `;
 
       if (prepend) {
         timeline.prepend(newPost);
       } else {
         timeline.appendChild(newPost);
+      }
+    }
+
+    function appendReplyToDOM(postId, r, prepend = true) {
+      const container = document.getElementById('replies-container-' + postId);
+      if (!container) return;
+
+      const rInitials = getInitials(r.name);
+      const rAvatarHTML = (r.avatarUrl && r.avatarUrl !== '') 
+        ? `<img src="${r.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
+        : `<span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">${rInitials}</span>`;
+      const rIsMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === r.handle.replace('@', '').toLowerCase();
+
+      const replyCard = document.createElement('div');
+      replyCard.className = "reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2";
+      replyCard.setAttribute('data-id', r.id);
+      replyCard.setAttribute('data-name', r.name);
+      replyCard.setAttribute('data-handle', r.handle);
+      replyCard.setAttribute('data-avatar', r.avatarUrl || '');
+      replyCard.setAttribute('data-text', r.text);
+      replyCard.setAttribute('data-time', r.time);
+      replyCard.setAttribute('data-privacy', r.privacy || 'public');
+
+      replyCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border border-gray-300 dark:border-gray-600">
+              ${rAvatarHTML}
+            </div>
+            <div>
+              <h5 class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1">
+                ${r.name}
+              </h5>
+              <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
+            </div>
+          </div>
+          ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition" title="Yanıtı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+        </div>
+        <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
+      `;
+
+      if (prepend) {
+        container.prepend(replyCard);
+      } else {
+        container.appendChild(replyCard);
+      }
+    }
+
+    function deleteReply(btnElement) {
+      if (confirm("Bu yanıt tweetini silmek istediğinize emin misiniz?")) {
+        const replyCard = btnElement.closest('.reply-card');
+        if (replyCard) {
+          replyCard.remove();
+          savePostsToStorage();
+          alert("Yanıt silindi.");
+        }
       }
     }
 
