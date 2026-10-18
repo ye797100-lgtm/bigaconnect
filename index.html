@@ -613,7 +613,6 @@
             if (latestUser) {
               currentUserData = latestUser;
             } else {
-              // Eğer diğer cihazdaysa ve kullanıcı havuzda yoksa güvenli ekleme yap
               users.push(currentUserData);
               localStorage.setItem('biga_registered_users', JSON.stringify(users));
             }
@@ -935,7 +934,6 @@
         (u.email.toLowerCase() === identifier || u.handle.toLowerCase() === cleanId) && u.password === password
       );
 
-      // GÜVENLİK YAMA KONTROLÜ: Eğer ortak havuzda bulunamadıysa ama daha önce bu tarayıcıda açıldıysa kurtar
       if (!user) {
         const oldUser = localStorage.getItem('biga_current_user');
         if (oldUser) {
@@ -1300,7 +1298,7 @@
         const rIsMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === r.handle.replace('@', '').toLowerCase();
 
         repliesHTML += `
-          <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2" data-id="${r.id}" data-name="${r.name}" data-handle="${r.handle}" data-avatar="${r.avatarUrl \vert{}\vert{} ''}" data-text="${r.text}" data-time="${r.time}" data-privacy="${r.privacy || 'public'}">
+          <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2" data-id="${r.id}" data-name="${r.name}" data-handle="${r.handle}" data-avatar="${r.avatarUrl || ''}" data-text="${r.text}" data-time="${r.time}" data-privacy="${r.privacy || 'public'}">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
                 <div class="w-7 h-7 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border border-gray-300 dark:border-gray-600">
@@ -1308,3 +1306,212 @@
                 </div>
                 <div>
                   <h5 class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1">
+                    ${r.name}
+                  </h5>
+                  <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
+                </div>
+              </div>
+              ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition" title="Yanıtı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+            </div>
+            <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
+          </div>
+        `;
+      });
+
+      newPost.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center border border-gray-300 dark:border-gray-600 overflow-hidden">
+              ${avatarHTML}
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+                ${name}
+                ${privacy === 'private' ? '<i class="fa-solid fa-lock text-[10px] text-gray-400" title="Gizli Hesap"></i>' : ''}
+              </h4>
+              <span class="text-xs text-gray-400">${cleanHandle} · ${time}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            ${isMe ? `<button onclick="deletePost(this)" class="text-gray-400 hover:text-red-500 text-xs px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition" title="Paylaşımı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+            ${actionButtonHTML}
+          </div>
+        </div>
+        <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formattedText}</p>
+
+        <!-- YANITLA BUTONU -->
+        <div class="flex items-center gap-4 pt-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500">
+          <button onclick="toggleReplyBox('${postId}')" class="hover:text-yellow-600 transition flex items-center gap-1.5 font-bold"><i class="fa-regular fa-comment"></i> Yanıtla</button>
+        </div>
+
+        <!-- YANIT TWEETLERİNİN LİSTELENDİĞİ ALAN -->
+        <div id="replies-container-${postId}" class="space-y-2.5 pl-4 sm:pl-6 border-l-2 border-yellow-300 dark:border-yellow-600/50 mt-2">
+          ${repliesHTML}
+        </div>
+
+        <!-- TWEET ATMA MANTIĞIYLA YANIT GİRME KUTUSU -->
+        <div id="reply-box-${postId}" class="hidden pt-3 space-y-2.5 border-t border-gray-100 dark:border-gray-700 mt-2">
+          <div class="flex items-center gap-2 text-xs font-bold text-gray-500">
+            <i class="fa-solid fa-reply text-yellow-500"></i> ${name} kişisinin gönderisine yanıt tweeti atıyorsun
+          </div>
+          <textarea id="reply-input-${postId}" rows="2" placeholder="Düşüncelerini yanıt olarak vızılda..." class="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"></textarea>
+          <div class="flex justify-end gap-2">
+            <button onclick="toggleReplyBox('${postId}')" class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-lg text-xs">İptal</button>
+            <button onclick="sendReply('${postId}', '${cleanHandle}', '${name}')" class="px-4 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-black rounded-lg text-xs shadow-sm transition-transform active:scale-95">Yanıtı Gönder 🚀</button>
+          </div>
+        </div>
+      `;
+
+      if (prepend) {
+        timeline.prepend(newPost);
+      } else {
+        timeline.appendChild(newPost);
+      }
+    }
+
+    function appendReplyToDOM(postId, r, prepend = true) {
+      const container = document.getElementById('replies-container-' + postId);
+      if (!container) return;
+
+      const rInitials = getInitials(r.name);
+      const rAvatarHTML = (r.avatarUrl && r.avatarUrl !== '') 
+        ? `<img src="${r.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
+        : `<span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">${rInitials}</span>`;
+      const rIsMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === r.handle.replace('@', '').toLowerCase();
+
+      const replyCard = document.createElement('div');
+      replyCard.className = "reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2";
+      replyCard.setAttribute('data-id', r.id);
+      replyCard.setAttribute('data-name', r.name);
+      replyCard.setAttribute('data-handle', r.handle);
+      replyCard.setAttribute('data-avatar', r.avatarUrl || '');
+      replyCard.setAttribute('data-text', r.text);
+      replyCard.setAttribute('data-time', r.time);
+      replyCard.setAttribute('data-privacy', r.privacy || 'public');
+
+      replyCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border border-gray-300 dark:border-gray-600">
+              ${rAvatarHTML}
+            </div>
+            <div>
+              <h5 class="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1">
+                ${r.name}
+              </h5>
+              <span class="text-[10px] text-gray-400">${r.handle} · ${r.time}</span>
+            </div>
+          </div>
+          ${rIsMe ? `<button onclick="deleteReply(this)" class="text-gray-400 hover:text-red-500 text-xs px-1.5 py-0.5 rounded transition" title="Yanıtı Sil"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+        </div>
+        <p class="text-xs text-gray-800 dark:text-gray-100 leading-relaxed pl-9">${formatTextWithMentions(r.text)}</p>
+      `;
+
+      if (prepend) {
+        container.prepend(replyCard);
+      } else {
+        container.appendChild(replyCard);
+      }
+    }
+
+    function deleteReply(btnElement) {
+      if (confirm("Bu yanıt tweetini silmek istediğinize emin misiniz?")) {
+        const replyCard = btnElement.closest('.reply-card');
+        if (replyCard) {
+          replyCard.remove();
+          savePostsToStorage();
+          alert("Yanıt silindi.");
+        }
+      }
+    }
+
+    function loadUserPosts(userHandle) {
+      const container = document.getElementById('userPostsContainer');
+      if (!container) return;
+
+      const savedPosts = localStorage.getItem('biga_posts');
+      if (!savedPosts) {
+        container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
+        return;
+      }
+
+      try {
+        const posts = JSON.parse(savedPosts);
+        const cleanHandle = '@' + userHandle.replace('@', '');
+        const userPosts = posts.filter(p => p.handle.toLowerCase() === cleanHandle.toLowerCase());
+
+        if (userPosts.length === 0) {
+          container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
+          return;
+        }
+
+        container.innerHTML = '';
+        userPosts.forEach(p => {
+          const initials = getInitials(p.name);
+          const avatarHTML = (p.avatarUrl && p.avatarUrl !== '') 
+            ? `<img src="${p.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
+            : `<span class="text-xs font-bold text-gray-700 dark:text-gray-300">${initials}</span>`;
+
+          const postItem = document.createElement('div');
+          postItem.className = "bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700";
+          postItem.innerHTML = `
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                ${avatarHTML}
+              </div>
+              <div>
+                <h4 class="font-bold text-xs text-gray-900 dark:text-white">${p.name}</h4>
+                <span class="text-[10px] text-gray-400">${p.handle} · ${p.time}</span>
+              </div>
+            </div>
+            <p class="text-xs text-gray-800 dark:text-gray-100">${formatTextWithMentions(p.text)}</p>
+          `;
+          container.appendChild(postItem);
+        });
+      } catch (e) {
+        container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
+      }
+    }
+
+    function deletePost(btnElement) {
+      if (confirm("Bu paylaşımı silmek istediğinize emin misiniz?")) {
+        const postCard = btnElement.closest('.post-card');
+        if (postCard) {
+          postCard.remove();
+          savePostsToStorage();
+          if (currentUserData) loadUserPosts(currentUserData.handle);
+          
+          const timeline = document.getElementById('timeline');
+          if (timeline && timeline.children.length === 0) {
+            timeline.innerHTML = `
+              <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+                <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-xs"></i>
+                <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
+              </div>
+            `;
+          }
+        }
+      }
+    }
+
+    function sendDm() {
+      const input = document.getElementById('dmInput');
+      if (!input || input.disabled) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatMessages = document.getElementById('chatMessages');
+      if (!chatMessages) return;
+      const msgDiv = document.createElement('div');
+      msgDiv.className = "flex items-start gap-2 justify-end w-full";
+      msgDiv.innerHTML = `<div class="bg-yellow-400 text-gray-900 font-medium p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%] text-sm">${text}</div>`;
+      chatMessages.appendChild(msgDiv);
+      input.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleDmKey(e) { if (e.key === 'Enter') sendDm(); }
+  </script>
+</body>
+</html>
