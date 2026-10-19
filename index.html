@@ -178,8 +178,13 @@
         </div>
         
         <div onclick="handleHeaderProfileClick()" class="flex items-center gap-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-300 dark:border-yellow-500/50 px-2.5 py-1.5 rounded-full cursor-pointer hover:bg-yellow-50 dark:hover:bg-gray-700 transition shadow-sm">
-          <div id="userAvatarHeader" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center font-bold text-xs border border-gray-300 dark:border-gray-600 overflow-hidden">
-            <span id="userAvatarHeaderInitials">BG</span>
+          <div id="userAvatarHeader" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-200 dark:bg-amber-800/80 text-amber-700 dark:text-amber-200 flex items-center justify-center font-bold text-xs border border-amber-300 dark:border-amber-700 overflow-hidden relative">
+            <span id="userAvatarHeaderInitials" class="w-full h-full flex items-center justify-center overflow-hidden">
+              <svg viewBox="0 0 100 100" class="w-full h-full fill-amber-500 dark:fill-amber-400">
+                <circle cx="50" cy="38" r="22"/>
+                <path d="M15 88 C15 65, 35 60, 50 60 C65 60, 85 65, 85 88 Z"/>
+              </svg>
+            </span>
             <img id="userAvatarHeaderImg" src="" class="w-full h-full object-cover hidden" alt="Avatar">
           </div>
           <div id="userHeaderInfoGroup" class="hidden sm:block text-left">
@@ -260,8 +265,13 @@
               <div class="flex justify-between items-end -mt-12 sm:-mt-16 mb-4">
                 <div class="relative group cursor-pointer" onclick="triggerAvatarUpload()" title="Profil fotoğrafını değiştirmek için tıkla">
                   <input type="file" id="avatarFileInput" class="hidden" accept="image/*" onchange="handleAvatarUpload(event)">
-                  <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center font-black text-2xl border-4 border-white dark:border-gray-800 shadow-md overflow-hidden relative">
-                    <span id="profileAvatarInitials">BG</span>
+                  <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-amber-200 dark:bg-amber-800/80 text-amber-700 dark:text-amber-200 flex items-center justify-center border-4 border-white dark:border-gray-800 shadow-md overflow-hidden relative">
+                    <span id="profileAvatarInitials" class="w-full h-full flex items-center justify-center overflow-hidden">
+                      <svg viewBox="0 0 100 100" class="w-full h-full fill-amber-500 dark:fill-amber-400">
+                        <circle cx="50" cy="38" r="22"/>
+                        <path d="M15 88 C15 65, 35 60, 50 60 C65 60, 85 65, 85 88 Z"/>
+                      </svg>
+                    </span>
                     <img id="profileAvatarImg" src="" class="w-full h-full object-cover hidden" alt="PP">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs">
                       <i class="fa-solid fa-camera text-lg"></i>
@@ -659,24 +669,21 @@
       }
     }
 
-    function getInitials(name) {
-      if (!name) return "BG";
-      const parts = name.trim().split(" ");
-      if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase();
-      }
-      return name.substring(0, 2).toUpperCase();
-    }
+    const defaultYellowAvatarSVG = `
+      <svg viewBox="0 0 100 100" class="w-full h-full fill-amber-500 dark:fill-amber-400">
+        <circle cx="50" cy="38" r="22"/>
+        <path d="M15 88 C15 65, 35 60, 50 60 C65 60, 85 65, 85 88 Z"/>
+      </svg>
+    `;
 
     function updateAvatarUI(avatarUrl, name) {
       const headerImg = document.getElementById('userAvatarHeaderImg');
       const headerInitials = document.getElementById('userAvatarHeaderInitials');
       const profileImg = document.getElementById('profileAvatarImg');
       const profileInitials = document.getElementById('profileAvatarInitials');
-      const initialsText = getInitials(name);
 
-      if (headerInitials) headerInitials.innerText = initialsText;
-      if (profileInitials) profileInitials.innerText = initialsText;
+      if (headerInitials) headerInitials.innerHTML = defaultYellowAvatarSVG;
+      if (profileInitials) profileInitials.innerHTML = defaultYellowAvatarSVG;
 
       if (avatarUrl && avatarUrl.trim() !== "") {
         if (headerImg) { headerImg.src = avatarUrl; headerImg.classList.remove('hidden'); }
@@ -848,7 +855,7 @@
     function openAuthModal(mode) {
       closeAuthModal();
       if (mode === 'register') document.getElementById('registerModal').classList.remove('hidden');
-      if (mode === 'login') document.getElementById('loginModal').classList.remove('hidden');
+      if (mode === 'login') document.getElementById('loginModal').classList.add('hidden') || document.getElementById('loginModal').classList.remove('hidden'); // Fix toggle
     }
 
     function closeAuthModal() { 
@@ -869,7 +876,6 @@
         currentUserData.avatarUrl = uploadEvent.target.result;
         updateLoginState(true, currentUserData);
         await saveUserToCloud(currentUserData);
-        alert("Profil fotoğrafın güncellendi!");
       };
       reader.readAsDataURL(file);
     }
@@ -882,7 +888,6 @@
         currentUserData.bannerUrl = uploadEvent.target.result;
         updateLoginState(true, currentUserData);
         await saveUserToCloud(currentUserData);
-        alert("Banner fotoğrafın güncellendi!");
       };
       reader.readAsDataURL(file);
     }
@@ -972,7 +977,6 @@
 
         await userRef.set(newUser);
         updateLoginState(true, newUser);
-        alert(`🐝 Tebrikler ${name}! Hesabın bulutta oluşturuldu.`);
         closeAuthModal();
       } catch (err) {
         alert("Kayıt sırasında bulut bağlantı hatası oluştu: " + err.message);
@@ -1011,7 +1015,6 @@
         if (!user.notifications) user.notifications = [];
 
         updateLoginState(true, user);
-        alert(`🐝 Hoş geldin, ${user.name}! Buluttan giriş başarılı.`);
         closeAuthModal();
       } catch (err) {
         alert("Giriş yapılırken hata oluştu: " + err.message);
@@ -1022,7 +1025,6 @@
       if (confirm("Çıkış yapmak istediğine emin misin?")) {
         updateLoginState(false);
         switchTab('timeline');
-        alert("Başarıyla çıkış yapıldı.");
       }
     }
 
@@ -1037,8 +1039,6 @@
 
       updateLoginState(true, currentUserData);
       await saveUserToCloud(currentUserData);
-
-      alert("Profil bilgilerin bulutta güncellendi!");
       closeProfileModal();
     }
 
@@ -1087,10 +1087,8 @@
       const idx = currentUserData.bookmarks.indexOf(postId);
       if (idx > -1) {
         currentUserData.bookmarks.splice(idx, 1);
-        alert("Gönderi kaydedilenlerden çıkarıldı.");
       } else {
         currentUserData.bookmarks.push(postId);
-        alert("Gönderi kaydedilenlere eklendi! 📌");
       }
       updateLoginState(true, currentUserData);
       await saveUserToCloud(currentUserData);
@@ -1249,10 +1247,9 @@
           if (handle.replace('@', '') !== targetHandle.replace('@', '')) {
             await notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`);
           }
-          alert("Yanıt gönderildi!");
         }
       } catch(e) {
-        alert("Yanıt gönderilirken hata oluştu.");
+        console.error("Yanıt hatası:", e);
       }
     }
 
@@ -1321,7 +1318,6 @@
         removePostImage();
         loadPostsFromCloud();
         if (currentUserData) loadUserPosts(currentUserData.handle);
-        alert("Gönderi buluta paylaşıldı! 🚀");
       } catch(e) {
         alert("Paylaşım yapılırken hata oluştu: " + e.message);
       }
@@ -1343,10 +1339,9 @@
       newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group space-y-3";
       newPost.setAttribute('data-id', postId);
 
-      const initials = getInitials(name);
       const avatarHTML = (avatarUrl && avatarUrl !== '') 
         ? `<img src="${avatarUrl}" class="w-full h-full object-cover" alt="PP">`
-        : `<span class="text-xs font-bold text-gray-700 dark:text-gray-300">${initials}</span>`;
+        : `<div class="w-full h-full flex items-center justify-center overflow-hidden bg-amber-200 dark:bg-amber-800/80 text-amber-600 dark:text-amber-300">${defaultYellowAvatarSVG}</div>`;
 
       const cleanHandle = '@' + handle.replace('@', '');
       const isMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === handle.replace('@', '').toLowerCase();
@@ -1356,10 +1351,9 @@
 
       let repliesHTML = '';
       replies.forEach(r => {
-        const rInitials = getInitials(r.name);
         const rAvatarHTML = (r.avatarUrl && r.avatarUrl !== '') 
           ? `<img src="${r.avatarUrl}" class="w-full h-full object-cover" alt="PP">`
-          : `<span class="text-[10px] font-bold text-gray-700 dark:text-gray-300">${rInitials}</span>`;
+          : `<div class="w-full h-full flex items-center justify-center overflow-hidden bg-amber-200 dark:bg-amber-800/80 text-amber-600 dark:text-amber-300">${defaultYellowAvatarSVG}</div>`;
         const rIsMe = isLoggedIn && currentUserData && currentUserData.handle.toLowerCase() === r.handle.replace('@', '').toLowerCase();
 
         let rImageHTML = r.imageUrl ? `<div class="mt-2 rounded-xl overflow-hidden max-h-60 border border-gray-200 dark:border-gray-700"><img src="${r.imageUrl}" class="w-full h-full object-cover"></div>` : '';
@@ -1368,7 +1362,7 @@
           <div class="reply-card bg-yellow-50/40 dark:bg-gray-900/60 p-3.5 rounded-xl border border-yellow-200/70 dark:border-gray-700 space-y-2">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border border-gray-300 dark:border-gray-600">
+                <div class="w-7 h-7 rounded-full bg-amber-200 dark:bg-amber-800/80 flex items-center justify-center overflow-hidden border border-amber-300 dark:border-amber-700">
                   ${rAvatarHTML}
                 </div>
                 <div>
@@ -1389,7 +1383,7 @@
       newPost.innerHTML = `
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center border border-gray-300 dark:border-gray-600 overflow-hidden">
+            <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800/80 flex items-center justify-center border border-amber-300 dark:border-amber-700 overflow-hidden">
               ${avatarHTML}
             </div>
             <div>
@@ -1460,9 +1454,8 @@
             loadUserPosts(currentUserData.handle);
             loadUserLikes();
           }
-          alert("Paylaşım silindi.");
         } catch(e) {
-          alert("Silme sırasında hata oluştu.");
+          console.error("Silme hatası:", e);
         }
       }
     }
