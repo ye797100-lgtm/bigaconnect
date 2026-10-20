@@ -368,7 +368,7 @@
           <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
             <div>
               <h3 class="font-black text-gray-900 dark:text-white text-sm sm:text-lg flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-yellow-500"></i> ÇOMÜ Biga Ramazan Aydın Yerleşkesi</h3>
-              <p class="text-xs text-gray-400 mt-0.5">BigaConnect Canlı Konum Radarı</p>
+              <p class="text-xs text-gray-400 mt-0.5">Kampüs yerleşke haritası · arkadaşlarınla canlı konum özelliği çok yakında</p>
             </div>
             <span class="text-[10px] sm:text-xs bg-yellow-400 text-gray-900 font-black px-2.5 py-1 rounded-full shadow-sm">Biga Kampüs</span>
           </div>
@@ -430,7 +430,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
-          <input type="password" id="loginPassword" required placeholder="Şifren" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Şifren" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
         <button type="button" onclick="handleForgotPassword()" class="w-full text-center text-xs font-bold text-yellow-600 hover:underline">Şifremi unuttum</button>
         <button type="submit" class="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-sm shadow transition">Giriş Yap</button>
@@ -459,7 +459,7 @@
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kullanıcı Adı</label>
           <div class="relative">
             <span class="absolute left-3 top-2 text-xs text-gray-400">@</span>
-            <input type="text" id="regHandle" required placeholder="kullanici_adi" class="w-full pl-7 pr-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+            <input type="text" id="regHandle" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" autocomplete="username" placeholder="kullanici_adi" class="w-full pl-7 pr-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
           </div>
         </div>
         <div>
@@ -521,7 +521,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Şifre</label>
-          <input type="password" id="regPassword" required placeholder="Şifren" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
+          <input type="password" id="regPassword" required minlength="8" autocomplete="new-password" placeholder="En az 8 karakter" class="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-xs dark:text-white focus:ring-2 focus:ring-yellow-400">
         </div>
         <button type="submit" class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-xl text-xs shadow transition mt-2">Kayıt Ol ve Katıl</button>
       </form>
@@ -606,6 +606,17 @@
   </div>
 
   <script>
+    // Firebase SDK yüklenemezse sessizce boş arayüz bırakma.
+    if (typeof firebase === 'undefined') {
+      window.addEventListener('DOMContentLoaded', () => {
+        const note = document.createElement('div');
+        note.className = 'fixed bottom-3 left-3 right-3 z-[100] rounded-xl bg-red-100 text-red-800 border border-red-300 p-3 text-sm font-bold shadow-lg';
+        note.textContent = 'BigaConnect sunucu bağlantısı kurulamadı. Sayfayı yenile veya bağlantını kontrol et.';
+        document.body.appendChild(note);
+      });
+      throw new Error('Firebase SDK yüklenemedi');
+    }
+
     // --- GERÇEK FİREBASE BAĞLANTI AYARLARI ---
     const firebaseConfig = {
       apiKey: "AIzaSyBxhs8iwlepLjGPbezGKDu8HhFxJICEVIo",
@@ -666,7 +677,10 @@
         'auth/invalid-credential': 'E-posta veya şifre hatalı!',
         'auth/wrong-password': 'E-posta veya şifre hatalı!',
         'auth/user-not-found': 'E-posta veya şifre hatalı!',
-        'auth/too-many-requests': 'Çok fazla deneme yaptın, biraz bekle.'
+        'auth/too-many-requests': 'Çok fazla deneme yaptın, biraz bekle.',
+        'auth/network-request-failed': 'Bağlantı sorunu. İnternetini kontrol edip tekrar dene.',
+        'permission-denied': 'Bu işlem için veritabanı izni yok. Firebase güvenlik kurallarını kontrol et.',
+        'unavailable': 'Sunucuya şu an ulaşılamıyor. Biraz sonra tekrar dene.'
       };
       return m[err.code] || ('Hata: ' + err.message);
     }
@@ -675,7 +689,7 @@
       if (p.privacy !== 'private') return true;
       if (!isLoggedIn || !currentUserData) return false;
       const h = safeH(p.handle), me = safeH(currentUserData.handle);
-      return h === me || (p.followerHandles || []).includes('@' + me) || (currentUserData.following || []).includes('@' + h);
+      return h === me || (p.followerHandles || []).includes('@' + me);
     }
 
     let isLoggedIn = false;
@@ -1698,7 +1712,7 @@
     function canViewProfile(u) {
       if (!u || u.privacy !== 'private') return true;
       if (!currentUserData) return false;
-      return safeH(u.handle) === safeH(currentUserData.handle) || (currentUserData.following || []).includes('@' + safeH(u.handle));
+      return safeH(u.handle) === safeH(currentUserData.handle) || (u.followers || []).includes('@' + safeH(currentUserData.handle));
     }
 
     async function loadUserReplies() {
