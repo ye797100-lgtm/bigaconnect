@@ -15,7 +15,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
   <script>
     tailwind.config = {
@@ -217,7 +216,6 @@
           <!-- Gönderi Fotoğraf Önizleme -->
           <div id="postImagePreviewContainer" class="hidden relative mt-2 w-32 h-32 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
             <img id="postImagePreview" src="" class="w-full h-full object-cover">
-            <video id="postVideoPreview" controls muted playsinline class="hidden w-full h-full object-cover"></video>
             <button onclick="removePostImage()" class="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"><i class="fa-solid fa-xmark"></i></button>
           </div>
 
@@ -225,7 +223,7 @@
             <div class="flex gap-4 text-gray-400 text-base">
               <label class="cursor-pointer hover:text-yellow-600 transition">
                 <i class="fa-regular fa-image"></i>
-                <input type="file" id="postImageInput" accept="image/*,video/*" class="hidden" onchange="handlePostImageSelect(event)">
+                <input type="file" id="postImageInput" accept="image/*" class="hidden" onchange="handlePostImageSelect(event)">
               </label>
               <button class="hover:text-yellow-600 transition"><i class="fa-solid fa-location-dot"></i></button>
             </div>
@@ -574,7 +572,7 @@
               <option value="Elektrik">Elektrik</option>
               <option value="Makine">Makine</option>
               <option value="Gıda Teknolojisi">Gıda Teknolojisi</option>
-              <option value="Süt ve Ürünleri Teknolojisi">Süt and Ürünleri Teknolojisi</option>
+              <option value="Süt ve Ürünleri Teknolojisi">Süt ve Ürünleri Teknolojisi</option>
               <option value="Yerel Yönetimler">Yerel Yönetimler</option>
               <option value="Kooperatifçilik">Kooperatifçilik</option>
             </optgroup>
@@ -817,27 +815,34 @@
       }
     }
 
-    async function viewUserProfileByHandle(handle, hint) {
+    async function viewUserProfileByHandle(handle) {
       if (!isLoggedIn) {
         alert("Profilleri görüntülemek için giriş yapmalısın.");
         openAuthModal('login');
         return;
       }
-      const raw = String(handle || '').replace('@', ''), t = safeH(raw);
-      if (safeH(currentUserData.handle) === t || (hint && hint.uid && hint.uid === currentUserData.uid)) {
-        viewingUserData = null; renderProfileView(currentUserData); switchTab('profile'); return;
+      const cleanTarget = handle.replace('@', '').toLowerCase();
+      
+      // Eğer kendi profilimizse
+      if (currentUserData.handle.replace('@', '').toLowerCase() === cleanTarget) {
+        viewingUserData = null;
+        renderProfileView(currentUserData);
+        switchTab('profile');
+        return;
       }
+
       try {
-        let u = null, legacy = null;
-        if (hint && hint.uid) { const d = await db.collection('users').doc(hint.uid).get(); if (d.exists && d.data().uid) u = d.data(); }
-        if (!u) {
-          const snap = await db.collection('users').where('handle', '==', t).get();
-          snap.forEach(d => { const x = d.data(); if (x.uid) { if (!u) u = x; } else legacy = x; });
+        const snapshot = await db.collection('users').where('handle', '==', cleanTarget).get();
+        if (!snapshot.empty) {
+          viewingUserData = snapshot.docs[0].data();
+          renderProfileView(viewingUserData);
+          switchTab('profile');
+        } else {
+          alert("Kullanıcı bulunamadı!");
         }
-        if (!u) u = await ghostProfile(raw, t, legacy, hint);
-        if (!u) return alert("Kullanıcı bulunamadı!");
-        viewingUserData = u; renderProfileView(u); switchTab('profile');
-      } catch (e) { alert("Profil açılamadı: " + (e.code || e.message)); }
+      } catch(e) {
+        console.error("Profil getirme hatası:", e);
+      }
     }
 
     function renderProfileView(userData) {
@@ -845,7 +850,7 @@
       const b = document.getElementById('profileBuzzBtn');
       const fb = document.getElementById('profileExternalFollowBtn');
       if (fb && userData && currentUserData && (currentUserData.requested || []).includes('@' + safeH(userData.handle))) fb.innerText = 'İstek gönderildi';
-      if (b) b.classList.toggle('hidden', !(isLoggedIn && currentUserData && userData && userData.uid && userData.uid !== currentUserData.uid && !userData.ghost && !recentBuzz(userData)));
+      if (b) b.classList.toggle('hidden', !(isLoggedIn && currentUserData && userData && userData.uid && userData.uid !== currentUserData.uid));
     }
 
     function renderProfileViewBase(userData) {
@@ -1043,23 +1048,15 @@
 
     async function handlePostImageSelect(e) {
       const file = e.target.files[0]; if (!file) return;
-      const pv = document.getElementById('postVideoPreview'), pi = document.getElementById('postImagePreview');
       try {
-        if (file.type.startsWith('video/')) {
-          if (file.size > 25 * 1024 * 1024) throw new Error('Video en fazla 25 MB olabilir');
-          selectedPostVideoFile = file; selectedPostImageBase64 = '';
-          pv.src = URL.createObjectURL(file); pv.classList.remove('hidden'); pi.classList.add('hidden');
-        } else {
-          selectedPostImageBase64 = await compressImage(file, 800, 0.7); selectedPostVideoFile = null;
-          pi.src = selectedPostImageBase64; pi.classList.remove('hidden'); pv.classList.add('hidden');
-        }
+        selectedPostImageBase64 = await compressImage(file, 800, 0.7);
+        document.getElementById('postImagePreview').src = selectedPostImageBase64;
         document.getElementById('postImagePreviewContainer').classList.remove('hidden');
-      } catch (err) { alert('Dosya eklenemedi: ' + err.message); }
+      } catch (err) { alert('Görsel yüklenemedi: ' + err.message); }
     }
 
     function removePostImage() {
-      selectedPostImageBase64 = ""; selectedPostVideoFile = null;
-      const pv = document.getElementById('postVideoPreview'); if (pv) { pv.pause(); pv.removeAttribute('src'); }
+      selectedPostImageBase64 = "";
       document.getElementById('postImagePreviewContainer').classList.add('hidden');
       document.getElementById('postImageInput').value = "";
     }
@@ -1232,22 +1229,16 @@
         if (!doc.exists) return;
         const data = doc.data();
         const me = '@' + safeH(currentUserData.handle);
-        const liked = Array.isArray(data.likes) && data.likes.includes(me);
-        if (!Array.isArray(data.likes)) await postRef.update({ likes: [me] });   // eski biçim -> diziye çevir
-        else await postRef.update({ likes: liked ? FV.arrayRemove(me) : FV.arrayUnion(me) });
+        const liked = (data.likes || []).includes(me);
+        await postRef.update({ likes: liked ? FV.arrayRemove(me) : FV.arrayUnion(me) });
         if (!liked && safeH(data.handle) !== safeH(me)) {
-          const k = 'ln_' + postId + '_' + currentUserData.uid;
-          if (!localStorage.getItem(k)) {
-            localStorage.setItem(k, '1');
-            await notifyUser(data.handle, `${currentUserData.name} gönderini beğendi 👍`, 'like', data.uid);
-          }
+          await notifyUser(data.handle, `${currentUserData.name} gönderini beğendi 👍`);
         }
         loadPostsFromCloud();
         loadUserPosts(viewingUserData ? viewingUserData.handle : currentUserData.handle);
         loadUserLikes();
       } catch (e) {
         console.error("Beğeni hatası:", e);
-        alert("Beğeni kaydedilemedi: " + (e.code || e.message));
       }
     }
 
@@ -1330,15 +1321,11 @@
       return esc(text).replace(/@([a-zA-Z0-9_]+)/g, '<span class="text-yellow-600 dark:text-yellow-400 font-bold bg-yellow-100/50 dark:bg-yellow-900/30 px-1 rounded">@$1</span>');
     }
 
-    async function notifyUser(targetHandle, notificationText, type, uidHint) {
+    async function notifyUser(targetHandle, notificationText, type) {
       try {
-        let uid = uidHint;
-        if (!uid) {
-          const hd = await db.collection('handles').doc(safeH(targetHandle)).get();
-          if (!hd.exists) return;
-          uid = hd.data().uid;
-        }
-        await db.collection('users').doc(uid).update({
+        const hd = await db.collection('handles').doc(safeH(targetHandle)).get();
+        if (!hd.exists) return;
+        await db.collection('users').doc(hd.data().uid).update({
           notifications: FV.arrayUnion({ text: String(notificationText).slice(0, 200), ts: Date.now(), from: safeH(currentUserData.handle), type: type || 'info' })
         });
       } catch (e) { console.error("Bildirim hatası:", e); }
@@ -1375,8 +1362,7 @@
             <p class="text-xs sm:text-sm text-gray-800 dark:text-gray-100 font-medium">${esc(n.text)}</p>
             <span class="text-[10px] text-gray-400 mt-1 block">${timeAgo(n.ts, n.time)}</span>
             ${n.type === 'followreq' && n.from ? `<button onclick="resolveFollowReq('${safeH(n.from)}', ${n.ts || 0}, true)" class="mt-2 mr-1 px-3 py-1 bg-green-500 hover:bg-green-600 text-white font-extrabold rounded-lg text-[11px]">Onayla</button><button onclick="resolveFollowReq('${safeH(n.from)}', ${n.ts || 0}, false)" class="mt-2 mr-1 px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 font-extrabold rounded-lg text-[11px]">Reddet</button>` : ''}
-            ${n.type === 'follow' && n.from ? (((currentUserData.following || []).includes('@' + safeH(n.from))) ? `<span class="mt-2 inline-block text-[11px] font-bold text-green-600">✓ Takip ediyorsun</span>` : `<button onclick="followBack('${safeH(n.from)}')" class="mt-2 px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-lg text-[11px] shadow-sm transition active:scale-95"><i class="fa-solid fa-user-plus"></i> Sen de takip et</button>`) : ''}
-            ${n.from && n.type !== 'follow' && n.type !== 'followreq' ? `<button onclick="startChatWith('${safeH(n.from)}')" class="mt-2 px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-lg text-[11px] shadow-sm transition active:scale-95"><i class="fa-regular fa-comments"></i> Sohbet başlat</button>` : ''}
+            ${n.from ? `<button onclick="startChatWith('${safeH(n.from)}')" class="mt-2 px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-lg text-[11px] shadow-sm transition active:scale-95"><i class="fa-regular fa-comments"></i> Sohbet başlat</button>` : ''}
           </div>
         `;
         container.appendChild(notifDiv);
@@ -1427,7 +1413,7 @@
           loadPostsFromCloud();
 
           if (handle.replace('@', '') !== targetHandle.replace('@', '')) {
-            await notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`, 'reply', doc.data().uid);
+            await notifyUser(targetHandle, `${name} (${handle}) gönderine yanıt verdi: "${text.substring(0, 30)}..."`);
           }
         }
       } catch(e) {
@@ -1473,7 +1459,7 @@
       const textElement = document.getElementById('postText');
       if (!textElement) return;
       const text = textElement.value.trim().slice(0, 500);
-      if (!text && !selectedPostImageBase64 && !selectedPostVideoFile) return alert("Lütfen bir şeyler yaz veya fotoğraf ekle!");
+      if (!text && !selectedPostImageBase64) return alert("Lütfen bir şeyler yaz veya fotoğraf ekle!");
       
       const name = currentUserData.name;
       const handle = '@' + currentUserData.handle.replace('@','');
@@ -1481,11 +1467,6 @@
       const privacy = currentUserData.privacy || 'public';
       const postId = 'post_' + Date.now();
 
-      let videoUrl = '';
-      if (selectedPostVideoFile) {
-        try { videoUrl = await uploadPostVideo(selectedPostVideoFile); }
-        catch (e) { return alert('Video yüklenemedi: ' + (e.code || e.message) + '\n(Video için Firebase Storage açık olmalı.)'); }
-      }
       const newPostData = {
         id: postId,
         uid: currentUserData.uid,
@@ -1494,7 +1475,6 @@
         avatarUrl,
         text,
         imageUrl: selectedPostImageBase64,
-        videoUrl,
         privacy,
         followerHandles: privacy === 'private' ? (currentUserData.followers || []) : [],
         likes: [],
@@ -1540,7 +1520,6 @@
 
     function appendPostDOMToContainer(container, p) {
       const postId = safeId(p.id);
-      postCache[postId] = p;
       const name = esc(p.name);
       const handle = '@' + safeH(p.handle);
       const avatarUrl = safeImg(p.avatarUrl);
@@ -1548,8 +1527,8 @@
       const imageUrl = safeImg(p.imageUrl);
       const time = timeAgo(p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : null, p.time);
       const privacy = p.privacy || 'public';
-      const replies = (Array.isArray(p.replies) ? p.replies : []).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
-      const likes = Array.isArray(p.likes) ? p.likes : [];
+      const replies = (p.replies || []).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      const likes = p.likes || [];
 
       const newPost = document.createElement('div');
       newPost.className = "post-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-yellow-200 dark:border-gray-700 transition-all relative group space-y-3";
@@ -1611,11 +1590,11 @@
       newPost.innerHTML = `
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-3">
-            <div onclick="viewUserFromPost('${postId}')" class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800/80 flex items-center justify-center border border-amber-300 dark:border-amber-700 overflow-hidden cursor-pointer hover:opacity-80 transition">
+            <div onclick="viewUserProfileByHandle('${cleanHandle}')" class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800/80 flex items-center justify-center border border-amber-300 dark:border-amber-700 overflow-hidden cursor-pointer hover:opacity-80 transition">
               ${avatarHTML}
             </div>
             <div>
-              <h4 onclick="viewUserFromPost('${postId}')" class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5 cursor-pointer hover:underline">
+              <h4 onclick="viewUserProfileByHandle('${cleanHandle}')" class="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5 cursor-pointer hover:underline">
                 ${name}
                 ${privacy === 'private' ? '<i class="fa-solid fa-lock text-[10px] text-gray-400" title="Gizli Hesap"></i>' : ''}
               </h4>
@@ -1628,7 +1607,7 @@
           </div>
         </div>
         <p class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">${formatTextWithMentions(text)}</p>
-        ${postImageHTML}${safeVid(p.videoUrl) ? `<div class="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"><video src="${safeVid(p.videoUrl)}" controls preload="metadata" playsinline class="w-full max-h-80 bg-black"></video></div>` : ''}
+        ${postImageHTML}
 
         <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500">
           <button onclick="toggleReplyBox('${postId}')" class="hover:text-yellow-600 transition flex items-center gap-1.5 font-bold"><i class="fa-regular fa-comment"></i> Yanıtla (${replies.length})</button>
@@ -1709,7 +1688,7 @@
 
       try {
         const cleanHandle = '@' + userHandle.replace('@', '');
-        const snapshot = await db.collection('posts').where('handle', 'in', handlesFor(viewingUserData || currentUserData, userHandle)).get();
+        const snapshot = await db.collection('posts').where('handle', '==', cleanHandle).get();
 
         if (snapshot.empty) {
           container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
@@ -1744,7 +1723,7 @@
       try {
         const snap = await db.collection('posts').orderBy('createdAt', 'desc').limit(100).get();
         const items = [];
-        snap.forEach(d => { const p = { ...d.data(), id: d.id }; (Array.isArray(p.replies) ? p.replies : []).filter(r => '@' + safeH(r.handle) === h).forEach(r => items.push({ p, r })); });
+        snap.forEach(d => { const p = { ...d.data(), id: d.id }; (p.replies || []).filter(r => '@' + safeH(r.handle) === h).forEach(r => items.push({ p, r })); });
         if (!items.length) { c.innerHTML = emptyBox('Henüz yanıt yok.'); return; }
         items.sort((a, b) => (b.r.ts || 0) - (a.r.ts || 0));
         c.innerHTML = '';
@@ -1764,26 +1743,14 @@
       const c = document.getElementById('userMediaContainer'), u = viewingUserData || currentUserData;
       if (!c || !u) return;
       if (!canViewProfile(u)) { c.innerHTML = lockedBox(); return; }
-      c.innerHTML = emptyBox('Yükleniyor...');
       try {
-        const items = [], me = safeH(u.handle);
-        const snap = await db.collection('posts').where('handle', 'in', handlesFor(u)).get();
-        snap.forEach(d => {
-          const p = d.data(), t = p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : 0;
-          const im = safeImg(p.imageUrl), vd = safeVid(p.videoUrl);
-          if (im) items.push({ k: 'img', src: im, t }); if (vd) items.push({ k: 'vid', src: vd, t });
-        });
-        const all = await db.collection('posts').orderBy('createdAt', 'desc').limit(100).get();
-        all.forEach(d => (Array.isArray(d.data().replies) ? d.data().replies : []).forEach(r => {
-          const im = r && safeH(r.handle) === me ? safeImg(r.imageUrl) : '';
-          if (im) items.push({ k: 'img', src: im, t: r.ts || 0 });
-        }));
-        if (!items.length) { c.innerHTML = emptyBox('Henüz fotoğraf veya video yok.'); return; }
-        items.sort((a, b) => b.t - a.t);
-        c.innerHTML = items.map(i => `<div class="aspect-square rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700 bg-black/5">${i.k === 'vid'
-          ? `<video src="${i.src}#t=0.1" controls preload="metadata" playsinline class="w-full h-full object-cover"></video>`
-          : `<img src="${i.src}" class="w-full h-full object-cover">`}</div>`).join('');
-      } catch (e) { c.innerHTML = emptyBox('Medya yüklenemedi: ' + (e.code || e.message)); }
+        const snap = await db.collection('posts').where('handle', '==', '@' + safeH(u.handle)).get();
+        const imgs = [];
+        snap.forEach(d => { const p = d.data(), src = safeImg(p.imageUrl); if (src) imgs.push({ src, t: p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : 0 }); });
+        if (!imgs.length) { c.innerHTML = emptyBox('Henüz medya yok.'); return; }
+        imgs.sort((a, b) => b.t - a.t);
+        c.innerHTML = imgs.map(i => `<div class="aspect-square rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700"><img src="${i.src}" class="w-full h-full object-cover"></div>`).join('');
+      } catch (e) { c.innerHTML = emptyBox('Medya yüklenemedi.'); }
     }
 
     async function buzzUser() {
@@ -1795,7 +1762,6 @@
       await notifyUser(t, `${currentUserData.name} sizi vızzladı 🐝`, 'buzz');
       currentUserData.buzzes = [{ h: t, ts: now }, ...log.filter(b => b.h !== t)].slice(0, 50);
       await saveUserToCloud(currentUserData);
-      const bb = document.getElementById('profileBuzzBtn'); if (bb) bb.classList.add('hidden');
       alert("Vızzladın! 🐝 Karşı tarafa bildirim gitti.");
     }
 
@@ -1921,7 +1887,7 @@
       if (!isLoggedIn) return openAuthModal('login');
       try {
         const hd = await db.collection('handles').doc(safeH(handle)).get();
-        if (!hd.exists) return alert("Bu kullanıcı hesabını henüz yeni sisteme taşımadı. Taşıyınca sohbet edebilirsiniz 🐝");
+        if (!hd.exists) return alert("Kullanıcı bulunamadı.");
         const other = hd.data().uid;
         if (other === currentUserData.uid) return;
         const od = await db.collection('users').doc(other).get();
@@ -1962,4 +1928,75 @@
       if (!text || !chatOpenId) return;
       input.value = '';
       try {
-        const ref
+        const ref = db.collection('chats').doc(chatOpenId), now = Date.now();
+        await ref.collection('messages').add({ from: currentUserData.uid, text, ts: now });
+        await ref.update({ last: text.slice(0, 60), lastTs: now, lastFrom: currentUserData.uid, ['readAt.' + currentUserData.uid]: now });
+      } catch (err) { alert("Mesaj gönderilemedi: " + err.message); }
+    }
+
+    // Akış filtresi
+    function feedAllows(p) {
+      if (feedMode !== 'following' || !isLoggedIn || !currentUserData) return true;
+      const h = '@' + safeH(p.handle);
+      return h === '@' + safeH(currentUserData.handle) || (currentUserData.following || []).includes(h);
+    }
+    function paintFeedBar() {
+      document.querySelectorAll('#feedBar button').forEach(b => {
+        const on = b.dataset.m === feedMode;
+        b.className = 'px-4 py-1.5 rounded-full text-xs font-extrabold transition ' + (on ? 'bg-yellow-400 text-gray-900 shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-yellow-200 dark:border-gray-700');
+      });
+    }
+    function setFeedMode(m) {
+      if (m === 'following' && !isLoggedIn) { alert("Takip ettiklerini görmek için giriş yapmalısın."); return openAuthModal('login'); }
+      feedMode = m; localStorage.setItem('biga_feed', m); paintFeedBar(); loadPostsFromCloud();
+    }
+    (function () {
+      const tl = document.getElementById('timeline'); if (!tl) return;
+      const bar = document.createElement('div'); bar.id = 'feedBar'; bar.className = 'flex gap-2 mb-3';
+      bar.innerHTML = '<button data-m="all" onclick="setFeedMode(\'all\')">🌍 Herkes</button><button data-m="following" onclick="setFeedMode(\'following\')">🐝 Takip ettiklerim</button>';
+      tl.parentNode.insertBefore(bar, tl); paintFeedBar();
+    })();
+
+    // Kullanıcı arama (Keşfet sekmesi)
+    let searchT;
+    function userSearch(q) {
+      clearTimeout(searchT);
+      const out = document.getElementById('userSearchResults'); q = safeH(q);
+      if (!q) { out.innerHTML = ''; return; }
+      if (!isLoggedIn) { out.innerHTML = '<p class="text-xs text-gray-400 py-2">Aramak için giriş yapmalısın.</p>'; return; }
+      searchT = setTimeout(async () => {
+        try {
+          const snap = await db.collection('users').orderBy('handle').startAt(q).endAt(q + '\uf8ff').limit(8).get();
+          out.innerHTML = snap.empty ? '<p class="text-xs text-gray-400 py-2">Sonuç yok.</p>' : '';
+          snap.forEach(d => {
+            const u = d.data(), av = safeImg(u.avatarUrl), b = document.createElement('button');
+            b.className = 'w-full flex items-center gap-3 p-2 rounded-xl hover:bg-yellow-50 dark:hover:bg-gray-700 text-left';
+            b.innerHTML = `<div class="w-9 h-9 rounded-full overflow-hidden border border-amber-300 shrink-0">${av ? `<img src="${av}" class="w-full h-full object-cover">` : defaultYellowAvatarSVG}</div><div><div class="font-bold text-sm text-gray-900 dark:text-white">${esc(u.name)}</div><div class="text-xs text-gray-400">@${safeH(u.handle)}</div></div>`;
+            b.onclick = () => viewUserProfileByHandle(u.handle);
+            out.appendChild(b);
+          });
+        } catch (e) { out.innerHTML = '<p class="text-xs text-gray-400 py-2">Arama başarısız.</p>'; }
+      }, 300);
+    }
+    (function () {
+      const ex = document.getElementById('contentExplore'); if (!ex) return;
+      ex.insertAdjacentHTML('afterbegin', `<div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm mb-4"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input oninput="userSearch(this.value)" placeholder="Kullanıcı ara (kullanıcı adı)" class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"></div><div id="userSearchResults" class="mt-2 space-y-1"></div></div>`);
+    })();
+
+    // Kampüs haritası
+    let mapReady = false;
+    function initCampusMap() {
+      if (mapReady) return; mapReady = true;
+      const places = [['Biga Kampüsü', 'Çanakkale Onsekiz Mart Üniversitesi Biga'], ['İİBF', 'Biga İktisadi ve İdari Bilimler Fakültesi'], ['Meslek Yüksekokulu', 'Biga Meslek Yüksekokulu'], ['Uygulamalı Bilimler', 'Biga Uygulamalı Bilimler Fakültesi'], ['Biga Merkez', 'Biga, Çanakkale']];
+      const go = q => { document.getElementById('campusMap').src = 'https://maps.google.com/maps?q=' + encodeURIComponent(q) + '&hl=tr&z=15&output=embed'; };
+      const box = document.getElementById('mapBtns');
+      places.forEach(([label, q], i) => {
+        const b = document.createElement('button');
+        b.className = 'px-3 py-1.5 rounded-full text-xs font-extrabold bg-yellow-400 hover:bg-yellow-500 text-gray-900 shadow-sm';
+        b.innerText = '📍 ' + label; b.onclick = () => go(q); box.appendChild(b);
+      });
+      go(places[0][1]);
+    }
+  </script>
+</body>
+</html>
