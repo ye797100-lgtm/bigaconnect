@@ -5,7 +5,6 @@
       <stop offset="1" stop-color="#E8A91F"/>
     </linearGradient>
   </defs>
-  <path fill="url(#gold)" d="M256 12c-13 0-26 3-37 10L65 103c-23 13-37 37-37 63v180c0 26 14 50 37 63l154 89c23 13 51 13 74 0l154-89c23-13 37-37 37-63V166c0-26-14-50-37-63L293 22c-11-7-24-10-37-10Z"/>
   <mask id="innerCutout"><rect width="512" height="512" fill="white"/><path d="m256 104 142 82v140l-142 82-142-82V186l142-82Z" fill="black"/></mask>
   <path fill="url(#gold)" mask="url(#innerCutout)" d="M256 12c-13 0-26 3-37 10L65 103c-23 13-37 37-37 63v180c0 26 14 50 37 63l154 89c23 13 51 13 74 0l154-89c23-13 37-37 37-63V166c0-26-14-50-37-63L293 22c-11-7-24-10-37-10Z"/>
   <g fill="url(#gold)">
