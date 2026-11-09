@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="BigaConnect">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7C94B"/>
+      <stop offset="1" stop-color="#E8A91F"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#gold)" d="M256 12c-13 0-26 3-37 10L65 103c-23 13-37 37-37 63v180c0 26 14 50 37 63l154 89c23 13 51 13 74 0l154-89c23-13 37-37 37-63V166c0-26-14-50-37-63L293 22c-11-7-24-10-37-10Z"/>
+  <path fill="#050505" d="m256 104 142 82v140l-142 82-142-82V186l142-82Z"/>
+  <g fill="url(#gold)">
+    <rect x="166" y="207" width="180" height="58" rx="27"/>
+    <rect x="166" y="292" width="180" height="58" rx="27"/>
+  </g>
+</svg>
