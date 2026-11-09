@@ -214,33 +214,32 @@
           <div class="lg:hidden relative brand-mark ml-1">
             <img src="/bigaconnect-mark.svg" alt="BigaConnect" class="w-8 h-8 object-contain drop-shadow-sm" />
               <div id="memorialRibbon" aria-hidden="true">
-    <svg viewBox="0 0 120 170" width="64" height="91" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="ribbonFace" x1="0" y1="0" x2="1" y2=".15">
-          <stop offset="0" stop-color="#686868"/>
-          <stop offset=".24" stop-color="#292929"/>
-          <stop offset=".62" stop-color="#090909"/>
-          <stop offset="1" stop-color="#3d3d3d"/>
-        </linearGradient>
-        <linearGradient id="ribbonFold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#050505"/>
-          <stop offset=".55" stop-color="#242424"/>
-          <stop offset="1" stop-color="#555"/>
-        </linearGradient>
-        <linearGradient id="ribbonTail" x1="0" y1="0" x2="1" y2=".2">
-          <stop offset="0" stop-color="#555"/>
-          <stop offset=".5" stop-color="#171717"/>
-          <stop offset="1" stop-color="#050505"/>
-        </linearGradient>
-      </defs>
-      <path d="M48 82 7 133l23 27 40-56Z" fill="url(#ribbonTail)"/>
-      <path d="m72 82 41 51-23 27-40-56Z" fill="url(#ribbonFold)"/>
-      <path d="m48 82 10 16-28 62-23-27Z" fill="#080808" opacity=".42"/>
-      <path d="m72 82-10 16 28 62 23-27Z" fill="#000" opacity=".3"/>
-      <path fill="url(#ribbonFace)" fill-rule="evenodd" d="M35 5C15 5 7 22 13 42c7 23 31 45 47 67 16-22 40-44 47-67 6-20-2-37-22-37-12 0-20 8-25 22C55 13 47 5 35 5Zm1 18c-9 0-12 8-8 19 5 14 20 30 32 47 12-17 27-33 32-47 4-11 1-19-8-19-9 0-17 11-24 25-7-14-15-25-24-25Z"/>
-      <path d="M35 5C15 5 7 22 13 42c7 23 31 45 47 67 16-22 40-44 47-67 6-20-2-37-22-37-12 0-20 8-25 22C55 13 47 5 35 5Z" fill="none" stroke="#777" stroke-opacity=".28" stroke-width="1.2"/>
-      <path d="M61 108 88 160l25-27-41-51" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="1.5"/>
-    </svg>
+    <svg viewBox="0 0 120 170" width="64" height="91" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="ribbonFront" x1="0" y1="0" x2="1" y2=".15">
+      <stop offset="0" stop-color="#777"/>
+      <stop offset=".22" stop-color="#3b3b3b"/>
+      <stop offset=".58" stop-color="#151515"/>
+      <stop offset="1" stop-color="#050505"/>
+    </linearGradient>
+    <linearGradient id="ribbonBack" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#090909"/>
+      <stop offset=".55" stop-color="#292929"/>
+      <stop offset="1" stop-color="#666"/>
+    </linearGradient>
+    <linearGradient id="ribbonTail" x1="0" y1="0" x2="1" y2=".2">
+      <stop offset="0" stop-color="#666"/>
+      <stop offset=".48" stop-color="#292929"/>
+      <stop offset="1" stop-color="#080808"/>
+    </linearGradient>
+  </defs>
+  <!-- Back tail and rear side of the loop -->
+  <path d="M43 8 C19 8 9 27 15 49 C20 68 39 87 56 108 L17 145 L39 166 L72 111 C58 92 37 69 31 49 C26 33 29 20 43 20 C55 20 65 31 75 48 L89 34 C76 16 60 8 43 8Z" fill="url(#ribbonBack)"/>
+  <!-- Front side of the loop crossing over the rear strip -->
+  <path d="M77 8 C101 8 111 27 105 49 C100 68 81 87 64 108 L103 145 L81 166 L48 111 C62 92 83 69 89 49 C94 33 91 20 77 20 C65 20 55 31 45 48 L31 34 C44 16 60 8 77 8Z" fill="url(#ribbonFront)"/>
+  <path d="M15 49 C20 68 39 87 56 108 L17 145 L39 166 L72 111" fill="none" stroke="#999" stroke-opacity=".18" stroke-width="1.5"/>
+  <path d="M105 49 C100 68 81 87 64 108 L103 145 L81 166 L48 111" fill="none" stroke="#000" stroke-opacity=".55" stroke-width="1.8"/>
+</svg>
   </div>
           </div>
         </div>
