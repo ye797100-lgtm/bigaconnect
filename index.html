@@ -53,9 +53,44 @@
     #mobileDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     .drawer-closed { transform: translateX(-100%); }
     .drawer-open { transform: translateX(0); }
+
+    /* 10 Kasım: geçici anma görünümü */
+    html.memorial-mode body > *:not(#memorialRibbon) { filter: grayscale(1) !important; }
+    #memorialRibbon { display:none; position:fixed; top:0; left:18px; width:48px; height:88px; z-index:99999; pointer-events:none; filter:drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
+    html.memorial-mode #memorialRibbon { display:block; }
   </style>
 </head>
 <body class="bg-yellow-50/30 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
+  <div id="memorialRibbon" aria-hidden="true">
+    <svg viewBox="0 0 48 88" width="48" height="88" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 0h12l8 25-7 6L9 23z" fill="#080808"/>
+      <path d="M28 0h12l-1 23-12 8-7-6z" fill="#080808"/>
+      <path d="M8 18l16 10 16-10-4 39-12-8-12 8z" fill="#080808"/>
+      <path d="M8 18l16 10 16-10-4 39-12-8-12 8z" fill="none" stroke="#222" stroke-width="1"/>
+      <path d="M8 0c-7 4-8 13-3 20 5 7 13 9 19 8 6 1 14-1 19-8 5-7 4-16-3-20-7-4-13 0-16 7C21 0 15-4 8 0z" fill="#080808"/>
+      <path d="M10 5c-4 3-4 8-1 12 3 4 8 6 13 5 5 1 10-1 13-5 3-4 3-9-1-12-4-3-8 0-12 7-4-7-8-10-12-7z" fill="#fff"/>
+      <path d="M10 5c-4 3-4 8-1 12 3 4 8 6 13 5 5 1 10-1 13-5 3-4 3-9-1-12-4-3-8 0-12 7-4-7-8-10-12-7z" fill="#080808" transform="translate(0 2) scale(1 .82)"/>
+    </svg>
+  </div>
+  <script>
+    (function () {
+      const zone = 'Europe/Istanbul';
+      const getTurkeyParts = () => Object.fromEntries(
+        new Intl.DateTimeFormat('en-GB', {
+          timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23'
+        }).formatToParts(new Date()).filter(p => p.type !== 'literal').map(p => [p.type, Number(p.value)])
+      );
+      const now = getTurkeyParts();
+      const isNovemberTenth = now.month === 11 && now.day === 10;
+      document.documentElement.classList.toggle('memorial-mode', isNovemberTenth);
+      if (isNovemberTenth) {
+        const elapsedToday = ((now.hour * 60 + now.minute) * 60 + now.second) * 1000;
+        const remaining = Math.max(0, 86400000 - elapsedToday);
+        window.setTimeout(() => document.documentElement.classList.remove('memorial-mode'), remaining);
+      }
+    })();
+  </script>
 
   <!-- MOBİL YAN BAR OVERLAY -->
   <div id="mobileDrawerBackdrop" onclick="closeMobileDrawer()" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden backdrop-blur-sm"></div>
