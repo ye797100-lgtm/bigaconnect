@@ -62,29 +62,21 @@
     html.memorial-mode .bee-wing,
     html.memorial-mode .coming-soon-card { animation:none !important; }
     html.memorial-mode { scroll-behavior:auto; }
+
+    @media (max-width: 1023px) {
+      #memorialRibbon {
+        position:absolute;
+        top:-4px;
+        left:34px;
+        width:22px;
+        height:33px;
+      }
+      #memorialRibbon svg { width:22px; height:33px; }
+    }
   </style>
 </head>
 <body class="bg-yellow-50/30 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
-  <div id="memorialRibbon" aria-hidden="true">
-    <svg viewBox="0 0 120 180" width="64" height="96" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="mourningRibbon" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#555"/>
-          <stop offset=".42" stop-color="#171717"/>
-          <stop offset="1" stop-color="#080808"/>
-        </linearGradient>
-        <linearGradient id="mourningFold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#090909"/>
-          <stop offset="1" stop-color="#444"/>
-        </linearGradient>
-      </defs>
-      <path d="M37 5C17 13 12 34 23 55c8 16 28 43 43 66l31 52 20-20-38-57C61 67 42 42 43 25c0-8 3-14 8-19z" fill="url(#mourningRibbon)"/>
-      <path d="M83 5c20 8 25 29 14 50-8 16-28 43-43 66l-31 52-20-20 38-57C59 67 78 42 77 25c0-8-3-14-8-19z" fill="url(#mourningFold)"/>
-      <path d="M37 5c-20 8-25 29-14 50 8 16 28 43 43 66l-26 39-24-28 28-39C29 67 10 42 11 25 12 13 20 5 37 5z" fill="url(#mourningRibbon)"/>
-      <path d="M83 5c20 8 25 29 14 50-8 16-28 43-43 66l26 39 24-28-28-39c15-26 34-51 33-68-1-12-9-20-26-20z" fill="url(#mourningFold)"/>
-      <path d="M37 5C17 13 12 34 23 55c8 16 28 43 43 66M83 5c20 8 25 29 14 50-8 16-28 43-43 66" fill="none" stroke="#050505" stroke-width="1.2"/>
-    </svg>
-  </div>
+
   <script>
     (function () {
       const zone = 'Europe/Istanbul';
@@ -227,6 +219,26 @@
               <path d="M22 40 Q16 30 12 32" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round" fill="none"/>
               <circle cx="11" cy="32" r="2.5" fill="#1F2937"/>
             </svg>
+              <div id="memorialRibbon" aria-hidden="true">
+                <svg viewBox="0 0 120 180" width="64" height="96" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="mourningRibbon" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0" stop-color="#555"/>
+                      <stop offset=".42" stop-color="#171717"/>
+                      <stop offset="1" stop-color="#080808"/>
+                    </linearGradient>
+                    <linearGradient id="mourningFold" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="#090909"/>
+                      <stop offset="1" stop-color="#444"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M37 5C17 13 12 34 23 55c8 16 28 43 43 66l31 52 20-20-38-57C61 67 42 42 43 25c0-8 3-14 8-19z" fill="url(#mourningRibbon)"/>
+                  <path d="M83 5c20 8 25 29 14 50-8 16-28 43-43 66l-31 52-20-20 38-57C59 67 78 42 77 25c0-8-3-14-8-19z" fill="url(#mourningFold)"/>
+                  <path d="M37 5c-20 8-25 29-14 50 8 16 28 43 43 66l-26 39-24-28 28-39C29 67 10 42 11 25 12 13 20 5 37 5z" fill="url(#mourningRibbon)"/>
+                  <path d="M83 5c20 8 25 29 14 50-8 16-28 43-43 66l26 39 24-28-28-39c15-26 34-51 33-68-1-12-9-20-26-20z" fill="url(#mourningFold)"/>
+                  <path d="M37 5C17 13 12 34 23 55c8 16 28 43 43 66M83 5c20 8 25 29 14 50-8 16-28 43-43 66" fill="none" stroke="#050505" stroke-width="1.2"/>
+                </svg>
+              </div>
           </div>
         </div>
         
