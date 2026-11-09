@@ -6,10 +6,10 @@
     </linearGradient>
   </defs>
   <path fill="url(#gold)" fill-rule="evenodd"
-    d="M256 12 L460 130 L460 382 L256 500 L52 382 L52 130 Z
-       M256 104 L382 177 L382 335 L256 408 L130 335 L130 177 Z"/>
+    d="M256 8 L471 132 L471 380 L256 504 L41 380 L41 132 Z
+       M256 98 L393 177 L393 335 L256 414 L119 335 L119 177 Z"/>
   <g fill="url(#gold)">
-    <rect x="166" y="207" width="180" height="58" rx="27"/>
-    <rect x="166" y="292" width="180" height="58" rx="27"/>
+    <rect x="166" y="185" width="180" height="58" rx="27"/>
+    <rect x="166" y="269" width="180" height="58" rx="27"/>
   </g>
 </svg>
