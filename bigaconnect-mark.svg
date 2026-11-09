@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="BigaConnect">
-  <defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7C94B"/><stop offset="1" stop-color="#E8A91F"/></linearGradient></defs>
-  <path fill="url(#gold)" fill-rule="evenodd" d="M256 12 L438 117 Q460 130 460 156 L460 356 Q460 382 438 395 L278 487 Q256 500 234 487 L74 395 Q52 382 52 356 L52 156 Q52 130 74 117 L234 25 Q256 12 278 25 Z M256 104 L386 179 Q398 186 398 200 L398 312 Q398 326 386 333 L268 401 Q256 408 244 401 L126 333 Q114 326 114 312 L114 200 Q114 186 126 179 Z"/>
-  <g fill="url(#gold)"><rect x="166" y="207" width="180" height="58" rx="27"/><rect x="166" y="292" width="180" height="58" rx="27"/></g>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7C94B"/>
+      <stop offset="1" stop-color="#E8A91F"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#gold)" fill-rule="evenodd"
+    d="M256 12 L460 130 L460 382 L256 500 L52 382 L52 130 Z
+       M256 104 L382 177 L382 335 L256 408 L130 335 L130 177 Z"/>
+  <g fill="url(#gold)">
+    <rect x="166" y="207" width="180" height="58" rx="27"/>
+    <rect x="166" y="292" width="180" height="58" rx="27"/>
+  </g>
 </svg>
