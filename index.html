@@ -1642,7 +1642,7 @@
           const doc = await db.collection('posts').doc(postId).get();
           if (doc.exists) {
             const p = { ...doc.data(), id: doc.id };
-            appendPostDOMToContainer(container, p);
+            if (canSeePost(p)) appendPostDOMToContainer(container, p);
           }
         } catch(e) {}
       }
@@ -2102,10 +2102,12 @@
         }
 
         container.innerHTML = '';
+        let visibleCount = 0;
         snapshot.forEach(doc => {
           const p = { ...doc.data(), id: doc.id };
-          if (canSeePost(p)) appendPostDOMToContainer(container, p);
+          if (canSeePost(p)) { appendPostDOMToContainer(container, p); visibleCount++; }
         });
+        if (!visibleCount) container.innerHTML = emptyBox('Bu profilde henüz görüntülenebilir gönderi yok.');
       } catch (e) {
         container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
       }
