@@ -2052,11 +2052,17 @@
       const log = (currentUserData.buzzes || []).filter(b => b && b.h);
       const last = log.find(b => b.h === t);
       if (last) return alert("Bu kişiyi zaten vızzladın.");
-      await notifyUser(t, `${currentUserData.name} sizi vızzladı.`, 'buzz');
+      const previous = [...log];
       currentUserData.buzzes = [{ h: t, ts: now }, ...log.filter(b => b.h !== t)].slice(0, 1000);
-      await saveUserToCloud(currentUserData);
-      const bb = document.getElementById('profileBuzzBtn'); if (bb) bb.classList.add('hidden');
-      alert("Vızzladın! Karşı tarafa bildirim gitti.");
+      try {
+        await saveUserToCloud(currentUserData);
+        await notifyUser(t, `${currentUserData.name} sizi vızzladı.`, 'buzz');
+        const bb = document.getElementById('profileBuzzBtn'); if (bb) bb.classList.add('hidden');
+        alert("Vızzladın! Karşı tarafa bildirim gitti.");
+      } catch (err) {
+        currentUserData.buzzes = previous;
+        alert('Vızzlama kaydedilemedi. Tekrar dene. ' + (err.code || err.message));
+      }
     }
 
     // ----- Sohbet, bildirim sayacı, akış filtresi, arama, harita -----
@@ -2099,7 +2105,7 @@
       me.notifReadAt = Date.now(); updateNotifBadge();
       try { await db.collection('users').doc(me.uid).update({ notifReadAt: me.notifReadAt }); } catch (e) {}
     }
-    function syncApprovals() {
+    async function syncApprovals() {
       const me = currentUserData; if (!me) return;
       me.requested = me.requested || []; me.following = me.following || []; let ch = false;
       (me.notifications || []).forEach(n => {
@@ -2108,7 +2114,10 @@
           if (me.requested.includes(t)) { me.requested = me.requested.filter(x => x !== t); if (!me.following.includes(t)) me.following.push(t); ch = true; }
         }
       });
-      if (ch) { saveUserToCloud(me); loadPostsFromCloud(); }
+      if (ch) {
+        try { await saveUserToCloud(me); loadPostsFromCloud(); }
+        catch (e) { console.error('Takip onayı eşitlenemedi:', e); }
+      }
     }
     async function resolveFollowReq(h, ts, ok) {
       const me = currentUserData, t = '@' + h;
