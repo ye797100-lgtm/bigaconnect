@@ -2204,19 +2204,32 @@
       tl.parentNode.insertBefore(bar, tl); paintFeedBar();
     })();
 
-    // Kullanıcı arama (Keşfet sekmesi)
+    // Kullanıcı arama (Keşfet / Gündem): isim ve kullanıcı adı
     let searchT;
     function userSearch(q) {
       clearTimeout(searchT);
-      const out = document.getElementById('userSearchResults'); q = safeH(q);
+      const out = document.getElementById('userSearchResults');
+      q = String(q || '').trim();
+      if (!out) return;
       if (!q) { out.innerHTML = ''; return; }
       if (!isLoggedIn) { out.innerHTML = '<p class="text-xs text-gray-400 py-2">Aramak için giriş yapmalısın.</p>'; return; }
       searchT = setTimeout(async () => {
         try {
-          const snap = await db.collection('users').orderBy('handle').startAt(q).endAt(q + '\uf8ff').limit(8).get();
-          out.innerHTML = snap.empty ? '<p class="text-xs text-gray-400 py-2">Sonuç yok.</p>' : '';
-          snap.forEach(d => {
-            const u = d.data(), av = safeImg(u.avatarUrl), b = document.createElement('button');
+          const users = db.collection('users');
+          const nameVariants = [...new Set([q, q.toLocaleLowerCase('tr-TR'), q.charAt(0).toLocaleUpperCase('tr-TR') + q.slice(1)])];
+          const queries = nameVariants.map(v => users.orderBy('name').startAt(v).endAt(v + '\uf8ff').limit(8).get());
+          const hq = safeH(q).toLowerCase();
+          const handleQuery = users.orderBy('handle').startAt(hq).endAt(hq + '\uf8ff').limit(8).get();
+          const snaps = await Promise.all([...queries, handleQuery]);
+          const matches = new Map();
+          snaps.forEach(snap => snap.forEach(d => {
+            const u = d.data();
+            if (u.uid && u.handle) matches.set(u.uid, u);
+          }));
+          const results = [...matches.values()].slice(0, 8);
+          out.innerHTML = results.length ? '' : '<p class="text-xs text-gray-400 py-2">Sonuç yok.</p>';
+          results.forEach(u => {
+            const av = safeImg(u.avatarUrl), b = document.createElement('button');
             b.className = 'w-full flex items-center gap-3 p-2 rounded-xl hover:bg-yellow-50 dark:hover:bg-gray-700 text-left';
             b.innerHTML = `<div class="w-9 h-9 rounded-full overflow-hidden border border-amber-300 shrink-0">${av ? `<img src="${av}" class="w-full h-full object-cover">` : defaultYellowAvatarSVG}</div><div><div class="font-bold text-sm text-gray-900 dark:text-white">${esc(u.name)}</div><div class="text-xs text-gray-400">@${safeH(u.handle)}</div></div>`;
             b.onclick = () => viewUserProfileByHandle(u.handle);
@@ -2227,7 +2240,7 @@
     }
     (function () {
       const ex = document.getElementById('contentExplore'); if (!ex) return;
-      ex.insertAdjacentHTML('afterbegin', `<div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm mb-4"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input oninput="userSearch(this.value)" placeholder="Kullanıcı ara (kullanıcı adı)" class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"></div><div id="userSearchResults" class="mt-2 space-y-1"></div></div>`);
+      ex.insertAdjacentHTML('afterbegin', `<div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm mb-4"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input oninput="userSearch(this.value)" placeholder="İsim veya kullanıcı adı ara" class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"></div><div id="userSearchResults" class="mt-2 space-y-1"></div></div>`);
     })();
 
     // Kampüs haritası
