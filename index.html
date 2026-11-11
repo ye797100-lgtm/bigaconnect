@@ -923,6 +923,7 @@
         try {
           await u.reload();
           if (stateVersion !== authStateVersion || !auth.currentUser || auth.currentUser.uid !== u.uid) return;
+          if (u.emailVerified) await u.getIdToken(true);
           if (!u.emailVerified) {
             await auth.signOut();
             updateLoginState(false);
@@ -1485,6 +1486,7 @@
         loginUid = cred.user.uid;
         pendingVerificationUid = loginUid;
         await cred.user.reload();
+        if (cred.user.emailVerified) await cred.user.getIdToken(true);
         if (!cred.user.emailVerified) {
           try { await cred.user.sendEmailVerification(); } catch (mailErr) { console.warn('Doğrulama e-postası yeniden gönderilemedi:', mailErr); }
           pendingVerificationUid = null;
