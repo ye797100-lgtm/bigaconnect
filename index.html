@@ -374,7 +374,7 @@
             </span>
             <img id="userAvatarHeaderImg" src="" class="w-full h-full object-cover hidden" alt="Avatar">
           </div>
-          <div id="userHeaderInfoGroup" class="hidden sm:block text-left">
+          <div id="userHeaderInfoGroup" class="hidden text-left">
             <h4 id="userNameHeader" class="font-bold text-xs text-gray-900 dark:text-white leading-tight">Giriş Yapılmadı</h4>
             <span id="userHandleHeader" class="text-[10px] text-gray-400 block">@hesap_yok</span>
           </div>
@@ -905,19 +905,43 @@
       }
 
       localStorage.removeItem('biga_current_user'); // eski sürümden kalan (şifre içeren) veriyi temizle
+      // Oturum kalıcılığını açıkça cihaz bazında etkinleştir.
+      try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); }
+      catch (e) { console.warn('Oturum kalıcılığı ayarlanamadı:', e); }
+
+      let authStateVersion = 0;
       auth.onAuthStateChanged(async (u) => {
-        if (!u) { updateLoginState(false); return; }
+        const stateVersion = ++authStateVersion;
+        if (!u) {
+          viewingUserData = null;
+          updateLoginState(false);
+          return;
+        }
         try {
           const doc = await db.collection('users').doc(u.uid).get();
-          if (doc.exists) {
-            const d0 = doc.data();
-            if (d0.joinedAt === undefined && u.metadata && u.metadata.creationTime) {
-              d0.joinedAt = Date.parse(u.metadata.creationTime) || 0;
-              db.collection('users').doc(u.uid).update({ joinedAt: d0.joinedAt }).catch(() => {});
-            }
-            updateLoginState(true, d0);
+          // Eski bir kullanıcı yükleme isteği, çıkıştan veya hesap değişiminden sonra
+          // arayüzü yeniden giriş yapılmış gibi gösteremez.
+          if (stateVersion !== authStateVersion || !auth.currentUser || auth.currentUser.uid !== u.uid) return;
+          if (!doc.exists) {
+            console.error('Firebase Auth hesabı var ancak users profili bulunamadı:', u.uid);
+            await auth.signOut();
+            return;
           }
-        } catch (e) { console.error('Profil yüklenemedi:', e); }
+          const d0 = doc.data();
+          if (d0.joinedAt === undefined && u.metadata && u.metadata.creationTime) {
+            d0.joinedAt = Date.parse(u.metadata.creationTime) || 0;
+            db.collection('users').doc(u.uid).update({ joinedAt: d0.joinedAt }).catch(() => {});
+          }
+          updateLoginState(true, d0);
+        } catch (e) {
+          if (stateVersion !== authStateVersion) return;
+          console.error('Profil yüklenemedi:', e);
+          updateLoginState(false);
+          if (e && (e.code === 'permission-denied' || e.code === 'firestore/permission-denied')) {
+            alert('Oturum açıldı ancak profilin okunamadı. Firestore güvenlik kuralları users/' + u.uid + ' erişimini engelliyor.');
+            await auth.signOut().catch(() => {});
+          }
+        }
       });
     });
 
@@ -1009,9 +1033,14 @@
         if (profileLoggedOutView) profileLoggedOutView.classList.remove('hidden');
         if (profileLoggedInView) profileLoggedInView.classList.add('hidden');
 
-        document.getElementById('userHeaderInfoGroup').classList.add('hidden');
-        document.getElementById('userHeaderGearIcon').className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
-
+        const headerInfo = document.getElementById('userHeaderInfoGroup');
+        if (headerInfo) headerInfo.classList.add('hidden');
+        const headerName = document.getElementById('userNameHeader');
+        const headerHandle = document.getElementById('userHandleHeader');
+        const headerAction = document.getElementById('userHeaderGearIcon');
+        if (headerName) headerName.textContent = 'Giriş Yapılmadı';
+        if (headerHandle) headerHandle.textContent = '@hesap_yok';
+        if (headerAction) headerAction.className = "fa-solid fa-right-to-bracket text-xs text-yellow-600 ml-0.5";
         updateAvatarUI("");
         loadPostsFromCloud();
         loadNotifications();
@@ -1503,12 +1532,20 @@
       return true;
     }
 
-    function handleLogout() {
-      if (confirm("Çıkış yapmak istediğine emin misin?")) {
-        viewingUserData = null;
-        auth.signOut();
+    async function handleLogout() {
+      if (!isLoggedIn && !auth.currentUser) {
+        updateLoginState(false);
+        return;
+      }
+      if (!confirm("Çıkış yapmak istediğine emin misin?")) return;
+      viewingUserData = null;
+      try {
+        await auth.signOut();
         updateLoginState(false);
         switchTab('timeline');
+      } catch (err) {
+        console.error('Çıkış yapılamadı:', err);
+        alert('Çıkış yapılamadı. İnternet bağlantını kontrol edip tekrar dene.');
       }
     }
 
