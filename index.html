@@ -1510,10 +1510,6 @@
         profileCreated = true;
         await db.collection('handles').doc(handle).set({ uid: cred.user.uid });
         handleCreated = true;
-        // Firebase doğrulama e-postasını Türkçe yerelleştir.
-        auth.languageCode = 'tr';
-        await cred.user.sendEmailVerification();
-
       } catch (err) {
         pendingVerificationUid = null;
         if (cred) {
@@ -1525,11 +1521,24 @@
         return;
       }
 
+      // Keep the account if email delivery reports an ambiguous network failure.
+      let verificationMailError = null;
+      try {
+        auth.languageCode = 'tr';
+        await cred.user.sendEmailVerification();
+      } catch (mailErr) {
+        verificationMailError = mailErr;
+        console.error('Doğrulama e-postası gönderilemedi:', mailErr);
+      }
       pendingVerificationUid = null;
       await auth.signOut().catch(() => {});
       updateLoginState(false);
       closeAuthModal();
-      alert('Kayıt oluşturuldu. BigaConnect’e girebilmek için ' + email + ' adresine gönderdiğimiz doğrulama bağlantısına tıkla. E-postayı bulamazsan spam klasörünü kontrol et.');
+      if (verificationMailError) {
+        alert('Hesabın oluşturuldu ancak e-posta gönderimi teyit edilemedi. Hesabın silinmedi. Giriş ekranından tekrar giriş yapıp yeni doğrulama bağlantısı iste.\n\n' + authErrorText(verificationMailError));
+      } else {
+        alert('Kayıt oluşturuldu. BigaConnect’e girebilmek için ' + email + ' adresine gönderdiğimiz doğrulama bağlantısına tıkla. E-postayı bulamazsan spam klasörünü kontrol et.');
+      }
     }
 
     async function handleForgotPassword() {
@@ -1614,14 +1623,19 @@
         b.set(db.collection('handles').doc(h), { uid: cred.user.uid });
         b.set(db.collection('users').doc(cred.user.uid), nu);
         await b.commit();
-        auth.languageCode = 'tr';
-        await cred.user.sendEmailVerification();
       } catch (e) {
         await db.collection('handles').doc(h).delete().catch(() => {});
         await db.collection('users').doc(cred.user.uid).delete().catch(() => {});
         await cred.user.delete().catch(() => {});
         pendingVerificationUid = null;
         throw e;
+      }
+      try {
+        auth.languageCode = 'tr';
+        await cred.user.sendEmailVerification();
+      } catch (mailErr) {
+        console.error('Taşıma sonrası doğrulama e-postası gönderilemedi:', mailErr);
+        alert('Hesabın taşındı ancak e-posta gönderimi teyit edilemedi. Hesap silinmedi; giriş ekranından tekrar giriş yapıp yeni doğrulama bağlantısı iste.\n\n' + authErrorText(mailErr));
       }
       try { await db.collection('users').doc(email).delete(); } catch (e) {} // şifreli eski belge silinir
       let skipped = false;
