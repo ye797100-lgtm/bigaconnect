@@ -1037,7 +1037,7 @@
         } catch (e) { console.error(e); }
       }
       if (!u) { try { u = await ghostProfile(raw, t, legacy, hint); } catch (e) { console.error(e); } }
-      if (!u && hint) u = { ghost: true, handle: t, postHandles: ['@' + raw, '@' + t], name: hint.name || t, avatarUrl: hint.avatarUrl || '', bannerUrl: '', dept: '', classNum: '', privacy: 'public', following: [], followers: [], bio: 'Bu kullanıcı henüz hesabını yeni sisteme taşımadı. Taşıyınca vızzlayabilir ve sohbet edebilirsin 🐝' };
+      if (!u && hint) u = { ghost: true, handle: t, postHandles: ['@' + raw, '@' + t], name: hint.name || t, avatarUrl: hint.avatarUrl || '', bannerUrl: '', dept: '', classNum: '', privacy: 'public', following: [], followers: [], bio: 'Bu kullanıcı henüz hesabını yeni sisteme taşımadı. Taşıyınca vızzlayabilir ve sohbet edebilirsin.' };
       if (!u) return alert("Kullanıcı bulunamadı!");
       try { openOtherProfile(u); } catch (e) { console.error(e); alert("Profil açılamadı: " + (e.code || e.message)); }
     }
@@ -1313,7 +1313,7 @@
         const newUser = {
           uid: cred.user.uid, name, handle, dept, classNum, privacy,
           avatarUrl: '', bannerUrl: '',
-          bio: 'Biga kampüsünde vızıldamaya hazır! 🐝', joinedAt: Date.now(),
+          bio: 'Biga kampüsünde vızıldamaya hazır.', joinedAt: Date.now(),
           following: [], buzzes: [], bookmarks: [], notifications: []
         };
         const batch = db.batch();
@@ -2268,7 +2268,7 @@
       const src = legacy || {};
       return { ghost: true, handle: t, postHandles: vars, name: src.name || (latest && latest.name) || t, avatarUrl: src.avatarUrl || (latest && latest.avatarUrl) || '',
         bannerUrl: src.bannerUrl || '', dept: src.dept || '', classNum: src.classNum || '', privacy: 'public', following: [], followers: [],
-        bio: 'Bu kullanıcı henüz hesabını yeni sisteme taşımadı. Taşıyınca vızzlayabilir ve sohbet edebilirsin 🐝' };
+        bio: 'Bu kullanıcı henüz hesabını yeni sisteme taşımadı. Taşıyınca vızzlayabilir ve sohbet edebilirsin.' };
     }
     console.log('BigaConnect v7');
 
@@ -2417,7 +2417,7 @@
         if (snap.docs.length < 15) nwDone = true;
         if (nwDone) {
           sent.innerText = list.children.length ? 'Hepsi bu kadar.' : '';
-          if (!list.children.length) list.innerHTML = '<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-dashed border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Son 7 günde yeni katılan olmadı. Arkadaşlarını BigaConnect\'e davet et! 🐝</div>';
+          if (!list.children.length) list.innerHTML = '<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-dashed border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Son 7 günde yeni katılan olmadı. Arkadaşlarını BigaConnect\'e davet et!</div>';
         } else sent.innerText = '';
       } catch (e) { sent.innerText = 'Yüklenemedi: ' + (e.code || e.message); }
       finally {
