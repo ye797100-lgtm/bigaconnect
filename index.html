@@ -1461,6 +1461,8 @@
         profileCreated = true;
         await db.collection('handles').doc(handle).set({ uid: cred.user.uid });
         handleCreated = true;
+        // Firebase doğrulama e-postasını Türkçe yerelleştir.
+        auth.languageCode = 'tr';
         await cred.user.sendEmailVerification();
 
       } catch (err) {
