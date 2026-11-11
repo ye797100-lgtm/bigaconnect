@@ -889,6 +889,7 @@
     }
 
     let isLoggedIn = false;
+    let pendingVerificationUid = null;
     let currentUserData = null;
     let viewingUserData = null; // Ziyaret edilen başka bir kullanıcının verisi
     let selectedPostImageBase64 = "";
@@ -917,7 +918,17 @@
           updateLoginState(false);
           return;
         }
+        // Kayıt/giriş akışı doğrulamayı kendisi tamamlıyor; oturumu erken açma.
+        if (pendingVerificationUid === u.uid) return;
         try {
+          await u.reload();
+          if (stateVersion !== authStateVersion || !auth.currentUser || auth.currentUser.uid !== u.uid) return;
+          if (!u.emailVerified) {
+            await auth.signOut();
+            updateLoginState(false);
+            alert('BigaConnect’e girmek için e-posta adresini doğrulamalısın. Gelen kutuna gönderdiğimiz bağlantıya tıkla.');
+            return;
+          }
           const doc = await db.collection('users').doc(u.uid).get();
           // Eski bir kullanıcı yükleme isteği, çıkıştan veya hesap değişiminden sonra
           // arayüzü yeniden giriş yapılmış gibi gösteremez.
@@ -1433,7 +1444,8 @@
       try {
         if ((await db.collection('handles').doc(handle).get()).exists) return alert("Bu kullanıcı adı alınmış!");
         cred = await auth.createUserWithEmailAndPassword(email, password);
-        cred.user.sendEmailVerification().catch(() => {});
+        pendingVerificationUid = cred.user.uid;
+        await cred.user.sendEmailVerification();
         const newUser = {
           uid: cred.user.uid, name, handle, dept, classNum, privacy,
           avatarUrl: '', bannerUrl: '',
@@ -1444,9 +1456,13 @@
         batch.set(db.collection('handles').doc(handle), { uid: cred.user.uid });
         batch.set(db.collection('users').doc(cred.user.uid), newUser);
         await batch.commit();
-        updateLoginState(true, newUser);
+        pendingVerificationUid = null;
+        await auth.signOut();
+        updateLoginState(false);
         closeAuthModal();
+        alert('Kayıt oluşturuldu. BigaConnect’e girebilmek için ' + email + ' adresine gönderdiğimiz doğrulama bağlantısına tıkla. E-postayı bulamazsan spam klasörünü kontrol et.');
       } catch (err) {
+        pendingVerificationUid = null;
         if (cred) await cred.user.delete().catch(() => {});
         alert(authErrorText(err));
       }
@@ -1463,15 +1479,29 @@
       e.preventDefault();
       const email = document.getElementById('loginIdentifier').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value;
+      let loginUid = null;
       try {
         const cred = await auth.signInWithEmailAndPassword(email, password);
+        loginUid = cred.user.uid;
+        pendingVerificationUid = loginUid;
+        await cred.user.reload();
+        if (!cred.user.emailVerified) {
+          try { await cred.user.sendEmailVerification(); } catch (mailErr) { console.warn('Doğrulama e-postası yeniden gönderilemedi:', mailErr); }
+          pendingVerificationUid = null;
+          await auth.signOut();
+          return alert('Bu e-posta henüz doğrulanmamış. Doğrulama bağlantısını yeniden gönderdik; gelen kutunu ve spam klasörünü kontrol et. Doğrulamadan giriş yapılamaz.');
+        }
         const doc = await db.collection('users').doc(cred.user.uid).get();
-        if (!doc.exists) { await auth.signOut(); return alert("Bu hesabın profili bulunamadı, lütfen yeniden kaydol."); }
+        if (!doc.exists) { pendingVerificationUid = null; await auth.signOut(); return alert("Bu hesabın profili bulunamadı, lütfen yeniden kaydol."); }
         const user = doc.data();
         ['following', 'buzzes', 'bookmarks', 'notifications'].forEach(k => { if (!user[k]) user[k] = []; });
+        pendingVerificationUid = null;
         updateLoginState(true, user);
         closeAuthModal();
       } catch (err) {
+        pendingVerificationUid = null;
+        if (loginUid && auth.currentUser && auth.currentUser.uid === loginUid) await auth.signOut().catch(() => {});
+
         if (['auth/user-not-found', 'auth/invalid-credential', 'auth/wrong-password'].includes(err.code)) {
           try { if (await tryClaimLegacy(email, password)) return; } catch (e2) { return alert(authErrorText(e2)); }
         }
@@ -1494,8 +1524,10 @@
       let h = base, n = 1;
       while ((await db.collection('handles').doc(h).get()).exists) h = base.slice(0, 16) + '_' + (n++);
       const cred = await auth.createUserWithEmailAndPassword(email, authPw);
+      pendingVerificationUid = cred.user.uid;
       let nu;
       try {
+        await cred.user.sendEmailVerification();
         nu = {
           uid: cred.user.uid, joinedAt: 0, name: L.name || h, handle: h, dept: L.dept || '', classNum: L.classNum || '',
           privacy: L.privacy || 'public', avatarUrl: L.avatarUrl || '', bannerUrl: L.bannerUrl || '', bio: L.bio || '',
@@ -1518,9 +1550,11 @@
           await wb.commit();
         } else skipped = true;
       } catch (e) { skipped = true; }
-      updateLoginState(true, nu);
+      pendingVerificationUid = null;
+      await auth.signOut();
+      updateLoginState(false);
       closeAuthModal();
-      alert("Eski hesabın yeni sisteme taşındı." + (skipped ? "\n(Kullanıcı adın yeni kurallara uymadığı için eski gönderilerin sahipliği taşınamadı.)" : ""));
+      alert("Eski hesabın yeni sisteme taşındı. Giriş yapmadan önce " + email + " adresine gönderdiğimiz doğrulama bağlantısına tıklamalısın." + (skipped ? "\n(Kullanıcı adın yeni kurallara uymadığı için eski gönderilerin sahipliği taşınamadı.)" : ""));
       return true;
     }
 
