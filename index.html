@@ -1502,10 +1502,20 @@
         await cred.user.reload();
         if (cred.user.emailVerified) await cred.user.getIdToken(true);
         if (!cred.user.emailVerified) {
-          try { await cred.user.sendEmailVerification(); } catch (mailErr) { console.warn('Doğrulama e-postası yeniden gönderilemedi:', mailErr); }
+          let resendError = null;
+          try {
+            auth.languageCode = 'tr';
+            await cred.user.sendEmailVerification();
+          } catch (mailErr) {
+            resendError = mailErr;
+            console.error('Doğrulama e-postası yeniden gönderilemedi:', mailErr);
+          }
           pendingVerificationUid = null;
           await auth.signOut();
-          return alert('Bu e-posta henüz doğrulanmamış. Doğrulama bağlantısını yeniden gönderdik; gelen kutunu ve spam klasörünü kontrol et. Doğrulamadan giriş yapılamaz.');
+          if (resendError) {
+            return alert('Bu e-posta henüz doğrulanmamış ve yeni doğrulama e-postası gönderilemedi.\n\n' + authErrorText(resendError) + '\n\nBir süre sonra tekrar giriş yaparak yeniden deneyebilirsin.');
+          }
+          return alert('Bu e-posta henüz doğrulanmamış. Yeni doğrulama bağlantısını gönderdik; gelen kutunu ve spam klasörünü kontrol et. Doğrulamadan giriş yapılamaz.');
         }
         const doc = await db.collection('users').doc(cred.user.uid).get();
         if (!doc.exists) { pendingVerificationUid = null; await auth.signOut(); return alert("Bu hesabın profili bulunamadı, lütfen yeniden kaydol."); }
@@ -1543,7 +1553,6 @@
       pendingVerificationUid = cred.user.uid;
       let nu;
       try {
-        await cred.user.sendEmailVerification();
         nu = {
           uid: cred.user.uid, joinedAt: 0, name: L.name || h, handle: h, dept: L.dept || '', classNum: L.classNum || '',
           privacy: L.privacy || 'public', avatarUrl: L.avatarUrl || '', bannerUrl: L.bannerUrl || '', bio: L.bio || '',
@@ -1554,7 +1563,15 @@
         b.set(db.collection('handles').doc(h), { uid: cred.user.uid });
         b.set(db.collection('users').doc(cred.user.uid), nu);
         await b.commit();
-      } catch (e) { await cred.user.delete().catch(() => {}); throw e; }
+        auth.languageCode = 'tr';
+        await cred.user.sendEmailVerification();
+      } catch (e) {
+        await db.collection('handles').doc(h).delete().catch(() => {});
+        await db.collection('users').doc(cred.user.uid).delete().catch(() => {});
+        await cred.user.delete().catch(() => {});
+        pendingVerificationUid = null;
+        throw e;
+      }
       try { await db.collection('users').doc(email).delete(); } catch (e) {} // şifreli eski belge silinir
       let skipped = false;
       try {
