@@ -834,9 +834,9 @@
 
     // --- Güvenlik yardımcıları (XSS önlemi) ---
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const safeH = h => String(h || '').replace('@', '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const safeH = h => String(h || '').trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
     const safeId = x => String(x || '').replace(/[^\w-]/g, '');
-    const safeImg = u => /^(data:image\/|https:\/\/)/.test(u || '') ? esc(u) : '';
+    const safeImg = u => /^(data:image\/(?:jpeg|png|webp|gif);base64,|https:\/\/)/i.test(u || '') ? esc(u) : '';
 
     function timeAgo(ms, fb) {
       if (!ms) return fb || 'Şimdi';
@@ -1177,7 +1177,8 @@
       try {
         const target = '@' + safeH(userData.handle);
         const snap = await db.collection('users').where('following', 'array-contains', target).limit(500).get();
-        const found = new Set(canonicalFollowList(userData.followers));
+        // Tek doğruluk kaynağı takip eden hesapların following alanıdır.
+        const found = new Set();
         snap.forEach(d => { const u = d.data(); if (u.handle) found.add('@' + safeH(u.handle)); });
         if (requestId !== profileStatsRequest) return;
         if (followersEl) followersEl.textContent = found.size;
@@ -1218,16 +1219,7 @@
           const target = '@' + safeH(profile.handle);
           const snap = await db.collection('users').where('following', 'array-contains', target).limit(500).get();
           snap.forEach(d => { const u = d.data(); if (u.uid && u.handle) users.set(safeH(u.handle), u); });
-          for (const h of canonicalFollowList(profile.followers)) {
-            if (users.has(safeH(h))) continue;
-            try {
-              const hd = await db.collection('handles').doc(safeH(h)).get();
-              if (hd.exists) {
-                const ud = await db.collection('users').doc(hd.data().uid).get();
-                if (ud.exists && ud.data().handle) users.set(safeH(ud.data().handle), ud.data());
-              }
-            } catch (_) {}
-          }
+          // Eski followers dizisi takipten çıkanları da tutabiliyordu; sorgu güncel listeyi verir.
         } else {
           const handles = canonicalFollowList(profile.following).slice(0, 200);
           const resolved = await Promise.all(handles.map(async h => {
@@ -1808,31 +1800,36 @@
       }
     }
 
+    let feedLoadVersion = 0;
     async function loadPostsFromCloud() {
       const timeline = document.getElementById('timeline');
       if (!timeline) return;
-
+      const requestVersion = ++feedLoadVersion;
+      timeline.setAttribute('aria-busy', 'true');
       try {
         const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').limit(50).get();
-        if (snapshot.empty) {
-          timeline.innerHTML = `
-            <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
-              <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-sm"></i>
-              <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
-            </div>
-          `;
-          return;
-        }
-
+        if (requestVersion !== feedLoadVersion) return;
         timeline.innerHTML = '';
+        let visibleCount = 0;
         snapshot.forEach(doc => {
           const p = { ...doc.data(), id: doc.id };
           if (!canSeePost(p) || !feedAllows(p)) return;
           appendPostDOMToContainer(timeline, p);
+          visibleCount++;
         });
+        if (!visibleCount) timeline.innerHTML = `
+          <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+            <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-sm"></i>
+            <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz gösterilecek vızıltı yok.</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Yeni paylaşımlar burada görünecek.</p>
+          </div>`;
       } catch (e) {
-        console.error("Gönderiler yüklenemedi:", e);
+        if (requestVersion === feedLoadVersion) {
+          console.error("Gönderiler yüklenemedi:", e);
+          timeline.innerHTML = '<p class="text-center text-sm text-red-500 py-8">Gönderiler yüklenemedi. Bağlantını kontrol edip yenile.</p>';
+        }
+      } finally {
+        if (requestVersion === feedLoadVersion) timeline.removeAttribute('aria-busy');
       }
     }
 
@@ -2107,7 +2104,7 @@
         container.innerHTML = '';
         snapshot.forEach(doc => {
           const p = { ...doc.data(), id: doc.id };
-          appendPostDOMToContainer(container, p);
+          if (canSeePost(p)) appendPostDOMToContainer(container, p);
         });
       } catch (e) {
         container.innerHTML = `<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-yellow-200 dark:border-gray-700 text-center text-xs text-gray-400">Henüz paylaştığın bir vızıldı yok.</div>`;
@@ -2132,7 +2129,11 @@
       try {
         const snap = await db.collection('posts').orderBy('createdAt', 'desc').limit(100).get();
         const items = [];
-        snap.forEach(d => { const p = { ...d.data(), id: d.id }; (Array.isArray(p.replies) ? p.replies : []).filter(r => '@' + safeH(r.handle) === h).forEach(r => items.push({ p, r })); });
+        snap.forEach(d => {
+          const p = { ...d.data(), id: d.id };
+          if (!canSeePost(p)) return;
+          (Array.isArray(p.replies) ? p.replies : []).filter(r => '@' + safeH(r.handle) === h).forEach(r => items.push({ p, r }));
+        });
         if (!items.length) { c.innerHTML = emptyBox('Henüz yanıt yok.'); return; }
         items.sort((a, b) => (b.r.ts || 0) - (a.r.ts || 0));
         c.innerHTML = '';
@@ -2157,15 +2158,22 @@
         const items = [], me = safeH(u.handle);
         const snap = await db.collection('posts').where('handle', 'in', handlesFor(u)).get();
         snap.forEach(d => {
-          const p = d.data(), t = p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : 0;
+          const p = d.data();
+          if (!canSeePost(p)) return;
+          const t = p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : 0;
           const im = safeImg(p.imageUrl), vd = safeVid(p.videoUrl);
-          if (im) items.push({ k: 'img', src: im, t }); if (vd) items.push({ k: 'vid', src: vd, t });
+          if (im) items.push({ k: 'img', src: im, t });
+          if (vd) items.push({ k: 'vid', src: vd, t });
         });
         const all = await db.collection('posts').orderBy('createdAt', 'desc').limit(100).get();
-        all.forEach(d => (Array.isArray(d.data().replies) ? d.data().replies : []).forEach(r => {
-          const im = r && safeH(r.handle) === me ? safeImg(r.imageUrl) : '';
-          if (im) items.push({ k: 'img', src: im, t: r.ts || 0 });
-        }));
+        all.forEach(d => {
+          const p = d.data();
+          if (!canSeePost(p)) return;
+          (Array.isArray(p.replies) ? p.replies : []).forEach(r => {
+            const im = r && safeH(r.handle) === me ? safeImg(r.imageUrl) : '';
+            if (im) items.push({ k: 'img', src: im, t: r.ts || 0 });
+          });
+        });
         if (!items.length) { c.innerHTML = emptyBox('Henüz fotoğraf veya video yok.'); return; }
         items.sort((a, b) => b.t - a.t);
         c.innerHTML = items.map(i => `<div class="aspect-square rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700 bg-black/5">${i.k === 'vid'
