@@ -928,7 +928,17 @@
             verifyButton.textContent = 'Doğrulanıyor…';
             try {
               await auth.applyActionCode(actionCode);
-              message.textContent = 'E-posta adresin başarıyla doğrulandı. Artık BigaConnect’e giriş yapabilirsin.';
+              // Kayıt yapılan aynı tarayıcıdaki Firebase oturumu korunmuşsa,
+              // doğrulama sonrası uygulamayı yeniden aç; Auth dinleyicisi profili
+              // yükleyip kullanıcıyı otomatik olarak içeri alır.
+              if (auth.currentUser) {
+                await auth.currentUser.reload();
+                if (auth.currentUser.emailVerified) {
+                  window.location.replace(window.location.pathname);
+                  return;
+                }
+              }
+              message.textContent = 'E-posta adresin başarıyla doğrulandı. Otomatik giriş için kayıt yaptığın cihaz ve tarayıcıdaki BigaConnect oturumunu aç.';
               verifyButton.style.display = 'none';
               homeLink.style.display = 'inline-block';
               window.history.replaceState({}, document.title, window.location.pathname);
@@ -1535,14 +1545,13 @@
         verificationMailError = mailErr;
         console.error('Doğrulama e-postası gönderilemedi:', mailErr);
       }
-      pendingVerificationUid = null;
-      await auth.signOut().catch(() => {});
-      updateLoginState(false);
+      // Doğrulama tamamlanana kadar bu cihazdaki Firebase oturumunu koru.
+      // E-posta bağlantısı aynı tarayıcıda açıldığında doğrulama sonrası otomatik giriş yapılır.
       closeAuthModal();
       if (verificationMailError) {
-        alert('Hesabın oluşturuldu ancak e-posta gönderimi teyit edilemedi. Hesabın silinmedi. Giriş ekranından tekrar giriş yapıp yeni doğrulama bağlantısı iste.\n\n' + authErrorText(verificationMailError));
+        alert('Hesabın oluşturuldu ancak e-posta gönderimi teyit edilemedi. Oturumun bu cihazda açık tutuldu. Biraz sonra giriş ekranından tekrar deneyerek doğrulama bağlantısı iste.\n\n' + authErrorText(verificationMailError));
       } else {
-        alert('Kayıt oluşturuldu. BigaConnect’e girebilmek için ' + email + ' adresine gönderdiğimiz doğrulama bağlantısına tıkla. E-postayı bulamazsan spam klasörünü kontrol et.');
+        alert('Kayıt oluşturuldu. ' + email + ' adresine gönderdiğimiz doğrulama bağlantısını bu cihazdaki tarayıcıda aç. Doğrulama tamamlanınca BigaConnect hesabın otomatik açılacak. E-postayı bulamazsan spam klasörünü kontrol et.');
       }
     }
 
@@ -1579,11 +1588,11 @@
               console.error('Doğrulama e-postası yeniden gönderilemedi:', mailErr);
             }
           }
-          pendingVerificationUid = null;
-          await auth.signOut();
-          if (resendError) return alert('Yeni doğrulama e-postası gönderilemedi.\\n\\n' + authErrorText(resendError));
-          if (shouldResend) return alert('Yeni doğrulama bağlantısını gönderdik. Yalnızca en son gelen e-postadaki bağlantıyı aç.');
-          return alert('Giriş yapılmadı. Gelen kutundaki en son doğrulama e-postasını aç. Bağlantı yoksa tekrar giriş yapıp yeni bağlantı isteyebilirsin.');
+          // Oturumu kapatma: doğrulama bağlantısı aynı tarayıcıda açılınca
+          // sayfa yeniden yüklenir ve Auth dinleyicisi doğrulanmış profili açar.
+          if (resendError) return alert('Yeni doğrulama e-postası gönderilemedi; bu cihazdaki oturumun açık kaldı.\\n\\n' + authErrorText(resendError));
+          if (shouldResend) return alert('Yeni doğrulama bağlantısını gönderdik. Bu cihazdaki tarayıcıda aç; doğrulama sonrası otomatik giriş yapılacak.');
+          return alert('E-posta adresin henüz doğrulanmamış. Gelen kutundaki doğrulama bağlantısını bu cihazdaki tarayıcıda aç; doğrulama sonrası otomatik giriş yapılacak.');
         }
         const doc = await db.collection('users').doc(cred.user.uid).get();
         if (!doc.exists) { pendingVerificationUid = null; await auth.signOut(); return alert("Bu hesabın profili bulunamadı, lütfen yeniden kaydol."); }
