@@ -1046,7 +1046,7 @@
       renderProfileViewBase(userData);
       const b = document.getElementById('profileBuzzBtn');
       const fb = document.getElementById('profileExternalFollowBtn');
-      if (fb && userData && currentUserData && (currentUserData.requested || []).includes('@' + safeH(userData.handle))) fb.innerText = 'İstek gönderildi';
+      if (fb && userData && currentUserData && canonicalFollowList(currentUserData.requested).includes('@' + safeH(userData.handle))) fb.innerText = 'İstek gönderildi';
       if (b) b.classList.toggle('hidden', !(isLoggedIn && currentUserData && userData && userData.uid && userData.uid !== currentUserData.uid && !userData.ghost && !recentBuzz(userData)));
     }
 
@@ -1703,7 +1703,7 @@
             <p class="text-xs sm:text-sm text-gray-800 dark:text-gray-100 font-medium">${esc(n.text)}</p>
             <span class="text-[10px] text-gray-400 mt-1 block">${timeAgo(n.ts, n.time)}</span>
             ${n.type === 'followreq' && n.from ? `<button onclick="resolveFollowReq('${safeH(n.from)}', ${n.ts || 0}, true)" class="mt-2 mr-1 px-3 py-1 bg-green-500 hover:bg-green-600 text-white font-extrabold rounded-lg text-[11px]">Onayla</button><button onclick="resolveFollowReq('${safeH(n.from)}', ${n.ts || 0}, false)" class="mt-2 mr-1 px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 font-extrabold rounded-lg text-[11px]">Reddet</button>` : ''}
-            ${n.type === 'follow' && n.from ? (((currentUserData.following || []).includes('@' + safeH(n.from))) ? `<span class="mt-2 inline-block text-[11px] font-bold text-green-600">✓ Takip ediyorsun</span>` : `<button onclick="followBack('${safeH(n.from)}')" class="mt-2 px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-lg text-[11px] shadow-sm transition active:scale-95"><i class="fa-solid fa-user-plus"></i> Sen de takip et</button>`) : ''}
+            ${n.type === 'follow' && n.from ? ((canonicalFollowList(currentUserData.following).includes('@' + safeH(n.from))) ? `<span class="mt-2 inline-block text-[11px] font-bold text-green-600">✓ Takip ediyorsun</span>` : `<button onclick="followBack('${safeH(n.from)}')" class="mt-2 px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-lg text-[11px] shadow-sm transition active:scale-95"><i class="fa-solid fa-user-plus"></i> Sen de takip et</button>`) : ''}
             ${n.from && n.type !== 'follow' && n.type !== 'followreq' ? `<button onclick="startChatWith('${safeH(n.from)}')" class="mt-2 px-3 py-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-extrabold rounded-lg text-[11px] shadow-sm transition active:scale-95"><i class="fa-regular fa-comments"></i> Sohbet başlat</button>` : ''}
           </div>
         `;
