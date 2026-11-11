@@ -2390,13 +2390,29 @@
       }
     }
     async function resolveFollowReq(h, ts, ok) {
-      const me = currentUserData, t = '@' + h;
+      const me = currentUserData, cleanFrom = safeH(h), t = '@' + cleanFrom;
+      if (!me || !me.uid || !cleanFrom) return;
       try {
         if (ok) {
+          // Eski/bekleyen bildirim, gönderen isteğini iptal ettikten sonra onaylanamasın.
+          const handleDoc = await db.collection('handles').doc(cleanFrom).get();
+          const requesterUid = handleDoc.exists && handleDoc.data().uid;
+          const requesterDoc = requesterUid ? await db.collection('users').doc(requesterUid).get() : null;
+          const stillRequested = requesterDoc && requesterDoc.exists &&
+            canonicalFollowList(requesterDoc.data().requested).includes('@' + safeH(me.handle));
+          if (!stillRequested) {
+            me.notifications = (me.notifications || []).filter(n =>
+              !(n.type === 'followreq' && safeH(n.from) === cleanFrom && (n.ts || 0) === ts));
+            await db.collection('users').doc(me.uid).update({ notifications: me.notifications });
+            loadNotifications();
+            alert('Bu takip isteği artık geçerli değil; onaylanmadı.');
+            return;
+          }
           me.followers = Array.from(new Set([...(me.followers || []), t]));
-          await notifyUser(h, `${me.name} takip isteğini onayladı.`, 'followok');
+          await notifyUser(cleanFrom, `${me.name} takip isteğini onayladı.`, 'followok');
         }
-        me.notifications = (me.notifications || []).filter(n => !(n.type === 'followreq' && n.from === h && (n.ts || 0) === ts));
+        me.notifications = (me.notifications || []).filter(n =>
+          !(n.type === 'followreq' && safeH(n.from) === cleanFrom && (n.ts || 0) === ts));
         await db.collection('users').doc(me.uid).update({ followers: me.followers || [], notifications: me.notifications });
         loadNotifications();
       } catch (e) { alert("İşlem başarısız: " + e.message); }
