@@ -490,8 +490,8 @@
               </div>
 
               <div class="flex gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400 font-bold">
-                <span><b id="profileFollowingCount" class="text-gray-900 dark:text-white">0</b> Takip Edilen</span>
-                <span><b id="profileFollowersCount" class="text-gray-900 dark:text-white">0</b> Takipçi</span>
+                <button type="button" onclick="openFollowList('following')" class="hover:text-yellow-600 transition"><b id="profileFollowingCount" class="text-gray-900 dark:text-white">0</b> Takip Edilen</button>
+                <button type="button" onclick="openFollowList('followers')" class="hover:text-yellow-600 transition"><b id="profileFollowersCount" class="text-gray-900 dark:text-white">0</b> Takipçi</button>
               </div>
             </div>
 
@@ -884,8 +884,8 @@
     function canSeePost(p) {
       if (p.privacy !== 'private') return true;
       if (!isLoggedIn || !currentUserData) return false;
-      const h = safeH(p.handle), me = safeH(currentUserData.handle);
-      return h === me || (p.followerHandles || []).includes('@' + me);
+      const owner = safeH(p.handle), me = safeH(currentUserData.handle);
+      return owner === me || canonicalFollowList(currentUserData.following).includes('@' + owner);
     }
 
     let isLoggedIn = false;
@@ -1117,7 +1117,7 @@
 
         // Takip durumunu kontrol et
         const targetHandleClean = '@' + userData.handle.replace('@', '');
-        const isFollowing = currentUserData.following && currentUserData.following.includes(targetHandleClean);
+        const isFollowing = canonicalFollowList(currentUserData.following).includes('@' + safeH(targetHandleClean));
         if (isFollowing) {
           externalFollowBtn.innerText = "Takiptesin ✓";
           externalFollowBtn.className = "px-5 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-red-100 hover:text-red-700 text-gray-800 dark:text-white font-black rounded-full text-xs sm:text-sm shadow-sm transition";
@@ -1127,8 +1127,109 @@
         }
       }
 
+      const followingCount = document.getElementById('profileFollowingCount');
+      if (followingCount) followingCount.textContent = canonicalFollowList(userData.following).length;
+      refreshProfileFollowStats(userData);
       loadUserPosts(userData.handle);
       loadUserLikes();
+    }
+
+    let profileStatsRequest = 0;
+    function canonicalFollowList(items) {
+      return [...new Set((Array.isArray(items) ? items : []).map(x => '@' + safeH(x)).filter(x => x !== '@'))];
+    }
+    async function refreshProfileFollowStats(userData) {
+      const requestId = ++profileStatsRequest;
+      const followingEl = document.getElementById('profileFollowingCount');
+      const followersEl = document.getElementById('profileFollowersCount');
+      if (followingEl) followingEl.textContent = canonicalFollowList(userData && userData.following).length;
+      if (followersEl) followersEl.textContent = canonicalFollowList(userData && userData.followers).length;
+      if (!isLoggedIn || !userData || !userData.handle) return;
+      try {
+        const target = '@' + safeH(userData.handle);
+        const snap = await db.collection('users').where('following', 'array-contains', target).limit(500).get();
+        const found = new Set(canonicalFollowList(userData.followers));
+        snap.forEach(d => { const u = d.data(); if (u.handle) found.add('@' + safeH(u.handle)); });
+        if (requestId !== profileStatsRequest) return;
+        if (followersEl) followersEl.textContent = found.size;
+      } catch (e) { console.warn('Takipçi sayısı yenilenemedi:', e); }
+    }
+
+    function ensureFollowListModal() {
+      let modal = document.getElementById('followListModal');
+      if (modal) return modal;
+      modal = document.createElement('div');
+      modal.id = 'followListModal';
+      modal.className = 'hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm p-3 flex items-center justify-center';
+      modal.innerHTML = `<div class="w-full max-w-md max-h-[80vh] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-yellow-200 dark:border-gray-700 flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-yellow-100 dark:border-gray-700"><h3 id="followListTitle" class="font-black text-gray-900 dark:text-white">Takip listesi</h3><button type="button" onclick="closeFollowList()" class="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500" aria-label="Kapat"><i class="fa-solid fa-xmark"></i></button></div>
+        <div id="followListItems" class="p-3 space-y-1 overflow-y-auto"><p class="text-sm text-gray-400 text-center py-6">Yükleniyor...</p></div>
+      </div>`;
+      modal.addEventListener('click', e => { if (e.target === modal) closeFollowList(); });
+      document.body.appendChild(modal);
+      return modal;
+    }
+    function closeFollowList() {
+      const modal = document.getElementById('followListModal');
+      if (modal) modal.classList.add('hidden');
+    }
+    async function openFollowList(kind) {
+      if (!isLoggedIn) { openAuthModal('login'); return; }
+      const profile = viewingUserData || currentUserData;
+      if (!profile) return;
+      const modal = ensureFollowListModal();
+      const title = document.getElementById('followListTitle');
+      const list = document.getElementById('followListItems');
+      title.textContent = kind === 'followers' ? 'Takipçiler' : 'Takip Edilenler';
+      list.innerHTML = '<p class="text-sm text-gray-400 text-center py-6">Yükleniyor...</p>';
+      modal.classList.remove('hidden');
+      try {
+        const users = new Map();
+        if (kind === 'followers') {
+          const target = '@' + safeH(profile.handle);
+          const snap = await db.collection('users').where('following', 'array-contains', target).limit(500).get();
+          snap.forEach(d => { const u = d.data(); if (u.uid && u.handle) users.set(safeH(u.handle), u); });
+          for (const h of canonicalFollowList(profile.followers)) {
+            if (users.has(safeH(h))) continue;
+            try {
+              const hd = await db.collection('handles').doc(safeH(h)).get();
+              if (hd.exists) {
+                const ud = await db.collection('users').doc(hd.data().uid).get();
+                if (ud.exists && ud.data().handle) users.set(safeH(ud.data().handle), ud.data());
+              }
+            } catch (_) {}
+          }
+        } else {
+          const handles = canonicalFollowList(profile.following).slice(0, 200);
+          const resolved = await Promise.all(handles.map(async h => {
+            try {
+              const hd = await db.collection('handles').doc(safeH(h)).get();
+              if (!hd.exists) return null;
+              const ud = await db.collection('users').doc(hd.data().uid).get();
+              return ud.exists ? ud.data() : null;
+            } catch (_) { return null; }
+          }));
+          resolved.forEach(u => { if (u && u.uid && u.handle) users.set(safeH(u.handle), u); });
+        }
+        const items = [...users.values()].sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), 'tr'));
+        if (!items.length) {
+          list.innerHTML = '<p class="text-sm text-gray-400 text-center py-8">Bu liste henüz boş.</p>';
+          return;
+        }
+        list.innerHTML = '';
+        items.forEach(u => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-yellow-50 dark:hover:bg-gray-700 text-left transition';
+          const avatar = safeImg(u.avatarUrl);
+          button.innerHTML = `<div class="w-10 h-10 rounded-full overflow-hidden border border-yellow-200 shrink-0">${avatar ? `<img src="${avatar}" class="w-full h-full object-cover" alt="">` : defaultYellowAvatarSVG}</div><div class="min-w-0"><div class="font-bold text-sm text-gray-900 dark:text-white truncate">${esc(u.name || u.handle)}</div><div class="text-xs text-gray-400">@${safeH(u.handle)}</div></div>`;
+          button.addEventListener('click', () => { closeFollowList(); viewUserProfileByHandle(u.handle, u); });
+          list.appendChild(button);
+        });
+      } catch (e) {
+        console.error('Takip listesi yüklenemedi:', e);
+        list.innerHTML = '<p class="text-sm text-red-500 text-center py-6">Liste yüklenemedi. Firestore erişim kurallarını kontrol et.</p>';
+      }
     }
 
     function toggleFollowExternalProfile() { if (viewingUserData) return followAction(viewingUserData.handle); }
@@ -1752,49 +1853,39 @@
       try { await followActionInner(handle); } catch (e) { alert("Takip işlemi başarısız: " + e.message); }
     }
     async function followActionInner(handle) {
-      if (!isLoggedIn) return openAuthModal('login');
-      const t = '@' + safeH(handle);
-      const me = {
-        ...currentUserData,
-        following: [...(currentUserData.following || [])],
-        requested: [...(currentUserData.requested || [])]
-      };
+      if (!isLoggedIn || !currentUserData || !currentUserData.uid) return openAuthModal('login');
+      const clean = safeH(handle);
+      if (!clean) return;
+      if (clean === safeH(currentUserData.handle)) return;
+      const t = '@' + clean;
+      const ownSnap = await db.collection('users').doc(currentUserData.uid).get();
+      if (!ownSnap.exists) throw new Error('Kullanıcı kaydın bulunamadı.');
+      const me = { ...currentUserData, ...ownSnap.data() };
+      me.following = canonicalFollowList(me.following);
+      me.requested = canonicalFollowList(me.requested);
+      const hd = await db.collection('handles').doc(clean).get();
+      if (!hd.exists || !hd.data().uid) throw new Error('Bu kullanıcı bulunamadı.');
+      const targetSnap = await db.collection('users').doc(hd.data().uid).get();
+      if (!targetSnap.exists) throw new Error('Hedef kullanıcının profili bulunamadı.');
+      const target = targetSnap.data();
+      let notification = null;
       if (me.following.includes(t)) {
         me.following = me.following.filter(x => x !== t);
-        const hd = await db.collection('handles').doc(safeH(t)).get();
-        if (hd.exists) {
-          const targetRef = db.collection('users').doc(hd.data().uid);
-          await targetRef.update({ followers: FV.arrayRemove('@' + safeH(me.handle)) });
-          const posts = await db.collection('posts').where('handle', '==', t).get();
-          for (let i = 0; i < posts.docs.length; i += 400) {
-            const batch = db.batch();
-            posts.docs.slice(i, i + 400).forEach(d => batch.update(d.ref, { followerHandles: FV.arrayRemove('@' + safeH(me.handle)) }));
-            await batch.commit();
-          }
-        }
       } else if (me.requested.includes(t)) {
         me.requested = me.requested.filter(x => x !== t);
+      } else if (target.privacy === 'private') {
+        me.requested.push(t);
+        notification = { text: `${me.name} seni takip etmek istiyor.`, type: 'followreq' };
       } else {
-        let priv = false;
-        try {
-          const hd = await db.collection('handles').doc(safeH(t)).get();
-          if (hd.exists) {
-            const ud = await db.collection('users').doc(hd.data().uid).get();
-            priv = ud.exists && ud.data().privacy === 'private';
-          }
-        } catch (e) {}
-        if (priv) {
-          me.requested.push(t);
-          await notifyUser(t, `${me.name} seni takip etmek istiyor.`, 'followreq');
-        } else {
-          me.following.push(t);
-          await notifyUser(t, `${me.name} seni takip etmeye başladı.`, 'follow');
-        }
+        me.following.push(t);
+        notification = { text: `${me.name} seni takip etmeye başladı.`, type: 'follow' };
       }
       await saveUserToCloud(me);
       updateLoginState(true, me);
+      if (notification) await notifyUser(t, notification.text, notification.type, target.uid);
       if (viewingUserData) renderProfileView(viewingUserData);
       loadPostsFromCloud();
+      refreshProfileFollowStats(viewingUserData || currentUserData);
     }
     function toggleQuickFollow(h) { return followAction(h); }
 
@@ -1821,7 +1912,7 @@
 
       const cleanHandle = '@' + handle.replace('@', '');
       const isMe = isLoggedIn && currentUserData && ((p.uid && p.uid === currentUserData.uid) || safeH(currentUserData.handle) === safeH(handle));
-      const isFollowing = isLoggedIn && currentUserData && currentUserData.following && currentUserData.following.includes(cleanHandle);
+      const isFollowing = isLoggedIn && currentUserData && canonicalFollowList(currentUserData.following).includes('@' + safeH(cleanHandle));
 
       const isLiked = isLoggedIn && currentUserData && likes.some(l => safeH(l) === safeH(currentUserData.handle));
       const isBookmarked = isLoggedIn && currentUserData && currentUserData.bookmarks && currentUserData.bookmarks.includes(postId);
@@ -1993,7 +2084,7 @@
     function canViewProfile(u) {
       if (!u || u.privacy !== 'private') return true;
       if (!currentUserData) return false;
-      return safeH(u.handle) === safeH(currentUserData.handle) || (u.followers || []).includes('@' + safeH(currentUserData.handle));
+      return safeH(u.handle) === safeH(currentUserData.handle) || canonicalFollowList(currentUserData.following).includes('@' + safeH(u.handle));
     }
 
     async function loadUserReplies() {
@@ -2111,7 +2202,7 @@
       (me.notifications || []).forEach(n => {
         if (n.type === 'followok' && n.from) {
           const t = '@' + safeH(n.from);
-          if (me.requested.includes(t)) { me.requested = me.requested.filter(x => x !== t); if (!me.following.includes(t)) me.following.push(t); ch = true; }
+          if (canonicalFollowList(me.requested).includes(t)) { me.requested = canonicalFollowList(me.requested).filter(x => x !== t); if (!canonicalFollowList(me.following).includes(t)) me.following = [...canonicalFollowList(me.following), t]; ch = true; }
         }
       });
       if (ch) {
@@ -2124,8 +2215,6 @@
       try {
         if (ok) {
           me.followers = Array.from(new Set([...(me.followers || []), t]));
-          const snap = await db.collection('posts').where('handle', '==', '@' + safeH(me.handle)).get();
-          const batch = db.batch(); snap.forEach(d => batch.update(d.ref, { followerHandles: FV.arrayUnion(t) })); await batch.commit();
           await notifyUser(h, `${me.name} takip isteğini onayladı.`, 'followok');
         }
         me.notifications = (me.notifications || []).filter(n => !(n.type === 'followreq' && n.from === h && (n.ts || 0) === ts));
@@ -2247,7 +2336,7 @@
     function feedAllows(p) {
       if (feedMode !== 'following' || !isLoggedIn || !currentUserData) return true;
       const h = '@' + safeH(p.handle);
-      return h === '@' + safeH(currentUserData.handle) || (currentUserData.following || []).includes(h);
+      return h === '@' + safeH(currentUserData.handle) || canonicalFollowList(currentUserData.following).includes(h);
     }
     function paintFeedBar() {
       document.querySelectorAll('#feedBar button').forEach(b => {
