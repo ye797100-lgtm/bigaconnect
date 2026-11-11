@@ -829,6 +829,10 @@
     }
     const db = firebase.firestore();
     const auth = firebase.auth();
+    // Firebase oturumu cihaz başına saklanır; giriş/kayıt başlamadan kalıcılığı hazırla.
+    // Bir cihazdaki giriş diğer cihazın oturumunu geçersiz kılmaz.
+    const authPersistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .catch(e => { console.warn('Oturum kalıcılığı ayarlanamadı:', e); return false; });
     try { firebase.analytics(); } catch (e) {}
     const FV = firebase.firestore.FieldValue;
 
@@ -955,9 +959,7 @@
       }
 
       localStorage.removeItem('biga_current_user'); // eski sürümden kalan (şifre içeren) veriyi temizle
-      // Oturum kalıcılığını açıkça cihaz bazında etkinleştir.
-      try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); }
-      catch (e) { console.warn('Oturum kalıcılığı ayarlanamadı:', e); }
+      // authPersistenceReady Firebase başlatılırken oluşturuldu; burada tekrar değiştirme.
 
       let authStateVersion = 0;
       auth.onAuthStateChanged(async (u) => {
@@ -1496,6 +1498,7 @@
       let profileCreated = false;
       let handleCreated = false;
       try {
+        await authPersistenceReady;
         if ((await db.collection('handles').doc(handle).get()).exists) return alert("Bu kullanıcı adı alınmış!");
         cred = await auth.createUserWithEmailAndPassword(email, password);
         pendingVerificationUid = cred.user.uid;
@@ -1556,6 +1559,9 @@
       const password = document.getElementById('loginPassword').value;
       let loginUid = null;
       try {
+        // Özellikle yeni cihaz/özel tarayıcı oturumlarında giriş, kalıcılık ayarı
+        // tamamlanmadan başlamasın.
+        await authPersistenceReady;
         const cred = await auth.signInWithEmailAndPassword(email, password);
         loginUid = cred.user.uid;
         pendingVerificationUid = loginUid;
@@ -1588,7 +1594,17 @@
         closeAuthModal();
       } catch (err) {
         pendingVerificationUid = null;
-        if (loginUid && auth.currentUser && auth.currentUser.uid === loginUid) await auth.signOut().catch(() => {});
+        // Firebase kimlik doğrulaması başarılı olduktan sonra Firestore profil
+        // okuması ağ/izin hatası verirse cihazdaki geçerli Auth oturumunu silme.
+        // Kullanıcı sayfayı yenileyerek profil yüklemesini yeniden deneyebilir.
+        const authError = !!(err && typeof err.code === 'string' && err.code.startsWith('auth/'));
+        if (loginUid && auth.currentUser && auth.currentUser.uid === loginUid && authError) {
+          await auth.signOut().catch(() => {});
+        } else if (loginUid && auth.currentUser && auth.currentUser.uid === loginUid) {
+          updateLoginState(false);
+          console.error('Kimlik doğrulandı ancak profil yüklenemedi:', err);
+          return alert('Giriş bilgilerin doğru ve Firebase oturumun açık. Ancak profil bilgilerin yüklenemedi. İnternet/veritabanı bağlantısını kontrol edip sayfayı yenile. Oturumun kapatılmadı.');
+        }
 
         if (['auth/user-not-found', 'auth/invalid-credential', 'auth/wrong-password'].includes(err.code)) {
           try { if (await tryClaimLegacy(email, password)) return; } catch (e2) { return alert(authErrorText(e2)); }
