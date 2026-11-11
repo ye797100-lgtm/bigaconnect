@@ -1442,31 +1442,43 @@
       if (password.length < 8) return alert("Şifren en az 8 karakter olmalı.");
 
       let cred = null;
+      let profileCreated = false;
+      let handleCreated = false;
       try {
         if ((await db.collection('handles').doc(handle).get()).exists) return alert("Bu kullanıcı adı alınmış!");
         cred = await auth.createUserWithEmailAndPassword(email, password);
         pendingVerificationUid = cred.user.uid;
-        await cred.user.sendEmailVerification();
         const newUser = {
           uid: cred.user.uid, name, handle, dept, classNum, privacy,
           avatarUrl: '', bannerUrl: '',
           bio: 'Biga kampüsünde vızıldamaya hazır.', joinedAt: Date.now(),
           following: [], buzzes: [], bookmarks: [], notifications: []
         };
-        const batch = db.batch();
-        batch.set(db.collection('handles').doc(handle), { uid: cred.user.uid });
-        batch.set(db.collection('users').doc(cred.user.uid), newUser);
-        await batch.commit();
-        pendingVerificationUid = null;
-        await auth.signOut();
-        updateLoginState(false);
-        closeAuthModal();
-        alert('Kayıt oluşturuldu. BigaConnect’e girebilmek için ' + email + ' adresine gönderdiğimiz doğrulama bağlantısına tıkla. E-postayı bulamazsan spam klasörünü kontrol et.');
+
+        // Önce Firestore kayıtlarını tamamla. E-posta daha sonra gönderilir;
+        // böylece başarısız kayıt işlemi geçersiz doğrulama bağlantısı üretmez.
+        await db.collection('users').doc(cred.user.uid).set(newUser);
+        profileCreated = true;
+        await db.collection('handles').doc(handle).set({ uid: cred.user.uid });
+        handleCreated = true;
+        await cred.user.sendEmailVerification();
+
       } catch (err) {
         pendingVerificationUid = null;
-        if (cred) await cred.user.delete().catch(() => {});
+        if (cred) {
+          if (handleCreated) await db.collection('handles').doc(handle).delete().catch(() => {});
+          if (profileCreated) await db.collection('users').doc(cred.user.uid).delete().catch(() => {});
+          await cred.user.delete().catch(() => {});
+        }
         alert(authErrorText(err));
+        return;
       }
+
+      pendingVerificationUid = null;
+      await auth.signOut().catch(() => {});
+      updateLoginState(false);
+      closeAuthModal();
+      alert('Kayıt oluşturuldu. BigaConnect’e girebilmek için ' + email + ' adresine gönderdiğimiz doğrulama bağlantısına tıkla. E-postayı bulamazsan spam klasörünü kontrol et.');
     }
 
     async function handleForgotPassword() {
