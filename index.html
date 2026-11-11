@@ -80,6 +80,135 @@
       }
       #memorialRibbon svg { width:22px; height:33px; }
     }
+  
+
+    /* MOBİL DÜZEN: daha ferah boşluklar, taşmayan kontroller ve dengeli profil */
+    @media (max-width: 767px) {
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { max-width: 100%; overflow-x: hidden; }
+      main { min-width: 0; width: 100%; padding: 12px !important; }
+      .page-content, #contentProfile, #profileLoggedInView,
+      #profileTabContentPosts, #profileTabContentReplies,
+      #profileTabContentMedia, #profileTabContentLikes {
+        min-width: 0;
+        max-width: 100%;
+      }
+      .page-content > *, #profileLoggedInView > * { min-width: 0; }
+      button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+      input, select, textarea { font-size: 16px !important; }
+
+      /* Üst bar ve sayfa kenarları */
+      main > div:first-child { gap: 8px; }
+      #pageTitle { font-size: 17px; line-height: 1.2; }
+      #userAvatarHeader { flex: 0 0 auto; }
+
+      /* Profil kartı */
+      #profileLoggedOutView { padding: 26px 18px !important; }
+      #profileLoggedOutView > div:last-child { width: 100%; flex-wrap: wrap; justify-content: center; }
+      #profileLoggedOutView > div:last-child button { min-height: 42px; flex: 1 1 120px; }
+
+      #profileLoggedInView > .bg-white {
+        border-width: 1px;
+        border-radius: 18px;
+      }
+      #profileBanner { height: 112px !important; }
+      #profileLoggedInView .px-5.pb-5 {
+        padding: 0 14px 16px !important;
+      }
+      #profileLoggedInView .px-5.pb-5 > .flex.justify-between.items-end {
+        align-items: flex-end;
+        flex-wrap: wrap;
+        row-gap: 12px;
+        margin-top: -38px !important;
+        margin-bottom: 14px !important;
+      }
+      #profileLoggedInView .px-5.pb-5 > .flex.justify-between.items-end > .relative {
+        flex: 0 0 auto;
+      }
+      #profileLoggedInView #profileAvatarInitials,
+      #profileLoggedInView #profileAvatarImg,
+      #profileLoggedInView .px-5.pb-5 > .flex.justify-between.items-end > .relative > div {
+        width: 82px !important;
+        height: 82px !important;
+      }
+      #profileLoggedInView .px-5.pb-5 > .flex.justify-between.items-end > .flex.items-center.gap-2 {
+        flex: 1 1 100%;
+        width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      #profileAccountTypeBadge { margin-right: auto; font-size: 10px; padding: 6px 9px; }
+      #profileEditBtn, #profileBuzzBtn, #profileExternalFollowBtn {
+        min-height: 40px;
+        padding: 9px 12px !important;
+        font-size: 11px !important;
+        white-space: nowrap;
+      }
+      #profileNameDisplay { font-size: 19px; line-height: 1.25; overflow-wrap: anywhere; }
+      #profileHandleDisplay { font-size: 12px; }
+      #profileDeptDisplay, #profileClassDisplay { overflow-wrap: anywhere; }
+      #profileLoggedInView .px-5.pb-5 .flex.flex-wrap.gap-2 > span {
+        max-width: 100%;
+        line-height: 1.35;
+      }
+      #profileBioDisplay { font-size: 13px !important; line-height: 1.55; overflow-wrap: anywhere; }
+      #profileLoggedInView .px-5.pb-5 > .flex.gap-4 {
+        gap: 18px;
+        flex-wrap: wrap;
+        font-size: 12px;
+      }
+
+      /* Profil sekmeleri: eşit genişlik, okunaklı ve tek satır */
+      #profileLoggedInView .border-t.border-yellow-200.flex.text-xs {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      #profileLoggedInView #profTabPosts,
+      #profileLoggedInView #profTabReplies,
+      #profileLoggedInView #profTabMedia,
+      #profileLoggedInView #profTabLikes {
+        min-width: 0;
+        min-height: 46px;
+        padding: 12px 2px !important;
+        font-size: 10px;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+      #userPostsContainer, #userRepliesContainer, #userLikesContainer { min-width: 0; }
+      #userMediaContainer { gap: 3px !important; }
+
+      /* Düzenleme penceresi ve form kontrolleri */
+      #profileModal { padding: 10px !important; align-items: center; }
+      #profileModal > div {
+        width: 100%;
+        max-width: 440px;
+        max-height: 88dvh;
+        overflow-y: auto;
+        padding: 20px 16px !important;
+        border-radius: 22px;
+      }
+      #profileModal form { gap: 14px; }
+      #profileModal input, #profileModal select, #profileModal textarea {
+        min-height: 44px;
+        padding: 11px 12px !important;
+      }
+      #profileModal form button[type="submit"] { min-height: 46px; }
+    }
+
+    @media (max-width: 380px) {
+      main { padding: 9px !important; }
+      #profileLoggedInView .px-5.pb-5 { padding-left: 11px !important; padding-right: 11px !important; }
+      #profileEditBtn, #profileBuzzBtn, #profileExternalFollowBtn { padding: 8px 9px !important; font-size: 10px !important; }
+      #profileLoggedInView #profTabPosts,
+      #profileLoggedInView #profTabReplies,
+      #profileLoggedInView #profTabMedia,
+      #profileLoggedInView #profTabLikes { font-size: 9.5px; }
+    }
+
   </style>
 </head>
 <body class="bg-yellow-50/30 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen transition-colors duration-200">
