@@ -1161,8 +1161,9 @@
       const profileInitials = document.getElementById('profileAvatarInitials');
       if (profileInitials) profileInitials.innerHTML = defaultYellowAvatarSVG;
 
-      if (userData.avatarUrl && userData.avatarUrl.trim() !== "") {
-        if (profileImg) { profileImg.src = userData.avatarUrl; profileImg.classList.remove('hidden'); }
+      const profileAvatarUrl = safeImg(userData.avatarUrl);
+      if (profileAvatarUrl) {
+        if (profileImg) { profileImg.src = profileAvatarUrl; profileImg.classList.remove('hidden'); }
         if (profileInitials) profileInitials.classList.add('hidden');
       } else {
         if (profileImg) { profileImg.src = ""; profileImg.classList.add('hidden'); }
@@ -1171,8 +1172,9 @@
 
       const bannerEl = document.getElementById('profileBanner');
       if (bannerEl) {
-        if (userData.bannerUrl && userData.bannerUrl.trim() !== "") {
-          bannerEl.style.backgroundImage = `url('${userData.bannerUrl}')`;
+        const profileBannerUrl = safeImg(userData.bannerUrl);
+        if (profileBannerUrl) {
+          bannerEl.style.backgroundImage = `url("${profileBannerUrl}")`;
           bannerEl.style.backgroundSize = 'cover';
           bannerEl.style.backgroundPosition = 'center';
         } else {
@@ -1890,6 +1892,14 @@
     }
 
     async function sendReply(postId, targetHandle) {
+      if (!isLoggedIn || !currentUserData || !currentUserData.uid) {
+        alert("Yanıt yazmak için giriş yapmalısın.");
+        openAuthModal('login');
+        return;
+      }
+      const cleanPostId = safeId(postId);
+      if (!cleanPostId) return;
+      postId = cleanPostId;
       const input = document.getElementById('reply-input-' + postId);
       if (!input) return;
       const text = input.value.trim().slice(0, 500);
