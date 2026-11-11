@@ -584,7 +584,7 @@
       <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-yellow-100 dark:border-gray-700 pb-2.5">
           <h3 class="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2"><i class="fa-solid fa-ranking-star text-yellow-500"></i> Haftanın Popüler Arıları</h3>
-          <span class="text-[10px] bg-yellow-400 text-gray-900 font-extrabold px-2 py-0.5 rounded-full shadow-sm">Top 3</span>
+          <span class="text-[10px] bg-yellow-400 text-gray-900 font-extrabold px-2 py-0.5 rounded-full shadow-sm">Top 5</span>
         </div>
         <p class="text-[11px] text-gray-400 leading-tight">Bu hafta kampüste en çok vızıldayan ve etkileşim alan öğrenciler!</p>
         <div class="bees-body space-y-1"><div class="pt-2 text-center py-6 bg-yellow-50/50 dark:bg-gray-700/30 rounded-xl border border-dashed border-yellow-200 dark:border-gray-600">
@@ -1283,11 +1283,13 @@
     }
 
     async function saveUserToCloud(userData) {
+      const { notifications, ...rest } = userData; // bildirimleri ezme (başkaları ekliyor)
       try {
-        const { notifications, ...rest } = userData; // bildirimleri ezme (başkaları ekliyor)
         await db.collection('users').doc(userData.uid).set(rest, { merge: true });
+        return true;
       } catch (e) {
         console.error("Bulut kayıt hatası:", e);
+        throw e;
       }
     }
 
@@ -1411,16 +1413,29 @@
 
     async function saveProfile(e) {
       e.preventDefault();
-      currentUserData.name = document.getElementById('editName').value.trim().slice(0, 40) || currentUserData.name;
-      currentUserData.dept = document.getElementById('editDept').value;
-      currentUserData.classNum = document.getElementById('editClass').value;
-      currentUserData.privacy = document.getElementById('editPrivacy').value;
-      currentUserData.bio = document.getElementById('editBio').value.slice(0, 200);
-
-      updateLoginState(true, currentUserData);
-      await saveUserToCloud(currentUserData);
-      if(!viewingUserData) renderProfileView(currentUserData);
-      closeProfileModal();
+      if (!isLoggedIn || !currentUserData) return;
+      const previous = { ...currentUserData };
+      const updated = {
+        ...currentUserData,
+        name: document.getElementById('editName').value.trim().slice(0, 40) || currentUserData.name,
+        dept: document.getElementById('editDept').value,
+        classNum: document.getElementById('editClass').value,
+        privacy: document.getElementById('editPrivacy').value,
+        bio: document.getElementById('editBio').value.slice(0, 200)
+      };
+      const submit = document.querySelector('#profileModal button[type="submit"]');
+      if (submit) { submit.disabled = true; submit.dataset.oldText = submit.innerText; submit.innerText = 'Kaydediliyor...'; }
+      try {
+        await saveUserToCloud(updated);
+        updateLoginState(true, updated);
+        if (!viewingUserData) renderProfileView(updated);
+        closeProfileModal();
+      } catch (err) {
+        updateLoginState(true, previous);
+        alert('Profil kaydedilemedi. İnternet bağlantını kontrol edip tekrar dene.\n' + (err.code || err.message));
+      } finally {
+        if (submit) { submit.disabled = false; submit.innerText = submit.dataset.oldText || 'Kaydet'; delete submit.dataset.oldText; }
+      }
     }
 
     async function toggleLikePostCore(postId) {
@@ -1506,14 +1521,16 @@
 
       try {
         const userHandle = '@' + activeUser.handle.replace('@', '');
-        const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').limit(100).get();
-        
-        let likedPosts = [];
+        const snapshot = await db.collection('posts').where('likes', 'array-contains', userHandle).get();
+        const likedPosts = [];
         snapshot.forEach(doc => {
           const p = { ...doc.data(), id: doc.id };
-          if (p.likes && p.likes.includes(userHandle)) {
-            likedPosts.push(p);
-          }
+          if (canSeePost(p)) likedPosts.push(p);
+        });
+        likedPosts.sort((a, b) => {
+          const at = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : Number(a.createdAt || 0);
+          const bt = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : Number(b.createdAt || 0);
+          return bt - at;
         });
 
         if (likedPosts.length === 0) {
@@ -1733,8 +1750,22 @@
       if (!isLoggedIn) return openAuthModal('login');
       const t = '@' + safeH(handle), me = currentUserData;
       me.following = me.following || []; me.requested = me.requested || [];
-      if (me.following.includes(t)) me.following = me.following.filter(x => x !== t);
-      else if (me.requested.includes(t)) me.requested = me.requested.filter(x => x !== t);
+      if (me.following.includes(t)) {
+        me.following = me.following.filter(x => x !== t);
+        try {
+          const hd = await db.collection('handles').doc(safeH(t)).get();
+          if (hd.exists) {
+            const targetRef = db.collection('users').doc(hd.data().uid);
+            const posts = await db.collection('posts').where('handle', '==', t).get();
+            const batch = db.batch();
+            batch.update(targetRef, { followers: FV.arrayRemove('@' + safeH(me.handle)) });
+            posts.forEach(d => batch.update(d.ref, { followerHandles: FV.arrayRemove('@' + safeH(me.handle)) }));
+            await batch.commit();
+          }
+        } catch (e) {
+          throw new Error('Takipten çıkıldı ancak karşı hesabın takipçi/gizli gönderi erişimi güncellenemedi: ' + (e.code || e.message));
+        }
+      } else if (me.requested.includes(t)) me.requested = me.requested.filter(x => x !== t);
       else {
         let priv = false;
         try {
@@ -1744,8 +1775,8 @@
         if (priv) { me.requested.push(t); await notifyUser(t, `${me.name} seni takip etmek istiyor.`, 'followreq'); }
         else { me.following.push(t); await notifyUser(t, `${me.name} seni takip etmeye başladı.`, 'follow'); }
       }
-      updateLoginState(true, me);
       await saveUserToCloud(me);
+      updateLoginState(true, me);
       if (viewingUserData) renderProfileView(viewingUserData);
       loadPostsFromCloud();
     }
@@ -2172,13 +2203,19 @@
     async function sendChatMessage(e) {
       e.preventDefault();
       const input = document.getElementById('chatInput'), text = input.value.trim().slice(0, 1000);
-      if (!text || !chatOpenId) return;
-      input.value = '';
+      if (!text || !chatOpenId || !currentUserData) return;
+      const conversationId = chatOpenId;
       try {
-        const ref = db.collection('chats').doc(chatOpenId), now = Date.now();
-        await ref.collection('messages').add({ from: currentUserData.uid, text, ts: now });
-        await ref.update({ last: text.slice(0, 60), lastTs: now, lastFrom: currentUserData.uid, ['readAt.' + currentUserData.uid]: now });
-      } catch (err) { alert("Mesaj gönderilemedi: " + err.message); }
+        const ref = db.collection('chats').doc(conversationId), now = Date.now();
+        const messageRef = ref.collection('messages').doc();
+        const batch = db.batch();
+        batch.set(messageRef, { from: currentUserData.uid, text, ts: now });
+        batch.update(ref, { last: text.slice(0, 60), lastTs: now, lastFrom: currentUserData.uid, ['readAt.' + currentUserData.uid]: now });
+        await batch.commit();
+        if (chatOpenId === conversationId && input.value.trim() === text) input.value = '';
+      } catch (err) {
+        alert("Mesaj gönderilemedi; yazdığın mesaj korunuyor. " + (err.code || err.message));
+      }
     }
 
     // Akış filtresi
@@ -2205,13 +2242,15 @@
     })();
 
     // Kullanıcı arama (Keşfet / Gündem): isim ve kullanıcı adı
-    let searchT;
+    let searchT, searchSeq = 0;
     function userSearch(q) {
       clearTimeout(searchT);
+      const seq = ++searchSeq;
       const out = document.getElementById('userSearchResults');
       q = String(q || '').trim();
       if (!out) return;
       if (!q) { out.innerHTML = ''; return; }
+      if (q.length < 2) { out.innerHTML = '<p class="text-xs text-gray-400 py-2">En az 2 karakter yaz.</p>'; return; }
       if (!isLoggedIn) { out.innerHTML = '<p class="text-xs text-gray-400 py-2">Aramak için giriş yapmalısın.</p>'; return; }
       searchT = setTimeout(async () => {
         try {
@@ -2221,6 +2260,7 @@
           const hq = safeH(q).toLowerCase();
           const handleQuery = users.orderBy('handle').startAt(hq).endAt(hq + '\uf8ff').limit(8).get();
           const snaps = await Promise.all([...queries, handleQuery]);
+          if (seq !== searchSeq) return;
           const matches = new Map();
           snaps.forEach(snap => snap.forEach(d => {
             const u = d.data();
@@ -2235,7 +2275,9 @@
             b.onclick = () => viewUserProfileByHandle(u.handle);
             out.appendChild(b);
           });
-        } catch (e) { out.innerHTML = '<p class="text-xs text-gray-400 py-2">Arama başarısız.</p>'; }
+        } catch (e) {
+          if (seq === searchSeq) out.innerHTML = '<p class="text-xs text-gray-400 py-2">Arama başarısız.</p>';
+        }
       }, 300);
     }
     (function () {
@@ -2374,13 +2416,19 @@
 
     async function loadWeeklyBees(force) {
       if (!document.querySelector('.bees-body')) return;
-      if (!force && Date.now() - beesAt < 60000) return;
+      if (!force && Date.now() - beesAt < 300000) return;
       beesAt = Date.now();
       try {
         const since = firebase.firestore.Timestamp.fromMillis(Date.now() - WEEK_MS);
-        const snap = await db.collection('posts').where('createdAt', '>=', since).orderBy('createdAt', 'desc').limit(300).get();
+        const baseQuery = db.collection('posts').where('createdAt', '>=', since).orderBy('createdAt', 'desc');
+        let page = await baseQuery.limit(300).get();
+        const docs = [...page.docs];
+        while (page.docs.length === 300) {
+          page = await baseQuery.startAfter(page.docs[page.docs.length - 1]).limit(300).get();
+          docs.push(...page.docs);
+        }
         const m = {};
-        snap.forEach(d => {
+        docs.forEach(d => {
           const p = d.data(); if (p.privacy === 'private') return;
           const h = safeH(p.handle); if (!h) return;
           const o = m[h] = m[h] || { h, name: p.name || h, avatarUrl: p.avatarUrl || '', posts: 0, likes: 0, replies: 0, hint: { ...p, id: d.id } };
@@ -2448,9 +2496,8 @@
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-300 dark:border-gray-700 shadow-sm space-y-2"><h3 class="font-black text-sm text-gray-900 dark:text-white"><i class="fa-solid fa-ranking-star text-yellow-500"></i> Haftanın Popüler Arıları</h3><div class="bees-body space-y-1"><p class="text-[11px] text-gray-400 py-3 text-center">Kürsü henüz boş! İlk vızıldayan sen ol.</p></div></div>
         <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-2"><h3 class="font-black text-sm text-gray-900 dark:text-white"><i class="fa-solid fa-users text-yellow-500"></i> Yeni Öğrenciler</h3><div class="newcomers-body space-y-1"><p class="text-[11px] text-gray-400 py-3 text-center">Henüz katılım yok. Arkadaşlarını davet et!</p></div><button onclick="switchTab('newcomers')" class="w-full text-center text-[11px] font-extrabold text-yellow-600 hover:underline">Tümünü gör →</button></div>`);
       const __rcf = window.refreshChatFab;
-      window.refreshChatFab = function () { __rcf(); loadNewcomersPreview(); loadWeeklyBees(); };
-      setTimeout(() => loadWeeklyBees(true), 1500);
-      setInterval(() => { loadWeeklyBees(true); loadNewcomersPreview(true); }, 300000);
+      window.refreshChatFab = function () { __rcf(); loadNewcomersPreview(); };
+      // Haftalık sıralama yalnızca Keşfet açıldığında, 5 dakikalık önbellekle yenilenir.
     })();
   </script>
 </body>
