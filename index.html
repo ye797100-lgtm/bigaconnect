@@ -1477,15 +1477,20 @@
         openAuthModal('login');
         return;
       }
-      if (!currentUserData.bookmarks) currentUserData.bookmarks = [];
+      const previous = [...(currentUserData.bookmarks || [])];
+      currentUserData.bookmarks = [...previous];
       const idx = currentUserData.bookmarks.indexOf(postId);
-      if (idx > -1) {
-        currentUserData.bookmarks.splice(idx, 1);
-      } else {
-        currentUserData.bookmarks.push(postId);
+      if (idx > -1) currentUserData.bookmarks.splice(idx, 1);
+      else currentUserData.bookmarks.push(postId);
+      try {
+        await saveUserToCloud(currentUserData);
+        updateLoginState(true, currentUserData);
+      } catch (err) {
+        currentUserData.bookmarks = previous;
+        updateLoginState(true, currentUserData);
+        alert('Kaydedilenler güncellenemedi. Tekrar dene. ' + (err.code || err.message));
+        return;
       }
-      updateLoginState(true, currentUserData);
-      await saveUserToCloud(currentUserData);
       loadPostsFromCloud();
       if(document.getElementById('contentBookmarks') && !document.getElementById('contentBookmarks').classList.contains('hidden')) {
         loadBookmarks();
@@ -1748,32 +1753,43 @@
     }
     async function followActionInner(handle) {
       if (!isLoggedIn) return openAuthModal('login');
-      const t = '@' + safeH(handle), me = currentUserData;
-      me.following = me.following || []; me.requested = me.requested || [];
+      const t = '@' + safeH(handle);
+      const me = {
+        ...currentUserData,
+        following: [...(currentUserData.following || [])],
+        requested: [...(currentUserData.requested || [])]
+      };
       if (me.following.includes(t)) {
         me.following = me.following.filter(x => x !== t);
-        try {
-          const hd = await db.collection('handles').doc(safeH(t)).get();
-          if (hd.exists) {
-            const targetRef = db.collection('users').doc(hd.data().uid);
-            const posts = await db.collection('posts').where('handle', '==', t).get();
+        const hd = await db.collection('handles').doc(safeH(t)).get();
+        if (hd.exists) {
+          const targetRef = db.collection('users').doc(hd.data().uid);
+          await targetRef.update({ followers: FV.arrayRemove('@' + safeH(me.handle)) });
+          const posts = await db.collection('posts').where('handle', '==', t).get();
+          for (let i = 0; i < posts.docs.length; i += 400) {
             const batch = db.batch();
-            batch.update(targetRef, { followers: FV.arrayRemove('@' + safeH(me.handle)) });
-            posts.forEach(d => batch.update(d.ref, { followerHandles: FV.arrayRemove('@' + safeH(me.handle)) }));
+            posts.docs.slice(i, i + 400).forEach(d => batch.update(d.ref, { followerHandles: FV.arrayRemove('@' + safeH(me.handle)) }));
             await batch.commit();
           }
-        } catch (e) {
-          throw new Error('Takipten çıkıldı ancak karşı hesabın takipçi/gizli gönderi erişimi güncellenemedi: ' + (e.code || e.message));
         }
-      } else if (me.requested.includes(t)) me.requested = me.requested.filter(x => x !== t);
-      else {
+      } else if (me.requested.includes(t)) {
+        me.requested = me.requested.filter(x => x !== t);
+      } else {
         let priv = false;
         try {
           const hd = await db.collection('handles').doc(safeH(t)).get();
-          if (hd.exists) { const ud = await db.collection('users').doc(hd.data().uid).get(); priv = ud.exists && ud.data().privacy === 'private'; }
+          if (hd.exists) {
+            const ud = await db.collection('users').doc(hd.data().uid).get();
+            priv = ud.exists && ud.data().privacy === 'private';
+          }
         } catch (e) {}
-        if (priv) { me.requested.push(t); await notifyUser(t, `${me.name} seni takip etmek istiyor.`, 'followreq'); }
-        else { me.following.push(t); await notifyUser(t, `${me.name} seni takip etmeye başladı.`, 'follow'); }
+        if (priv) {
+          me.requested.push(t);
+          await notifyUser(t, `${me.name} seni takip etmek istiyor.`, 'followreq');
+        } else {
+          me.following.push(t);
+          await notifyUser(t, `${me.name} seni takip etmeye başladı.`, 'follow');
+        }
       }
       await saveUserToCloud(me);
       updateLoginState(true, me);
