@@ -1858,15 +1858,13 @@
         let uid = uidHint;
         if (!uid) {
           const hd = await db.collection('handles').doc(safeH(targetHandle)).get();
-          if (!hd.exists) return false;
+          if (!hd.exists) return;
           uid = hd.data().uid;
         }
-        if (!uid || !currentUserData) return false;
         await db.collection('users').doc(uid).update({
           notifications: FV.arrayUnion({ text: String(notificationText).slice(0, 200), ts: Date.now(), from: safeH(currentUserData.handle), type: type || 'info' })
         });
-        return true;
-      } catch (e) { console.error("Bildirim hatası:", e); return false; }
+      } catch (e) { console.error("Bildirim hatası:", e); }
     }
 
     async function loadNotifications() {
@@ -2444,21 +2442,14 @@
       const me = currentUserData; if (!me) return;
       me.requested = me.requested || []; me.following = me.following || []; let ch = false;
       (me.notifications || []).forEach(n => {
-        if (!n.from || !['followok', 'followno'].includes(n.type)) return;
-        const t = '@' + safeH(n.from);
-        if (!canonicalFollowList(me.requested).includes(t)) return;
-        me.requested = canonicalFollowList(me.requested).filter(x => x !== t);
-        if (n.type === 'followok' && !canonicalFollowList(me.following).includes(t)) {
-          me.following = [...canonicalFollowList(me.following), t];
+        if (n.type === 'followok' && n.from) {
+          const t = '@' + safeH(n.from);
+          if (canonicalFollowList(me.requested).includes(t)) { me.requested = canonicalFollowList(me.requested).filter(x => x !== t); if (!canonicalFollowList(me.following).includes(t)) me.following = [...canonicalFollowList(me.following), t]; ch = true; }
         }
-        ch = true;
       });
       if (ch) {
-        try {
-          await saveUserToCloud(me);
-          loadPostsFromCloud();
-          if (viewingUserData) renderProfileView(viewingUserData);
-        } catch (e) { console.error('Takip isteği eşitlenemedi:', e); }
+        try { await saveUserToCloud(me); loadPostsFromCloud(); }
+        catch (e) { console.error('Takip onayı eşitlenemedi:', e); }
       }
     }
 
@@ -2466,27 +2457,24 @@
       const me = currentUserData, cleanFrom = safeH(h), t = '@' + cleanFrom;
       if (!me || !me.uid || !cleanFrom) return;
       try {
-        // Hem onay hem ret öncesinde isteğin hâlâ beklemede olduğunu doğrula.
-        const handleDoc = await db.collection('handles').doc(cleanFrom).get();
-        const requesterUid = handleDoc.exists && handleDoc.data().uid;
-        const requesterDoc = requesterUid ? await db.collection('users').doc(requesterUid).get() : null;
-        const stillRequested = requesterDoc && requesterDoc.exists &&
-          canonicalFollowList(requesterDoc.data().requested).includes('@' + safeH(me.handle));
-        if (!stillRequested) {
-          me.notifications = (me.notifications || []).filter(n =>
-            !(n.type === 'followreq' && safeH(n.from) === cleanFrom && (n.ts || 0) === ts));
-          await db.collection('users').doc(me.uid).update({ notifications: me.notifications });
-          loadNotifications();
-          alert('Bu takip isteği artık geçerli değil; işlem yapılmadı.');
-          return;
+        if (ok) {
+          // Eski/bekleyen bildirim, gönderen isteğini iptal ettikten sonra onaylanamasın.
+          const handleDoc = await db.collection('handles').doc(cleanFrom).get();
+          const requesterUid = handleDoc.exists && handleDoc.data().uid;
+          const requesterDoc = requesterUid ? await db.collection('users').doc(requesterUid).get() : null;
+          const stillRequested = requesterDoc && requesterDoc.exists &&
+            canonicalFollowList(requesterDoc.data().requested).includes('@' + safeH(me.handle));
+          if (!stillRequested) {
+            me.notifications = (me.notifications || []).filter(n =>
+              !(n.type === 'followreq' && safeH(n.from) === cleanFrom && (n.ts || 0) === ts));
+            await db.collection('users').doc(me.uid).update({ notifications: me.notifications });
+            loadNotifications();
+            alert('Bu takip isteği artık geçerli değil; onaylanmadı.');
+            return;
+          }
+          me.followers = Array.from(new Set([...(me.followers || []), t]));
+          await notifyUser(cleanFrom, me.name + ' takip isteğini onayladı.', 'followok');
         }
-
-        const notificationSent = ok
-          ? await notifyUser(cleanFrom, me.name + ' takip isteğini onayladı.', 'followok', requesterUid)
-          : await notifyUser(cleanFrom, me.name + ' takip isteğini reddetti.', 'followno', requesterUid);
-        if (!notificationSent) throw new Error('Karşı hesaba bildirim gönderilemedi. İstek beklemede bırakıldı; tekrar dene.');
-
-        if (ok) me.followers = Array.from(new Set([...(me.followers || []), t]));
         me.notifications = (me.notifications || []).filter(n =>
           !(n.type === 'followreq' && safeH(n.from) === cleanFrom && (n.ts || 0) === ts));
         await db.collection('users').doc(me.uid).update({ followers: me.followers || [], notifications: me.notifications });
