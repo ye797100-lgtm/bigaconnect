@@ -418,7 +418,7 @@
         </div>
 
         <div id="timeline" class="space-y-4">
-          <div id="emptyState" class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+          <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border-2 border-dashed border-yellow-200 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
             <i class="fa-solid fa-bug text-4xl text-yellow-500 mb-3 drop-shadow-sm"></i>
             <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Henüz bir vızıldı yok!</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kampüste ilk paylaşımı yapan sen ol.</p>
@@ -840,7 +840,12 @@
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const safeH = h => String(h || '').trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
     const safeId = x => String(x || '').replace(/[^\w-]/g, '');
-    const safeImg = u => /^(data:image\/(?:jpeg|png|webp|gif);base64,|https:\/\/)/i.test(u || '') ? esc(u) : '';
+    // Keep validated URLs raw for DOM properties; HTML escaping is only for markup strings.
+    const safeImageUrl = u => {
+      const value = String(u || '').trim();
+      return /^(data:image\/(?:jpeg|png|webp|gif);base64,|https:\/\/)/i.test(value) ? value : '';
+    };
+    const safeImg = u => esc(safeImageUrl(u));
 
     function timeAgo(ms, fb) {
       if (!ms) return fb || 'Şimdi';
@@ -1049,7 +1054,7 @@
 
       if (headerInitials) headerInitials.innerHTML = defaultYellowAvatarSVG;
 
-      const safeAvatarUrl = safeImg(avatarUrl);
+      const safeAvatarUrl = safeImageUrl(avatarUrl);
       if (safeAvatarUrl) {
         if (headerImg) { headerImg.src = safeAvatarUrl; headerImg.classList.remove('hidden'); }
         if (headerInitials) headerInitials.classList.add('hidden');
@@ -1175,7 +1180,7 @@
       const profileInitials = document.getElementById('profileAvatarInitials');
       if (profileInitials) profileInitials.innerHTML = defaultYellowAvatarSVG;
 
-      const profileAvatarUrl = safeImg(userData.avatarUrl);
+      const profileAvatarUrl = safeImageUrl(userData.avatarUrl);
       if (profileAvatarUrl) {
         if (profileImg) { profileImg.src = profileAvatarUrl; profileImg.classList.remove('hidden'); }
         if (profileInitials) profileInitials.classList.add('hidden');
@@ -1186,9 +1191,9 @@
 
       const bannerEl = document.getElementById('profileBanner');
       if (bannerEl) {
-        const profileBannerUrl = safeImg(userData.bannerUrl);
+        const profileBannerUrl = safeImageUrl(userData.bannerUrl);
         if (profileBannerUrl) {
-          bannerEl.style.backgroundImage = `url("${profileBannerUrl}")`;
+          bannerEl.style.backgroundImage = `url("${encodeURI(profileBannerUrl)}")`;
           bannerEl.style.backgroundSize = 'cover';
           bannerEl.style.backgroundPosition = 'center';
         } else {
@@ -2371,7 +2376,7 @@
         c.innerHTML = items.map(i => `<div class="aspect-square rounded-xl overflow-hidden border border-yellow-200 dark:border-gray-700 bg-black/5">${i.k === 'vid'
           ? `<video src="${i.src}#t=0.1" controls preload="metadata" playsinline class="w-full h-full object-cover"></video>`
           : `<img src="${i.src}" class="w-full h-full object-cover">`}</div>`).join('');
-      } catch (e) { c.innerHTML = emptyBox('Medya yüklenemedi: ' + (e.code || e.message)); }
+      } catch (e) { c.innerHTML = emptyBox('Medya yüklenemedi: ' + esc(e.code || e.message || 'Bilinmeyen hata')); }
     }
 
     async function buzzUser() {
