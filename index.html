@@ -919,7 +919,8 @@
         const verifyButton = document.getElementById('emailVerifyButton');
         const homeLink = document.getElementById('emailVerifyHome');
         try {
-          await auth.checkActionCode(actionCode);
+          const actionInfo = await auth.checkActionCode(actionCode);
+          const verifiedEmail = String(actionInfo.data && actionInfo.data.email || '').trim().toLowerCase();
           message.textContent = 'Bağlantı geçerli. Doğrulamayı tamamlamak için aşağıdaki butona bas.';
           verifyButton.disabled = false;
           verifyButton.style.display = 'block';
@@ -928,17 +929,17 @@
             verifyButton.textContent = 'Doğrulanıyor…';
             try {
               await auth.applyActionCode(actionCode);
-              // Kayıt yapılan aynı tarayıcıdaki Firebase oturumu korunmuşsa,
-              // doğrulama sonrası uygulamayı yeniden aç; Auth dinleyicisi profili
-              // yükleyip kullanıcıyı otomatik olarak içeri alır.
+              // Yalnızca doğrulanan e-posta ile aynı hesaba ait oturumu otomatik aç.
+              // Başka bir hesap bu tarayıcıda açıksa yanlış hesaba yönlendirme yapma.
               if (auth.currentUser) {
                 await auth.currentUser.reload();
-                if (auth.currentUser.emailVerified) {
+                const activeEmail = String(auth.currentUser.email || '').trim().toLowerCase();
+                if (verifiedEmail && activeEmail === verifiedEmail && auth.currentUser.emailVerified) {
                   window.location.replace(window.location.pathname);
                   return;
                 }
               }
-              message.textContent = 'E-posta adresin başarıyla doğrulandı. Otomatik giriş için kayıt yaptığın cihaz ve tarayıcıdaki BigaConnect oturumunu aç.';
+              message.textContent = 'E-posta adresin başarıyla doğrulandı. Otomatik giriş için doğruladığın e-posta ile kayıt yaptığın cihaz ve tarayıcıda oturum aç.';
               verifyButton.style.display = 'none';
               homeLink.style.display = 'inline-block';
               window.history.replaceState({}, document.title, window.location.pathname);
@@ -1048,8 +1049,9 @@
 
       if (headerInitials) headerInitials.innerHTML = defaultYellowAvatarSVG;
 
-      if (avatarUrl && avatarUrl.trim() !== "") {
-        if (headerImg) { headerImg.src = avatarUrl; headerImg.classList.remove('hidden'); }
+      const safeAvatarUrl = safeImg(avatarUrl);
+      if (safeAvatarUrl) {
+        if (headerImg) { headerImg.src = safeAvatarUrl; headerImg.classList.remove('hidden'); }
         if (headerInitials) headerInitials.classList.add('hidden');
       } else {
         if (headerImg) { headerImg.src = ""; headerImg.classList.add('hidden'); }
@@ -2227,30 +2229,51 @@
     }
 
     async function deleteReply(postId, replyId) {
+      if (!isLoggedIn || !currentUserData || !currentUserData.uid) return;
+      const cleanPostId = safeId(postId), cleanReplyId = safeId(replyId);
+      if (!cleanPostId || cleanPostId !== String(postId) || !cleanReplyId || cleanReplyId !== String(replyId)) return;
       if (!confirm("Bu yanıtı silmek istediğine emin misin?")) return;
       try {
-        const postRef = db.collection('posts').doc(postId);
+        const postRef = db.collection('posts').doc(cleanPostId);
         const doc = await postRef.get();
         if (!doc.exists) return;
-        const mine = '@' + safeH(currentUserData.handle);
-        const left = (doc.data().replies || []).filter(r => !(r.id === replyId && '@' + safeH(r.handle) === mine));
+        const replies = Array.isArray(doc.data().replies) ? doc.data().replies : [];
+        const mine = safeH(currentUserData.handle);
+        const target = replies.find(r => safeId(r.id) === cleanReplyId);
+        if (!target || safeH(target.handle) !== mine) {
+          alert('Bu yanıtı silme yetkin yok.');
+          return;
+        }
+        const left = replies.filter(r => safeId(r.id) !== cleanReplyId);
         await postRef.update({ replies: left });
         loadPostsFromCloud();
       } catch (e) { console.error("Yanıt silme hatası:", e); }
     }
 
     async function deletePost(postId) {
-      if (confirm("Bu paylaşımı silmek istediğine emin misin?")) {
-        try {
-          await db.collection('posts').doc(postId).delete();
-          loadPostsFromCloud();
-          if (currentUserData) {
-            loadUserPosts(viewingUserData ? viewingUserData.handle : currentUserData.handle);
-            loadUserLikes();
-          }
-        } catch(e) {
-          console.error("Silme hatası:", e);
+      if (!isLoggedIn || !currentUserData || !currentUserData.uid) return;
+      const cleanPostId = safeId(postId);
+      if (!cleanPostId || cleanPostId !== String(postId)) return;
+      if (!confirm("Bu paylaşımı silmek istediğine emin misin?")) return;
+      try {
+        const postRef = db.collection('posts').doc(cleanPostId);
+        const doc = await postRef.get();
+        if (!doc.exists) return;
+        const post = doc.data() || {};
+        const ownsPost = post.uid
+          ? post.uid === currentUserData.uid
+          : safeH(post.handle) === safeH(currentUserData.handle);
+        if (!ownsPost) {
+          alert('Bu paylaşımı silme yetkin yok.');
+          return;
         }
+        await postRef.delete();
+        loadPostsFromCloud();
+        loadUserPosts(viewingUserData ? viewingUserData.handle : currentUserData.handle);
+        loadUserLikes();
+      } catch(e) {
+        console.error("Silme hatası:", e);
+        alert('Paylaşım silinemedi. Yetkini ve bağlantını kontrol et.');
       }
     }
 
