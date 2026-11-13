@@ -848,7 +848,7 @@
     const safeImg = u => esc(safeImageUrl(u));
 
     function timeAgo(ms, fb) {
-      if (!ms) return fb || 'Şimdi';
+      if (!ms) return esc(fb || 'Şimdi');
       const s = Math.floor((Date.now() - ms) / 1000);
       if (s < 60) return 'Şimdi';
       const m = Math.floor(s / 60); if (m < 60) return m + ' dk önce';
