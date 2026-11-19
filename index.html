@@ -2688,6 +2688,7 @@
 
     // Kampüs Haritası — konum paylaşımı varsayılan olarak kapalıdır.
     let campusLeafletMap = null, campusMapReady = false, campusWatchId = null;
+    let campusFriendUnsubs = [], campusFriendMarkers = {};
     let campusLastWriteAt = 0, campusLastCoords = null, campusMapMarkers = [];
     const CAMPUS_CONSENT_VERSION = '2026-11-19-v1';
     const CAMPUS_LOCATION_MAX_AGE = 15 * 60 * 1000;
@@ -2755,34 +2756,59 @@
         campusMessage('Arkadaşlarının konumlarını görmek için giriş yapmalısın.');
         return;
       }
+      campusFriendUnsubs.forEach(unsub => { try { unsub(); } catch (_) {} });
+      campusFriendUnsubs = [];
+      Object.values(campusFriendMarkers).forEach(marker => campusLeafletMap.removeLayer(marker));
+      campusFriendMarkers = {};
       const myHandle = safeH(currentUserData.handle);
       const following = canonicalFollowList(currentUserData.following).map(h => safeH(h)).filter(Boolean).slice(0,200);
-      const results = await Promise.all(following.map(async handle => {
+      let eligible = 0;
+      await Promise.all(following.map(async handle => {
         try {
           const handleSnap = await db.collection('handles').doc(handle).get();
-          if (!handleSnap.exists || !handleSnap.data().uid || handleSnap.data().uid === currentUserData.uid) return null;
+          if (!handleSnap.exists || !handleSnap.data().uid || handleSnap.data().uid === currentUserData.uid) return;
           const friendSnap = await db.collection('users').doc(handleSnap.data().uid).get();
-          if (!friendSnap.exists) return null;
+          if (!friendSnap.exists) return;
           const friend = friendSnap.data();
-          if (!canonicalFollowList(friend.following).includes('@' + myHandle)) return null;
-          const locSnap = await db.collection('campusLocations').doc(friend.uid).get();
-          if (!locSnap.exists) return null;
-          const loc = locSnap.data();
-          const updatedAt = loc.updatedAt && typeof loc.updatedAt.toMillis === 'function' ? loc.updatedAt.toMillis() : 0;
-          if (updatedAt < Date.now() - CAMPUS_LOCATION_MAX_AGE) return null;
-          if (!Number.isFinite(loc.lat) || !Number.isFinite(loc.lng) || Math.abs(loc.lat)>90 || Math.abs(loc.lng)>180) return null;
-          return { ...friend, lat:loc.lat, lng:loc.lng, updatedAt };
-        } catch (e) { return null; }
+          if (!canonicalFollowList(friend.following).includes('@' + myHandle)) return;
+          eligible++;
+          const unsub = db.collection('campusLocations').doc(friend.uid).onSnapshot(locSnap => {
+            const oldMarker = campusFriendMarkers[friend.uid];
+            if (!locSnap.exists) {
+              if (oldMarker) { campusLeafletMap.removeLayer(oldMarker); delete campusFriendMarkers[friend.uid]; }
+              return;
+            }
+            const loc = locSnap.data();
+            const updatedAt = loc.updatedAt && typeof loc.updatedAt.toMillis === 'function' ? loc.updatedAt.toMillis() : 0;
+            if (updatedAt < Date.now() - CAMPUS_LOCATION_MAX_AGE || !Number.isFinite(loc.lat) || !Number.isFinite(loc.lng) || Math.abs(loc.lat)>90 || Math.abs(loc.lng)>180) {
+              if (oldMarker) { campusLeafletMap.removeLayer(oldMarker); delete campusFriendMarkers[friend.uid]; }
+              return;
+            }
+            if (oldMarker) campusLeafletMap.removeLayer(oldMarker);
+            const marker = L.marker([loc.lat,loc.lng], { icon:campusAvatarIcon(friend) }).addTo(campusLeafletMap);
+            marker.bindTooltip(esc(friend.name || friend.handle) + ' · ' + Math.max(1,Math.floor((Date.now()-updatedAt)/60000)) + ' dk önce');
+            marker.on('click', () => viewUserProfileByHandle(friend.handle));
+            campusFriendMarkers[friend.uid] = marker;
+          }, error => console.warn('Arkadaş konumu okunamadı:', error));
+          campusFriendUnsubs.push(unsub);
+        } catch (e) { /* Karşılıklı takip veya konum erişimi yoksa kullanıcıyı atla. */ }
       }));
-      campusMapMarkers.forEach(m => campusLeafletMap.removeLayer(m));
-      campusMapMarkers = [];
-      results.filter(Boolean).forEach(friend => {
-        const marker = L.marker([friend.lat,friend.lng], { icon:campusAvatarIcon(friend) }).addTo(campusLeafletMap);
-        marker.bindTooltip(esc(friend.name || friend.handle) + ' · ' + Math.max(1,Math.floor((Date.now()-friend.updatedAt)/60000)) + ' dk önce');
-        marker.on('click', () => viewUserProfileByHandle(friend.handle));
-        campusMapMarkers.push(marker);
-      });
-      campusMessage(results.filter(Boolean).length ? results.filter(Boolean).length + ' karşılıklı takip arkadaşının güncel konumu haritada.' : 'Şu anda paylaşım yapan karşılıklı takip arkadaşın yok.');
+      campusMessage(eligible ? eligible + ' karşılıklı takip arkadaşının konumu canlı olarak izleniyor; yalnızca son 15 dakikadaki konumlar gösterilir.' : 'Şu anda karşılıklı takip ettiğin arkadaşın yok.');
+    }
+    // Açık harita sekmesinde eski konum işaretlerini dakikada bir temizle.
+    if (!window.__campusStaleCleanupStarted) {
+      window.__campusStaleCleanupStarted = true;
+      window.setInterval(() => {
+        Object.entries(campusFriendMarkers).forEach(([uid, marker]) => {
+          const tip = marker.getTooltip();
+          const text = tip ? tip.getContent() : '';
+          const match = String(text).match(/· (\d+) dk önce/);
+          if (match && Number(match[1]) >= 15) {
+            campusLeafletMap.removeLayer(marker);
+            delete campusFriendMarkers[uid];
+          }
+        });
+      }, 60000);
     }
     async function enableCampusLocationSharing() {
       if (!isLoggedIn || !currentUserData || !auth.currentUser) {
@@ -2816,7 +2842,6 @@
           campusLastWriteAt=now; campusLastCoords=c;
           campusSetSharingUI(true,'Konumun paylaşılıyor. İstediğin an paylaşımı kapatıp silebilirsin.');
           campusMessage('Konum güncellendi. Son doğruluk: yaklaşık ' + c.accuracy + ' metre.');
-          refreshCampusFriends();
         } catch (e) {
           console.error('Kampüs konumu kaydedilemedi:',e);
           campusMessage('Konum kaydedilemedi: ' + (e.code || e.message) + '. Güvenlik kurallarının güncel olduğundan emin ol.',true);
