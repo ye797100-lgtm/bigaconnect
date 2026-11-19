@@ -2688,7 +2688,7 @@
 
     // Kampüs Haritası — konum paylaşımı varsayılan olarak kapalıdır.
     let campusLeafletMap = null, campusMapReady = false, campusWatchId = null;
-    let campusFriendUnsubs = [], campusFriendMarkers = {};
+    let campusFriendUnsubs = [], campusFriendMarkers = {}, campusFriendMarkerTimes = {};
     let campusLastWriteAt = 0, campusLastCoords = null, campusMapMarkers = [];
     const CAMPUS_CONSENT_VERSION = '2026-11-19-v1';
     const CAMPUS_LOCATION_MAX_AGE = 15 * 60 * 1000;
@@ -2759,7 +2759,7 @@
       campusFriendUnsubs.forEach(unsub => { try { unsub(); } catch (_) {} });
       campusFriendUnsubs = [];
       Object.values(campusFriendMarkers).forEach(marker => campusLeafletMap.removeLayer(marker));
-      campusFriendMarkers = {};
+      campusFriendMarkers = {}; campusFriendMarkerTimes = {};
       const myHandle = safeH(currentUserData.handle);
       const following = canonicalFollowList(currentUserData.following).map(h => safeH(h)).filter(Boolean).slice(0,200);
       let eligible = 0;
@@ -2775,7 +2775,7 @@
           const unsub = db.collection('campusLocations').doc(friend.uid).onSnapshot(locSnap => {
             const oldMarker = campusFriendMarkers[friend.uid];
             if (!locSnap.exists) {
-              if (oldMarker) { campusLeafletMap.removeLayer(oldMarker); delete campusFriendMarkers[friend.uid]; }
+              if (oldMarker) { campusLeafletMap.removeLayer(oldMarker); delete campusFriendMarkers[friend.uid]; delete campusFriendMarkerTimes[friend.uid]; }
               return;
             }
             const loc = locSnap.data();
@@ -2788,7 +2788,7 @@
             const marker = L.marker([loc.lat,loc.lng], { icon:campusAvatarIcon(friend) }).addTo(campusLeafletMap);
             marker.bindTooltip(esc(friend.name || friend.handle) + ' · ' + Math.max(1,Math.floor((Date.now()-updatedAt)/60000)) + ' dk önce');
             marker.on('click', () => viewUserProfileByHandle(friend.handle));
-            campusFriendMarkers[friend.uid] = marker;
+            campusFriendMarkers[friend.uid] = marker; campusFriendMarkerTimes[friend.uid] = updatedAt;
           }, error => console.warn('Arkadaş konumu okunamadı:', error));
           campusFriendUnsubs.push(unsub);
         } catch (e) { /* Karşılıklı takip veya konum erişimi yoksa kullanıcıyı atla. */ }
@@ -2800,12 +2800,10 @@
       window.__campusStaleCleanupStarted = true;
       window.setInterval(() => {
         Object.entries(campusFriendMarkers).forEach(([uid, marker]) => {
-          const tip = marker.getTooltip();
-          const text = tip ? tip.getContent() : '';
-          const match = String(text).match(/· (\d+) dk önce/);
-          if (match && Number(match[1]) >= 15) {
+          if (Date.now() - (campusFriendMarkerTimes[uid] || 0) >= CAMPUS_LOCATION_MAX_AGE) {
             campusLeafletMap.removeLayer(marker);
             delete campusFriendMarkers[uid];
+            delete campusFriendMarkerTimes[uid];
           }
         });
       }, 60000);
