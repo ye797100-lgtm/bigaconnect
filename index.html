@@ -2727,12 +2727,11 @@
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
       }).addTo(campusLeafletMap);
+      // Bina koordinatları doğrulanmadığı için yalnızca yerleşke merkezinde yakınlaştırma seçenekleri sunulur.
       const places = [
-        ['Biga Kampüsü', CAMPUS_CENTER, 16],
-        ['İİBF', [40.2258,27.2412], 17],
-        ['Meslek Yüksekokulu', [40.2277,27.2440], 17],
-        ['Uygulamalı Bilimler', [40.2247,27.2442], 17],
-        ['Biga Merkez', [40.2288,27.3610], 14]
+        ['Kampüs', CAMPUS_CENTER, 16],
+        ['Yakınlaştır', CAMPUS_CENTER, 18],
+        ['Geniş görünüm', CAMPUS_CENTER, 14]
       ];
       const box = document.getElementById('mapBtns');
       places.forEach(([label, coords, zoom], i) => {
@@ -2745,7 +2744,7 @@
       campusLeafletMap.whenReady(() => refreshCampusFriends());
       if (isLoggedIn && currentUserData) {
         db.collection('campusLocations').doc(currentUserData.uid).get().then(doc => {
-          if (doc.exists) campusSetSharingUI(true, 'Paylaşımın açık. Bu sayfa açıkken konumun güncellenir.');
+          if (doc.exists) campusSetSharingUI(false, 'Önceki konum kaydın en fazla 15 dakika görünür. Güncellemeyi başlatmak için paylaşımı yeniden aç.');
           else campusSetSharingUI(false);
         }).catch(() => campusSetSharingUI(false));
       } else campusSetSharingUI(false, 'Konum paylaşmak ve arkadaşlarını görmek için giriş yapmalısın.');
@@ -2847,7 +2846,11 @@
       campusWatchId=null;
     }
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopCampusLocationWatch();
+      if (document.hidden && campusWatchId !== null) {
+        stopCampusLocationWatch();
+        campusSetSharingUI(false, 'Sekme arka plana geçtiği için canlı konum güncellemesi durduruldu. Devam etmek için yeniden başlat.');
+        campusMessage('Arka planda konum takibi yapılmaz. Sayfaya döndüğünde paylaşımı yeniden başlatabilirsin.');
+      }
     });
 
 
