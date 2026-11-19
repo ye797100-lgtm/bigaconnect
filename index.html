@@ -2745,7 +2745,7 @@
       campusLeafletMap.whenReady(() => refreshCampusFriends());
       if (isLoggedIn && currentUserData) {
         db.collection('campusLocations').doc(currentUserData.uid).get().then(doc => {
-          if (doc.exists) campusSetSharingUI(false, 'Önceki konum kaydın en fazla 15 dakika görünür. Güncellemeyi başlatmak için paylaşımı yeniden aç.');
+          if (doc.exists) campusSetSharingUI(true, 'Önceki konum kaydın hâlâ mevcut; canlı güncelleme bu oturumda başlamadı. Paylaşımı kapatıp silebilir, ardından yeniden açabilirsin.');
           else campusSetSharingUI(false);
         }).catch(() => campusSetSharingUI(false));
       } else campusSetSharingUI(false, 'Konum paylaşmak ve arkadaşlarını görmek için giriş yapmalısın.');
