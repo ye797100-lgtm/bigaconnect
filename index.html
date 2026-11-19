@@ -8,6 +8,9 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome İkonları -->
+  <!-- Leaflet: interaktif kampüs haritası -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Firebase SDK'ları (Compat v9) -->
@@ -559,22 +562,45 @@
 
       <!-- 6. KAMPÜS HARİTASI -->
       <div id="contentMap" class="page-content hidden space-y-4">
-        <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-4">
-          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
+        <section class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3 gap-3">
             <div>
-              <h3 class="font-black text-gray-900 dark:text-white text-sm sm:text-lg flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-yellow-500"></i> ÇOMÜ Biga Ramazan Aydın Yerleşkesi</h3>
-              <p class="text-xs text-gray-400 mt-0.5">Kampüs yerleşke haritası · arkadaşlarınla canlı konum özelliği çok yakında</p>
+              <h3 class="font-black text-gray-900 dark:text-white text-sm sm:text-lg flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-yellow-500"></i> Kampüs Haritası</h3>
+              <p class="text-xs text-gray-400 mt-1">ÇOMÜ Biga Ramazan Aydın Yerleşkesi · arkadaşlarının paylaştığı konumlar</p>
             </div>
-            <span class="text-[10px] sm:text-xs bg-yellow-400 text-gray-900 font-black px-2.5 py-1 rounded-full shadow-sm">Biga Kampüs</span>
+            <span class="text-[10px] sm:text-xs bg-yellow-400 text-gray-900 font-black px-2.5 py-1 rounded-full shadow-sm shrink-0">Biga</span>
           </div>
-          <div class="space-y-3"><div id="mapBtns" class="flex flex-wrap gap-2"></div><iframe id="campusMap" title="Kampüs haritası" loading="lazy" class="w-full h-[380px] sm:h-[440px] rounded-2xl border-2 border-yellow-300 dark:border-yellow-600"></iframe></div>
-          <div style="display:none" class="relative w-full h-[380px] sm:h-[440px] bg-gradient-to-br from-yellow-100 via-amber-50 to-yellow-200 dark:from-gray-800 dark:via-gray-900 dark:to-yellow-950/30 rounded-2xl border-2 border-dashed border-yellow-400 dark:border-yellow-600 flex flex-col items-center justify-center p-4 sm:p-6 text-center overflow-hidden shadow-inner coming-soon-card">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-yellow-400/90 text-gray-900 rounded-3xl flex items-center justify-center text-3xl sm:text-4xl shadow-xl border-2 border-yellow-500 mb-3 sm:mb-4 animate-bounce"><i class="fa-solid fa-location-dot"></i></div>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest text-yellow-700 dark:text-yellow-400 bg-yellow-200 dark:bg-yellow-900/50 px-3 py-1 rounded-full mb-2">BigaConnect Canlı Radar</span>
-            <h3 class="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-2">Çok Yakında</h3>
-            <p class="text-xs text-gray-600 dark:text-gray-300 max-w-md leading-relaxed font-medium mb-4">ÇOMÜ Biga Ramazan Aydın Yerleşkesi’nde arkadaşlarının anlık konumlarını harita üzerinde görebileceğin interaktif radar sistemi çok yakında!</p>
+          <div id="mapBtns" class="flex flex-wrap gap-2"></div>
+          <div id="campusMap" role="application" aria-label="Biga kampüs haritası" class="w-full h-[390px] sm:h-[470px] rounded-2xl border-2 border-yellow-300 dark:border-yellow-600 z-0"></div>
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+            <span><i class="fa-solid fa-circle text-green-500 mr-1"></i> Güncel konumlar · 15 dakikadan eski konumlar gösterilmez</span>
+            <button type="button" onclick="refreshCampusFriends()" class="font-extrabold text-yellow-700 dark:text-yellow-400 hover:underline"><i class="fa-solid fa-rotate mr-1"></i> Arkadaşları yenile</button>
           </div>
-        </div>
+        </section>
+        <section class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <div><h3 class="font-black text-gray-900 dark:text-white text-sm"><i class="fa-solid fa-location-crosshairs text-yellow-500 mr-1"></i> Konum paylaşımım</h3>
+              <p id="campusShareStatus" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Konumun şu anda paylaşılmıyor.</p></div>
+            <span id="campusShareBadge" class="text-[10px] font-black rounded-full px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500">KAPALI</span>
+          </div>
+          <div class="rounded-xl bg-yellow-50 dark:bg-gray-900/50 border border-yellow-200 dark:border-gray-700 p-3 text-xs leading-relaxed text-gray-700 dark:text-gray-300">
+            <strong>Gizlilik:</strong> Paylaşım isteğe bağlıdır. Açtığında hassas konumun yalnızca karşılıklı takip ettiğin BigaConnect kullanıcılarına görünür. Konum verin profilinde veya gönderilerinde yayınlanmaz. Paylaşımı istediğin an kapatabilirsin; kapattığında kayıtlı konumun silinir. Konum yalnızca bu sayfa açıkken güncellenir.
+          </div>
+          <label class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300">
+            <input id="campusConsentCheck" type="checkbox" class="mt-0.5 accent-yellow-500">
+            <span>Konum paylaşımına ilişkin <a href="#campusPrivacyNotice" class="font-bold underline">aydınlatma metnini</a> okudum. Konumumun karşılıklı takip ettiğim kişilere gösterilmesini açıkça kabul ederek paylaşımı başlatmak istiyorum.</span>
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button id="campusShareOnBtn" type="button" onclick="enableCampusLocationSharing()" class="px-4 py-2.5 rounded-xl bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-black shadow-sm"><i class="fa-solid fa-location-dot mr-1"></i> Konumumu paylaş</button>
+            <button id="campusShareOffBtn" type="button" onclick="disableCampusLocationSharing()" class="hidden px-4 py-2.5 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 text-xs font-black"><i class="fa-solid fa-location-crosshairs mr-1"></i> Paylaşımı kapat ve sil</button>
+          </div>
+          <div id="campusLocationMessage" role="status" aria-live="polite" class="text-xs text-gray-500 dark:text-gray-400"></div>
+          <div id="campusPrivacyNotice" class="border-t border-gray-100 dark:border-gray-700 pt-3 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400 space-y-1">
+            <strong class="text-gray-700 dark:text-gray-200">Konum verisi aydınlatma özeti</strong>
+            <p>İşleme amacı: kampüs haritasında karşılıklı takip ilişkisi bulunan kullanıcıların birbirini bulabilmesi. İşlenen veri: cihazın sağladığı enlem, boylam, doğruluk seviyesi ve güncelleme zamanı. Alıcı grubu: yalnızca karşılıklı takip ettiğin ve e-posta adresi doğrulanmış BigaConnect kullanıcıları. Paylaşım isteğe bağlıdır; tarayıcı iznini reddedebilir, cihaz ayarlarından geri alabilir veya uygulama içindeki kapatma düğmesini kullanabilirsin. Kapatma işlemi konum belgesini siler. Eski konumlar 15 dakika sonra haritada gösterilmez. Veri sorumlusu ve KVKK kapsamındaki başvuru kanalları için BigaConnect'in yayınlanmış gizlilik/iletişim bilgilerine başvurabilirsin.</p>
+            <p>Bu kısa özet tam KVKK aydınlatma metninin veya hukuki uygunluk incelemesinin yerine geçmez. Üretime almadan önce veri sorumlusu kimliği, hukuki sebep, saklama-imha süresi ve başvuru kanalları tamamlanmalıdır.</p>
+          </div>
+        </section>
       </div>
 
     </main>
@@ -1698,6 +1724,8 @@
       if (!confirm("Çıkış yapmak istediğine emin misin?")) return;
       viewingUserData = null;
       try {
+        stopCampusLocationWatch();
+        if (auth.currentUser) await db.collection('campusLocations').doc(auth.currentUser.uid).delete().catch(() => {});
         await auth.signOut();
         updateLoginState(false);
         switchTab('timeline');
@@ -2658,20 +2686,170 @@
       ex.insertAdjacentHTML('afterbegin', `<div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border-2 border-yellow-200 dark:border-gray-700 shadow-sm mb-4"><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input oninput="userSearch(this.value)" placeholder="İsim veya kullanıcı adı ara" class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"></div><div id="userSearchResults" class="mt-2 space-y-1"></div></div>`);
     })();
 
-    // Kampüs haritası
-    let mapReady = false;
-    function initCampusMap() {
-      if (mapReady) return; mapReady = true;
-      const places = [['Biga Kampüsü', 'Çanakkale Onsekiz Mart Üniversitesi Biga'], ['İİBF', 'Biga İktisadi ve İdari Bilimler Fakültesi'], ['Meslek Yüksekokulu', 'Biga Meslek Yüksekokulu'], ['Uygulamalı Bilimler', 'Biga Uygulamalı Bilimler Fakültesi'], ['Biga Merkez', 'Biga, Çanakkale']];
-      const go = q => { document.getElementById('campusMap').src = 'https://maps.google.com/maps?q=' + encodeURIComponent(q) + '&hl=tr&z=15&output=embed'; };
-      const box = document.getElementById('mapBtns');
-      places.forEach(([label, q], i) => {
-        const b = document.createElement('button');
-        b.className = 'px-3 py-1.5 rounded-full text-xs font-extrabold bg-yellow-400 hover:bg-yellow-500 text-gray-900 shadow-sm';
-        b.innerHTML = '<i class="fa-solid fa-location-dot mr-1"></i> ' + esc(label); b.onclick = () => go(q); box.appendChild(b);
-      });
-      go(places[0][1]);
+    // Kampüs Haritası — konum paylaşımı varsayılan olarak kapalıdır.
+    let campusLeafletMap = null, campusMapReady = false, campusWatchId = null;
+    let campusLastWriteAt = 0, campusLastCoords = null, campusMapMarkers = [];
+    const CAMPUS_CONSENT_VERSION = '2026-11-19-v1';
+    const CAMPUS_LOCATION_MAX_AGE = 15 * 60 * 1000;
+    const CAMPUS_MIN_WRITE_MS = 30000;
+    const CAMPUS_MIN_MOVE_METERS = 25;
+    const CAMPUS_CENTER = [40.2265, 27.2425];
+    function campusMessage(message, error) {
+      const el = document.getElementById('campusLocationMessage');
+      if (el) { el.textContent = message || ''; el.className = 'text-xs ' + (error ? 'text-red-600' : 'text-gray-500 dark:text-gray-400'); }
     }
+    function campusSetSharingUI(active, status) {
+      const badge = document.getElementById('campusShareBadge');
+      const statusEl = document.getElementById('campusShareStatus');
+      const on = document.getElementById('campusShareOnBtn');
+      const off = document.getElementById('campusShareOffBtn');
+      if (badge) { badge.textContent = active ? 'AÇIK' : 'KAPALI'; badge.className = 'text-[10px] font-black rounded-full px-2.5 py-1 ' + (active ? 'bg-green-100 text-green-700' : 'bg-gray-100 dark:bg-gray-700 text-gray-500'); }
+      if (statusEl) statusEl.textContent = status || (active ? 'Konumun karşılıklı takip ettiğin kişilere gösteriliyor.' : 'Konumun şu anda paylaşılmıyor.');
+      if (on) on.classList.toggle('hidden', active);
+      if (off) off.classList.toggle('hidden', !active);
+    }
+    function campusDistanceMeters(a, b) {
+      const rad = x => x * Math.PI / 180, dLat = rad(b.lat-a.lat), dLng = rad(b.lng-a.lng);
+      const q = Math.sin(dLat/2)**2 + Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLng/2)**2;
+      return 6371000 * 2 * Math.atan2(Math.sqrt(q), Math.sqrt(1-q));
+    }
+    function campusAvatarIcon(user) {
+      const avatar = safeImg(user.avatarUrl);
+      const inner = avatar ? '<img src="' + avatar + '" alt="" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">' : '<span style="width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#FACC15;color:#422006;font-weight:900;">' + esc((user.name || user.handle || '?').slice(0,1).toUpperCase()) + '</span>';
+      return L.divIcon({ className:'campus-avatar-marker', html:'<div style="width:50px;height:50px;border:3px solid #FACC15;border-radius:50%;background:white;box-shadow:0 2px 8px #0005;display:flex;align-items:center;justify-content:center;">' + inner + '</div>', iconSize:[50,50], iconAnchor:[25,25] });
+    }
+    function initCampusMap() {
+      if (campusMapReady) { setTimeout(() => campusLeafletMap && campusLeafletMap.invalidateSize(), 100); return; }
+      const root = document.getElementById('campusMap');
+      if (!root || !window.L) { campusMessage('Harita kütüphanesi yüklenemedi. Sayfayı yenilemeyi dene.', true); return; }
+      campusMapReady = true;
+      campusLeafletMap = L.map(root, { zoomControl:true }).setView(CAMPUS_CENTER, 16);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+      }).addTo(campusLeafletMap);
+      const places = [
+        ['Biga Kampüsü', CAMPUS_CENTER, 16],
+        ['İİBF', [40.2258,27.2412], 17],
+        ['Meslek Yüksekokulu', [40.2277,27.2440], 17],
+        ['Uygulamalı Bilimler', [40.2247,27.2442], 17],
+        ['Biga Merkez', [40.2288,27.3610], 14]
+      ];
+      const box = document.getElementById('mapBtns');
+      places.forEach(([label, coords, zoom], i) => {
+        const b = document.createElement('button');
+        b.type='button'; b.className='px-3 py-1.5 rounded-full text-xs font-extrabold bg-yellow-400 hover:bg-yellow-500 text-gray-900 shadow-sm';
+        b.innerHTML='<i class="fa-solid fa-location-dot mr-1"></i> '+esc(label);
+        b.onclick=()=>campusLeafletMap.setView(coords,zoom);
+        box.appendChild(b);
+      });
+      campusLeafletMap.whenReady(() => refreshCampusFriends());
+      if (isLoggedIn && currentUserData) {
+        db.collection('campusLocations').doc(currentUserData.uid).get().then(doc => {
+          if (doc.exists) campusSetSharingUI(true, 'Paylaşımın açık. Bu sayfa açıkken konumun güncellenir.');
+          else campusSetSharingUI(false);
+        }).catch(() => campusSetSharingUI(false));
+      } else campusSetSharingUI(false, 'Konum paylaşmak ve arkadaşlarını görmek için giriş yapmalısın.');
+      setTimeout(() => campusLeafletMap && campusLeafletMap.invalidateSize(), 150);
+    }
+    async function refreshCampusFriends() {
+      if (!isLoggedIn || !currentUserData || !campusLeafletMap) {
+        campusMessage('Arkadaşlarının konumlarını görmek için giriş yapmalısın.');
+        return;
+      }
+      const myHandle = safeH(currentUserData.handle);
+      const following = canonicalFollowList(currentUserData.following).map(h => safeH(h)).filter(Boolean).slice(0,200);
+      const results = await Promise.all(following.map(async handle => {
+        try {
+          const handleSnap = await db.collection('handles').doc(handle).get();
+          if (!handleSnap.exists || !handleSnap.data().uid || handleSnap.data().uid === currentUserData.uid) return null;
+          const friendSnap = await db.collection('users').doc(handleSnap.data().uid).get();
+          if (!friendSnap.exists) return null;
+          const friend = friendSnap.data();
+          if (!canonicalFollowList(friend.following).includes('@' + myHandle)) return null;
+          const locSnap = await db.collection('campusLocations').doc(friend.uid).get();
+          if (!locSnap.exists) return null;
+          const loc = locSnap.data();
+          const updatedAt = loc.updatedAt && typeof loc.updatedAt.toMillis === 'function' ? loc.updatedAt.toMillis() : 0;
+          if (updatedAt < Date.now() - CAMPUS_LOCATION_MAX_AGE) return null;
+          if (!Number.isFinite(loc.lat) || !Number.isFinite(loc.lng) || Math.abs(loc.lat)>90 || Math.abs(loc.lng)>180) return null;
+          return { ...friend, lat:loc.lat, lng:loc.lng, updatedAt };
+        } catch (e) { return null; }
+      }));
+      campusMapMarkers.forEach(m => campusLeafletMap.removeLayer(m));
+      campusMapMarkers = [];
+      results.filter(Boolean).forEach(friend => {
+        const marker = L.marker([friend.lat,friend.lng], { icon:campusAvatarIcon(friend) }).addTo(campusLeafletMap);
+        marker.bindTooltip(esc(friend.name || friend.handle) + ' · ' + Math.max(1,Math.floor((Date.now()-friend.updatedAt)/60000)) + ' dk önce');
+        marker.on('click', () => viewUserProfileByHandle(friend.handle));
+        campusMapMarkers.push(marker);
+      });
+      campusMessage(results.filter(Boolean).length ? results.filter(Boolean).length + ' karşılıklı takip arkadaşının güncel konumu haritada.' : 'Şu anda paylaşım yapan karşılıklı takip arkadaşın yok.');
+    }
+    async function enableCampusLocationSharing() {
+      if (!isLoggedIn || !currentUserData || !auth.currentUser) {
+        campusMessage('Konum paylaşmak için önce giriş yapmalısın.', true); return;
+      }
+      const check = document.getElementById('campusConsentCheck');
+      if (!check || !check.checked) { campusMessage('Devam etmek için aydınlatma özetini okuyup açık rıza kutusunu işaretlemelisin.', true); return; }
+      if (!navigator.geolocation) { campusMessage('Bu tarayıcı konum hizmetini desteklemiyor.', true); return; }
+      if (!window.isSecureContext) { campusMessage('Konum paylaşımı için güvenli bağlantı (HTTPS) gerekli.', true); return; }
+      if (campusWatchId !== null) navigator.geolocation.clearWatch(campusWatchId);
+      campusMessage('Tarayıcı konum izni bekleniyor…');
+      campusSetSharingUI(false, 'Konum izni bekleniyor…');
+      campusLastWriteAt = 0; campusLastCoords = null;
+      campusWatchId = navigator.geolocation.watchPosition(async position => {
+        try {
+          const c = { lat:position.coords.latitude, lng:position.coords.longitude, accuracy:Math.round(position.coords.accuracy || 0) };
+          if (!Number.isFinite(c.lat) || !Number.isFinite(c.lng) || !Number.isFinite(c.accuracy) || c.accuracy > 250) {
+            campusMessage('Konum doğruluğu yeterli değil. Daha açık bir alanda tekrar dene.', true); return;
+          }
+          const now = Date.now();
+          if (campusLastCoords && now-campusLastWriteAt<CAMPUS_MIN_WRITE_MS && campusDistanceMeters(campusLastCoords,c)<CAMPUS_MIN_MOVE_METERS) return;
+          const ref = db.collection('campusLocations').doc(currentUserData.uid);
+          const old = await ref.get();
+          const data = {
+            uid:currentUserData.uid, lat:c.lat, lng:c.lng, accuracy:c.accuracy,
+            updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+            consentVersion:CAMPUS_CONSENT_VERSION
+          };
+          if (!old.exists) data.consentedAt = firebase.firestore.FieldValue.serverTimestamp();
+          await ref.set(data,{merge:true});
+          campusLastWriteAt=now; campusLastCoords=c;
+          campusSetSharingUI(true,'Konumun paylaşılıyor. İstediğin an paylaşımı kapatıp silebilirsin.');
+          campusMessage('Konum güncellendi. Son doğruluk: yaklaşık ' + c.accuracy + ' metre.');
+          refreshCampusFriends();
+        } catch (e) {
+          console.error('Kampüs konumu kaydedilemedi:',e);
+          campusMessage('Konum kaydedilemedi: ' + (e.code || e.message) + '. Güvenlik kurallarının güncel olduğundan emin ol.',true);
+          if (campusWatchId !== null) navigator.geolocation.clearWatch(campusWatchId);
+          campusWatchId=null; campusSetSharingUI(false);
+        }
+      }, error => {
+        const msg = error.code===1 ? 'Konum iznini reddettin. Paylaşımı başlatmak için tarayıcı ayarlarından izin vermelisin.' : error.code===2 ? 'Cihaz konumu belirleyemedi. GPS ve konum servislerini kontrol et.' : 'Konum isteği zaman aşımına uğradı. Tekrar deneyebilirsin.';
+        campusMessage(msg,true);
+        if (campusWatchId !== null) navigator.geolocation.clearWatch(campusWatchId);
+        campusWatchId=null; campusSetSharingUI(false);
+      }, { enableHighAccuracy:true, maximumAge:10000, timeout:20000 });
+    }
+    async function disableCampusLocationSharing() {
+      if (campusWatchId !== null) navigator.geolocation.clearWatch(campusWatchId);
+      campusWatchId=null; campusLastCoords=null; campusLastWriteAt=0;
+      try {
+        if (auth.currentUser) await db.collection('campusLocations').doc(auth.currentUser.uid).delete();
+        campusSetSharingUI(false,'Konum paylaşımı kapalı; kayıtlı konum belgen silindi.');
+        campusMessage('Konum paylaşımın kapatıldı ve kayıtlı konumun silindi.');
+        if (document.getElementById('campusConsentCheck')) document.getElementById('campusConsentCheck').checked=false;
+        refreshCampusFriends();
+      } catch(e) { campusMessage('Paylaşım kapatıldı ancak konum belgesi silinemedi: '+(e.code||e.message),true); }
+    }
+    function stopCampusLocationWatch() {
+      if (campusWatchId !== null && navigator.geolocation) navigator.geolocation.clearWatch(campusWatchId);
+      campusWatchId=null;
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopCampusLocationWatch();
+    });
+
 
     // ===== v5: eski kullanıcılar, video/medya, vızzla, takip bildirimi =====
     const postCache = {};
